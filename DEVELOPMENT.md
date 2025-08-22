@@ -62,32 +62,148 @@ Agent-in-the-Loop/
   - We will get nowwhere if we don't comment our code effectively in a group setting, - please maintain this.
 ---
 
-## Usage Guide
+## Getting Started
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/<your-org>/agent-in-the-loop.git
-   cd agent-in-the-loop
+### Prerequisites
+- **Git**: For version control and collaboration
+- **Python 3.8+**: For agent development and ML libraries
+- **Visual Studio Code**: Recommended IDE with extensions
+- **Java Runtime**: Required for MicroRTS simulation engine
 
-2. System Files (local only)
+### 1. Repository Setup
+```bash
+# Clone the repository
+git clone https://github.com/B0rc/Agent-in-the-Loop-Repository.git
+cd Agent-in-the-Loop-Repository
+```
 
-Place the Unity build under system_files/unity_build/
+### 2. Python Virtual Environment Setup
+```bash
+# Create virtual environment
+python -m venv venv
 
-Store maps/configs under system_files/microrts_assets/
+# Activate virtual environment
+# On Windows:
+venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
 
-Store DEAP run logs/outputs under system_files/deap_outputs/
+# Verify activation (should show venv path)
+which python
+```
 
-Add OCR screenshots here for experiments
+### 3. Install Development Dependencies
+Create `requirements.txt` in the repository root:
+```txt
+opencv-python>=4.8.0        # Computer vision for screen capture
+pytesseract>=0.3.10         # OCR text recognition
+numpy>=1.24.0               # Numerical computing
+pillow>=10.0.0              # Image processing
+matplotlib>=3.7.0           # Plotting and visualization
+scikit-learn>=1.3.0         # Machine learning utilities
+pygame>=2.5.0               # Game input simulation
+pyautogui>=0.9.54           # GUI automation
+jupyter>=1.0.0              # Interactive development
+pytest>=7.4.0               # Testing framework
+black>=23.7.0               # Code formatting
+pylint>=2.17.0              # Code linting
+```
 
-⚠️ Do not commit large binaries to Git. Use Git LFS or keep them local.
+Then install:
+```bash
+pip install -r requirements.txt
+```
 
-3. Development Flow
+### 4. VS Code Setup
 
-Start prototypes in /experiments/prototypes/
+#### Required Extensions
+Install these VS Code extensions:
+- `ms-python.python` - Python language support
+- `ms-python.pylint` - Code linting
+- `ms-python.black-formatter` - Code formatting  
+- `ms-toolsai.jupyter` - Jupyter notebook support
+- `eamodio.gitlens` - Enhanced Git capabilities
+- `ms-vscode.hexdump` - Binary file viewing
+- `redhat.vscode-xml` - XML support for map files
 
-Promote stable code into /agent/ submodules
+#### Workspace Configuration
+Create `.vscode/settings.json`:
+```json
+{
+  "python.defaultInterpreterPath": "./venv/Scripts/python",
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.formatting.provider": "black",
+  "files.exclude": {
+    "Project System Files/**": true
+  }
+}
+```
 
-Keep static context docs in /project_context/
+### 5. Project Structure Creation
+```bash
+# Create planned directory structure
+mkdir agent experiments project_context
+mkdir agent/screen_reading agent/decision_logic agent/action_execution
+mkdir agent/visualisation agent/integration agent/tests
+mkdir experiments/prototypes
+
+# Add placeholder files
+echo "# Screen Reading Module" > agent/screen_reading/README.md
+echo "# Decision Logic Module" > agent/decision_logic/README.md  
+echo "# Action Execution Module" > agent/action_execution/README.md
+echo "# Visualisation Module" > agent/visualisation/README.md
+echo "# Integration Module" > agent/integration/README.md
+echo "# Test Suite" > agent/tests/README.md
+echo "# Prototypes Area" > experiments/prototypes/README.md
+```
+
+### 6. Virtual Environment Usage
+
+#### Daily Development Workflow
+```bash
+# Always activate venv before working
+cd Agent-in-the-Loop-Repository
+venv\Scripts\activate  # Windows
+# source venv/bin/activate  # macOS/Linux
+
+# Your terminal prompt should now show (venv)
+# Install new packages as needed
+pip install package-name
+
+# Deactivate when done
+deactivate
+```
+
+#### VS Code Python Interpreter
+1. Open VS Code in the repository: `code .`
+2. Press `Ctrl+Shift+P` (Command Palette)
+3. Type "Python: Select Interpreter"
+4. Choose `./venv/Scripts/python.exe`
+
+### 7. System Files Setup (Local Only)
+- Obtain evolutionary RTS system files from team lead
+- Place under `Project System Files/` directory
+- Test system: `cd "Project System Files" && RTSViewer.exe`
+
+### 8. Verification
+```bash
+# Test Python environment
+python --version
+pip list
+
+# Test repository structure
+git status
+tree /f  # Windows - shows directory structure
+```
+
+### Development Workflow
+1. **Always activate venv**: `venv\Scripts\activate`
+2. **Create feature branch**: `git checkout -b feature/your-feature`
+3. **Start with prototypes**: Work in `experiments/prototypes/`
+4. **Move to production**: Stable code goes in `agent/`
+5. **Test regularly**: Use `pytest` in `agent/tests/`
+6. **Format code**: Run `black .` before commits
 
 ## Current System Commands
 

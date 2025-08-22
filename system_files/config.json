@@ -1,0 +1,9 @@
+{
+    "seed": "123",
+    "generations": 10,
+    "population": 30,
+    "mutation": 1.0,
+    "end_mutation": 0.01,
+    "crossover": 0.9,
+    "injection_interval": 10
+}
