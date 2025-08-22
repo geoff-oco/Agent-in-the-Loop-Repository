@@ -95,14 +95,7 @@ which python
 ### 3. Install Development Dependencies
 Create `requirements.txt` in the repository root:
 ```txt
-opencv-python>=4.8.0        # Computer vision for screen capture
-pytesseract>=0.3.10         # OCR text recognition
 numpy>=1.24.0               # Numerical computing
-pillow>=10.0.0              # Image processing
-matplotlib>=3.7.0           # Plotting and visualization
-scikit-learn>=1.3.0         # Machine learning utilities
-pygame>=2.5.0               # Game input simulation
-pyautogui>=0.9.54           # GUI automation
 jupyter>=1.0.0              # Interactive development
 pytest>=7.4.0               # Testing framework
 black>=23.7.0               # Code formatting
@@ -116,15 +109,30 @@ pip install -r requirements.txt
 
 ### 4. VS Code Setup
 
-#### Required Extensions
-Install these VS Code extensions:
-- `ms-python.python` - Python language support
-- `ms-python.pylint` - Code linting
-- `ms-python.black-formatter` - Code formatting  
-- `ms-toolsai.jupyter` - Jupyter notebook support
-- `eamodio.gitlens` - Enhanced Git capabilities
-- `ms-vscode.hexdump` - Binary file viewing
-- `redhat.vscode-xml` - XML support for map files
+#### Install Required Extensions
+**Option 1: Via Extensions Panel**
+1. Open VS Code
+2. Click Extensions icon (Ctrl+Shift+X)
+3. Search and install each extension:
+   - `ms-python.python` - Python language support
+   - `ms-python.pylint` - Code linting
+   - `ms-python.black-formatter` - Code formatting  
+   - `ms-toolsai.jupyter` - Jupyter notebook support
+   - `eamodio.gitlens` - Enhanced Git capabilities
+   - `ms-vscode.hexdump` - Binary file viewing
+   - `redhat.vscode-xml` - XML support for map files
+
+**Option 2: Via Command Line**
+```bash
+# Install all extensions at once
+code --install-extension ms-python.python
+code --install-extension ms-python.pylint
+code --install-extension ms-python.black-formatter
+code --install-extension ms-toolsai.jupyter
+code --install-extension eamodio.gitlens
+code --install-extension ms-vscode.hexdump
+code --install-extension redhat.vscode-xml
+```
 
 #### Workspace Configuration
 Create `.vscode/settings.json`:

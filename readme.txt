@@ -49,36 +49,66 @@ Agent-in-the-Loop/
 
 ## 🚀 Getting Started
 
+### Quick Setup
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/<your-org>/agent-in-the-loop.git
-   cd agent-in-the-loop
+   git clone https://github.com/B0rc/Agent-in-the-Loop-Repository.git
+   cd Agent-in-the-Loop-Repository
+   ```
 
-2. Where to Work
+2. **Setup Python Environment**
+   ```bash
+   # Create virtual environment
+   python -m venv venv
+   
+   # Activate virtual environment
+   venv\Scripts\activate  # Windows
+   # source venv/bin/activate  # macOS/Linux
+   
+   # Install dependencies (numpy, matplotlib, jupyter, pytest, black, pylint)
+   pip install -r requirements.txt
+   ```
 
-   New ideas → /experiments/prototypes/
+3. **VS Code Setup (Recommended)**
+   
+   **Install Extensions:**
+   - Via Extensions Panel (Ctrl+Shift+X), search and install:
+     - `ms-python.python` - Python support
+     - `ms-python.pylint` - Code linting
+     - `ms-python.black-formatter` - Code formatting
+     - `ms-toolsai.jupyter` - Jupyter notebooks
+     - `eamodio.gitlens` - Git integration
+   
+   **Or via Command Line:**
+   ```bash
+   code --install-extension ms-python.python
+   code --install-extension ms-python.pylint
+   code --install-extension ms-python.black-formatter
+   code --install-extension ms-toolsai.jupyter
+   code --install-extension eamodio.gitlens
+   ```
+   
+   **Open in VS Code:**
+   ```bash
+   code .
+   ```
+   
+   **Select Python Interpreter:**
+   - Press `Ctrl+Shift+P`
+   - Type "Python: Select Interpreter"
+   - Choose `./venv/Scripts/python.exe`
 
-   Stable modules → /agent/
+### Development Workflow
+- **Always activate venv**: `venv\Scripts\activate` before coding
+- **Branch naming**: `feature/<description>` for features, `docs/<description>` for docs
+- **Code locations**:
+  - New ideas → `experiments/prototypes/`
+  - Stable modules → `agent/`
+  - Tests → `agent/tests/`
+  - Documentation → `project_context/`
 
-   Tests → /agent/tests/
+### Important Notes
+⚠️ **Large Files**: Do not commit Unity builds or large binaries. Keep system files local only.
 
-   Static docs → /project_context/
-
-   System artefacts → /system_files/ (local-only, avoid committing large binaries)
-
-   Branch Naming
-
-      feature/<short-description> → code features
-
-      docs/<short-description> → documentation updates
-
-      Use Pull Requests for merging into main. Keep prototypes separate from production-ready modules.
-
-⚠️ Large Files
-
-   Do not commit Unity builds or large binaries directly.
-
-   If essential, configure .gitattributes with Git LFS.
-
-   Otherwise, store artefacts locally and reference them in system_files/README.md.
+📖 **Detailed Setup**: See `DEVELOPMENT.md` for complete setup instructions and VS Code configuration.
 
