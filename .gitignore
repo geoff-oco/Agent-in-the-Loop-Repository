@@ -1,12 +1,6 @@
 # Project System Files - Large binaries and build outputs
 Project System Files/
 
-# Agent development
-agent/
-
-# Experiments and prototypes
-experiments/
-
 # Python
 __pycache__/
 *.py[cod]
