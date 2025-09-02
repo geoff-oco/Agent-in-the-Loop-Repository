@@ -1,0 +1,10 @@
+This is some example text of the program reading from a text file. the line here is quite long to demonstrate the wrapping of text in the ui, but currently the text wrapping is not dynamic. Yet.
+
+In Phase one I recomend:
+    - put all your units on base 1. 
+
+In Phase two I recomend:
+    - move the units back to home base.
+
+In Phase three I recomend:
+    - attaking both remaining bases split evenly.
