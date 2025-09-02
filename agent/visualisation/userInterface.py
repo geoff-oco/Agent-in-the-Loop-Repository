@@ -25,7 +25,7 @@ def transparency_callback(sender, app_data, user_data): # Checkbox is commented 
         print("not done")
 
 #Output section reads from "strategyExample.txt"
-file = open("strategyExample.txt")
+file = open("agent/visualisation/strategyExample.txt")
 
 
 #This section defines the window and its widgets
