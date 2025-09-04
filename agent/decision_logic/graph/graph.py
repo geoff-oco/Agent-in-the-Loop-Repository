@@ -1,7 +1,7 @@
 from typing import List, Dict, Optional, Any
 from pydantic import BaseModel, Field      # BaseModel is the state object for our graph as it evolves in play.
 from langgraph.graph import StateGraph, END  # Stategraph will allow us nodes and edges and END is the required last node.
-from helpers.Helpers import Helpers # import our helper clas for helper functions
+from ..helpers.Helpers import Helpers # import our helper clas for helper functions
 
 # State Object
 class ChatState(BaseModel): #Base model arguments our our model and API base at minimum
@@ -46,13 +46,13 @@ def node_chat(state: ChatState) -> ChatState: #This changes the chatstate
     try:
         reply = Helpers._ollama_chat(state.base_url, state.model, state.system, state.messages) #calling our helper method with payload and parmters already set up
     except Exception as e:
-        # If Ollama isn’t running or something breaks, give a safe fallback reply.
+        # If Ollama isnï¿½t running or something breaks, give a safe fallback reply.
         reply = (
             "(model unavailable) Minimal fallback: focus economy, spend resources, Game Over man, game over! "
             f"Error: {e}"
         )
 
-    # Add Ollama’s reply into the chat history as an assistant message
+    # Add Ollamaï¿½s reply into the chat history as an assistant message
     state.messages.append({"role": "assistant", "content": reply})
 
     # Also store the reply separately in last_reply for history purposes

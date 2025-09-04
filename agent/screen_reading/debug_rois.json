@@ -1,0 +1,379 @@
+{
+  "timestamp": "2025-09-04T13:19:55.035629",
+  "window_bounds": [
+    0,
+    0,
+    1920,
+    1080
+  ],
+  "rois_processed": 23,
+  "overall_success": true,
+  "success_rate": 0.3333333333333333,
+  "roi_results": {
+    "phase_header": {
+      "coordinates": [
+        1312,
+        1008,
+        127,
+        31
+      ],
+      "extracted_data": {
+        "phase": 0
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "Phase 0"
+    },
+    "ler_panel": {
+      "coordinates": [
+        1602,
+        36,
+        271,
+        31
+      ],
+      "extracted_data": {
+        "blue_ratio": 1.0,
+        "red_ratio": 1.0,
+        "favour": "Blue"
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "enBee2ell"
+    },
+    "blue_blue_units": {
+      "coordinates": [
+        312,
+        814,
+        34,
+        72
+      ],
+      "extracted_data": {
+        "raw_crop": "<Image array: ndarray>"
+      },
+      "confidence": 100.0,
+      "success": true,
+      "error_message": null,
+      "raw_text": "Units column data"
+    },
+    "blue_blue_light_adj": {
+      "coordinates": [
+        348,
+        815,
+        27,
+        21
+      ],
+      "extracted_data": {
+        "value": 0
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "0"
+    },
+    "blue_blue_heavy_adj": {
+      "coordinates": [
+        345,
+        840,
+        33,
+        20
+      ],
+      "extracted_data": {
+        "value": 0
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "0"
+    },
+    "blue_blue_ranged_adj": {
+      "coordinates": [
+        347,
+        862,
+        30,
+        21
+      ],
+      "extracted_data": {
+        "value": 0
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "0"
+    },
+    "blue_red_units": {
+      "coordinates": [
+        400,
+        811,
+        35,
+        73
+      ],
+      "extracted_data": {
+        "raw_crop": "<Image array: ndarray>"
+      },
+      "confidence": 100.0,
+      "success": true,
+      "error_message": null,
+      "raw_text": "Units column data"
+    },
+    "red1_blue_units": {
+      "coordinates": [
+        779,
+        279,
+        31,
+        61
+      ],
+      "extracted_data": {
+        "raw_crop": "<Image array: ndarray>"
+      },
+      "confidence": 100.0,
+      "success": true,
+      "error_message": null,
+      "raw_text": "Units column data"
+    },
+    "red1_blue_light_adj": {
+      "coordinates": [
+        810,
+        280,
+        39,
+        17
+      ],
+      "extracted_data": {
+        "value": 0
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "0"
+    },
+    "red1_blue_heavy_adj": {
+      "coordinates": [
+        808,
+        298,
+        43,
+        20
+      ],
+      "extracted_data": {
+        "value": 0
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "0"
+    },
+    "red1_blue_ranged_adj": {
+      "coordinates": [
+        808,
+        320,
+        43,
+        19
+      ],
+      "extracted_data": {
+        "value": 0
+      },
+      "confidence": 5.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "0"
+    },
+    "red1_red_units": {
+      "coordinates": [
+        856,
+        279,
+        34,
+        61
+      ],
+      "extracted_data": {
+        "raw_crop": "<Image array: ndarray>"
+      },
+      "confidence": 100.0,
+      "success": true,
+      "error_message": null,
+      "raw_text": "Units column data"
+    },
+    "red2_blue_units": {
+      "coordinates": [
+        1202,
+        99,
+        33,
+        56
+      ],
+      "extracted_data": {
+        "raw_crop": "<Image array: ndarray>"
+      },
+      "confidence": 100.0,
+      "success": true,
+      "error_message": null,
+      "raw_text": "Units column data"
+    },
+    "red2_blue_light_adj": {
+      "coordinates": [
+        1234,
+        99,
+        34,
+        17
+      ],
+      "extracted_data": {
+        "value": 0
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "0"
+    },
+    "red2_blue_heavy_adj": {
+      "coordinates": [
+        1235,
+        116,
+        34,
+        20
+      ],
+      "extracted_data": {
+        "value": 0
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "0"
+    },
+    "red2_blue_ranged_adj": {
+      "coordinates": [
+        1234,
+        136,
+        35,
+        20
+      ],
+      "extracted_data": {
+        "value": 0
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "0"
+    },
+    "red2_red_units": {
+      "coordinates": [
+        1270,
+        97,
+        41,
+        57
+      ],
+      "extracted_data": {
+        "raw_crop": "<Image array: ndarray>"
+      },
+      "confidence": 100.0,
+      "success": true,
+      "error_message": null,
+      "raw_text": "Units column data"
+    },
+    "red3_blue_units": {
+      "coordinates": [
+        1057,
+        572,
+        43,
+        65
+      ],
+      "extracted_data": {
+        "raw_crop": "<Image array: ndarray>"
+      },
+      "confidence": 100.0,
+      "success": true,
+      "error_message": null,
+      "raw_text": "Units column data"
+    },
+    "red3_blue_light_adj": {
+      "coordinates": [
+        1101,
+        570,
+        38,
+        24
+      ],
+      "extracted_data": {
+        "value": 0
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "0"
+    },
+    "red3_blue_heavy_adj": {
+      "coordinates": [
+        1099,
+        592,
+        42,
+        23
+      ],
+      "extracted_data": {
+        "value": 0
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "0"
+    },
+    "red3_blue_ranged_adj": {
+      "coordinates": [
+        1101,
+        617,
+        41,
+        21
+      ],
+      "extracted_data": {
+        "value": 0
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": null,
+      "raw_text": "0"
+    },
+    "red3_red_units": {
+      "coordinates": [
+        1145,
+        569,
+        38,
+        69
+      ],
+      "extracted_data": {
+        "raw_crop": "<Image array: ndarray>"
+      },
+      "confidence": 100.0,
+      "success": true,
+      "error_message": null,
+      "raw_text": "Units column data"
+    },
+    "action_panel": {
+      "coordinates": [
+        1577,
+        72,
+        329,
+        985
+      ],
+      "extracted_data": {},
+      "confidence": 0.0,
+      "success": false,
+      "error_message": "Unknown ROI type: action_panel",
+      "raw_text": null
+    },
+    "action_cards": {
+      "coordinates": [
+        0,
+        0,
+        1,
+        1
+      ],
+      "extracted_data": {
+        "phases": {
+          "1": [],
+          "2": [],
+          "3": []
+        },
+        "cards": []
+      },
+      "confidence": 0.0,
+      "success": false,
+      "error_message": "No action cards detected",
+      "raw_text": null
+    }
+  }
+}

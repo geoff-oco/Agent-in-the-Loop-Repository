@@ -1,6 +1,6 @@
 import os # Gives us tools to work with environment variables and file paths
 from dotenv import load_dotenv # Lets us load values from a .env file into environment variables
-from graph.graph import build_graph, ChatState  # Import our ChatState class and build_graph function from graph.py
+from .graph.graph import build_graph, ChatState  # Import our ChatState class and build_graph function from graph.py
 
 def main():
     load_dotenv()

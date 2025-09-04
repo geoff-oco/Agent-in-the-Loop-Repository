@@ -1,0 +1,59 @@
+{
+  "timestamp": "2025-09-04T13:19:55.035629",
+  "phase": 0,
+  "ler": {
+    "blue": 1.0,
+    "red": 1.0,
+    "favour": "Blue"
+  },
+  "bases": {
+    "blue": {
+      "blue": {
+        "light": 0,
+        "heavy": 0,
+        "ranged": 0
+      },
+      "red": {
+        "light": 0,
+        "heavy": 0,
+        "ranged": 0
+      }
+    },
+    "red1": {
+      "blue": {
+        "light": 0,
+        "heavy": 0,
+        "ranged": 0
+      },
+      "red": {
+        "light": 7,
+        "heavy": 0,
+        "ranged": 0
+      }
+    },
+    "red2": {
+      "blue": {
+        "light": 0,
+        "heavy": 0,
+        "ranged": 0
+      },
+      "red": {
+        "light": 0,
+        "heavy": 0,
+        "ranged": 0
+      }
+    },
+    "red3": {
+      "blue": {
+        "light": 0,
+        "heavy": 0,
+        "ranged": 0
+      },
+      "red": {
+        "light": 0,
+        "heavy": 0,
+        "ranged": 0
+      }
+    }
+  }
+}
