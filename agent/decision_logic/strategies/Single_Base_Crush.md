@@ -1,0 +1,9 @@
+- **Goal:** Maximise LER by taking one weak/isolated red base first, then rolling momentum to adjacent bases.
+- **Assumptions:** Red only defends near its base; Base 10HP; Heavy slow 4HP/4DMG; Light fast 4HP/2DMG; Ranged long range 1HP/1DMG.
+- **Action Controls:** **Lock** a single-lane opening; **Delete** early splits; **Insert** follow-ups from captured bases; **Edit** to maintain a tough frontline and protected backline.
+- **When to use:** A clear weakest or most accessible base is identifiable.
+- **P1:** Lock a concentrated push onto the weakest base; lead with Heavies to draw aggro; keep Ranged protected; hold Lights to finish.
+- **P2:** Insert a pivot from the captured base to the next nearest/softest base; keep forces grouped and protected.
+- **P3:** Insert a final push from your closest held base onto the last red base; preserve the screen and avoid trickling.
+- **General:** Favour one decisive lane until the first capture; re-form if the line thins; keep Ranged behind the screen; avoid early Light trades.
+- **Risks & Mitigations:** Overextension → pause and consolidate; Ranged exposure → slow advance with a solid Heavy screen.

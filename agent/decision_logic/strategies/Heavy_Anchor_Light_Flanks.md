@@ -1,0 +1,9 @@
+- **Goal:** Pin defenders with a Heavy anchor while Lights exploit flanks; Ranged add safe chip from behind.
+- **Assumptions:** Lights are fast and durable enough to flank once defenders are engaged; Red won’t chase far.
+- **Action Controls:** **Lock** the anchor lane; **Insert** a delayed Light flank; **Delete** ranged-only probes; **Edit** to keep the anchor solid.
+- **When to use:** There is space around the target base to flank without crossing heavy fire.
+- **P1:** Lock a Heavy-led approach to draw aggro; insert a small delayed Light group to threaten edges while defenders are pinned.
+- **P2:** Insert a follow-up from the captured/forward base toward the next objective, leveraging the established flank.
+- **P3:** Insert a balanced closing push; maintain the anchor and keep Ranged protected.
+- **General:** Time flanks to coincide with peak anchor engagement; never lead with Ranged; regroup if the anchor weakens.
+- **Risks & Mitigations:** Lights burst down → enter during anchor engagement; anchor collapses → reinforce the screen before committing flanks.

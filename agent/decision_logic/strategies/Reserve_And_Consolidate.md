@@ -1,0 +1,9 @@
+- **Goal:** Protect LER by avoiding marginal trades and committing only with local superiority; keep a small reserve to stabilise.
+- **Assumptions:** Red won’t pursue far; you can disengage and re-form when needed.
+- **Action Controls:** **Lock** single-lane pushes; **Delete** splits that expose Ranged; **Edit** to hold a small reserve; **Insert** only when superiority is clear.
+- **When to use:** Totals are tight and you must minimise risk.
+- **P1:** Lock a modest, safe approach on the easiest base; let Ranged do work behind a stable screen.
+- **P2:** Insert a short push only when your formation is healthy; otherwise Edit to reinforce the frontline and reset the posture.
+- **P3:** Insert the final push from the nearest held base once you clearly hold local advantage.
+- **General:** Pause rather than feed losses; use the reserve to cover rotations and keep Ranged safe.
+- **Risks & Mitigations:** Attrition creep → step back and rebuild; Ranged exposed → move reserve Heavy forward to cover.

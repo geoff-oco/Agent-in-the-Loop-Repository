@@ -1,0 +1,9 @@
+- **Goal:** Win LER by letting Ranged do sustained damage from safety behind a Heavy shield.
+- **Assumptions:** Ranged threaten at long distance but are fragile; Red holds ground near bases.
+- **Action Controls:** **Lock** a siege posture at defender edge; **Delete** unprotected pokes; **Insert** small Heavy top-ups; **Edit** to maintain the screen.
+- **When to use:** The target base is densely defended and direct brawls would be costly.
+- **P1:** Lock a siege lane onto a single base; hold Heavies at the engagement edge; keep Ranged one step back; avoid diving.
+- **P2:** Insert/Edit rotations to refresh the screen and sustain pressure; keep the formation intact.
+- **P3:** Insert a short transfer of the siege to the next base once the first falls; finish structures after defenders thin.
+- **General:** Lights scout and finish; prioritise steady attrition over fast dives; keep spacing disciplined.
+- **Risks & Mitigations:** Screen collapse → halt and re-form; low structure DPS → commit Lights only after defenders are reduced.
