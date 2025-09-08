@@ -21,12 +21,14 @@ def node(state):
         msgs.append(SystemMessage(content=sys_txt))
     msgs.append(HumanMessage(content=body))
 
+    Helpers.log("sending request for new strategy to LLM...")
+
     # aaand send it!
     ai: AIMessage = llm.invoke(msgs)
 
     # LOG what the LLM replied
     reply_text = ai.content if isinstance(ai.content, str) else str(ai.content)
-    Helpers.log(f"[advise] LLM reply (truncated): {reply_text[:2000]}")
+    Helpers.log("Received new strategy from LLM")
 
     #finalise state
     state.last_reply = reply_text if isinstance(reply_text, str) and reply_text.strip() else "No advice available."

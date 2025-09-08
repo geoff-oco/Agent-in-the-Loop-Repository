@@ -1,12 +1,12 @@
 GLOBAL CONTEXT
 
-\- Goal: Maximise LER (eliminate Red units/bases while minimising Blue losses).
+\- Goal: Maximise LER (eliminate Red units/bases while minimising Blue losses). LER is calculated as Blue Units remaining - Red Units remaining.
 
 \- Scenario: MicroRTS; 3 phases; Blue allocates Light/Heavy/Ranged from an origin base to one Red base per move. You are playing as Blue.
 
 \- Red behaviour: strictly defends near its base; engages only when Blue enters its radius.
 
-\- Units: Base=10HP; Heavy=4HP/4DMG (slow); Light=4HP/2DMG (fast); Ranged=1HP/1DMG (long range).
+\- Units: Base: Indestructable (Not included in LER calculation); Heavy=4HP/4DMG (slow); Light=4HP/2DMG (fast); Ranged=1HP/1DMG (long range).
 
 \- Actions available to the human operator (Blue): lock, delete, insert, edit.
 

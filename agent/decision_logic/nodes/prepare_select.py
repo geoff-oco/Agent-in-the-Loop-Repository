@@ -28,6 +28,8 @@ def node(state):
         msgs.append(SystemMessage(content=sys_txt))
     msgs.append(HumanMessage(content="\n\n".join([t for t in [glob_txt, sel_txt, inst, listing, game_json] if t])))
 
+    Helpers.log(f"[select] Invoking LLM for first pass with model {state.model} at {state.base_url} with initial tool call...")
+
     ai: AIMessage = llm.invoke(msgs) # Invoke the LLM with the constructed messages, expecting a tool call in response
     msgs.append(ai) # Append the LLM's response to the message list
 
