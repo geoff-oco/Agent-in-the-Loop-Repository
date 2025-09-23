@@ -64,6 +64,7 @@ class ExternalOverlay:
         dpg.show_viewport()
         self._set_handles()
         self._set_dpg_win_transparent()
+        #dpg.show_style_editor() # for show of Style
         self.ui_to_run(self.target_hwnd)
         dpg.start_dearpygui()
         dpg.destroy_context()

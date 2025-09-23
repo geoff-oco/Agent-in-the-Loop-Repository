@@ -19,7 +19,7 @@ Sets dearPyGui layout.
 ### _callback functions
 
 These functions are directly tied to the buttons. 
-_generation_callback() and _screenCapture_callback() call functions as threads, to allow interactivity with the GUI to continue while these run in the background. This is what makes canceling possible.
+_generation_callback() calls the _run_agent function as a thread, to allow interactivity with the GUI to continue while these run in the background. This is what makes canceling possible.
 
 _stopButton_callback() simply cancels the run_agent() and run_orc functions
 
