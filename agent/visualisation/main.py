@@ -1,5 +1,5 @@
 from external_overlay.external_overlay import ExternalOverlay
-from ui_new import ui
+from ui import ui
 
 def main():
     overlay = ExternalOverlay("RTSViewer", ui)
