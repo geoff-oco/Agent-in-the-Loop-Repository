@@ -1,5 +1,6 @@
 import dearpygui.dearpygui as dpg
 import threading
+from multiprocessing import Process
 import time
 import psutil
 import win32gui
@@ -34,10 +35,8 @@ def _generation_callback(sender, app_data, user_data):
     '''Handles button press response of \"Generate Strategy\"
     
         Called on  button press'''
-    
     print("button was pressed")
-
-    thread = threading.Thread(target=_run_agent)
+    thread = threading.Thread(target=_generate_button_pressed)
     thread.start()
 
 
@@ -63,21 +62,31 @@ def _change_ui_state(running):
         dpg.hide_item("loading_ind")
 
 
-def _run_agent():
-    '''Function that runs the agent.
+def _generate_button_pressed():
+    '''This function is called as a thread when the Generate Strategy button is pressed 
     
-        Currently uses a timer to simulate the agent.'''
-    with open("agent/visualisation/strategyExample.txt") as file:
+        When this button is pressed, it opens the txt file it will be reading from. If the
+        agent has run without being canceled it will print that text onto the output window.
+        
+        The agent will be run in another process. If the running flag is set
+        to false via cancel button press, this process is terminated early.
+
+        This function also manages the ui state changes while running'''
+    
+    with open("agent/visualisation/finalOutput.txt") as file:
         global running
         running = True
         _change_ui_state(running)
 
-        for i in range(70):
-            if running:
-                time.sleep(0.05)
-            else:
+        process = Process(target=_run_agent,daemon=True)
+
+        process.start()
+        while process.is_alive():
+            if not running:
+                process.terminate()
                 break
 
+        process.join()
         if running:
             file.seek(0)
             dpg.set_value("outputText",file.read())
@@ -87,4 +96,10 @@ def _run_agent():
         _change_ui_state(running)
 
 
+def _run_agent():
+    '''This is the function that runs the ORC and Agent, in that order.
+        This will be called as a seperate process.
 
+        Contains timer to serve as an example for now.'''
+    time.sleep(8)
+    
