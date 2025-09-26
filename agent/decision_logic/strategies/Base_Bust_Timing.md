@@ -1,9 +1,0 @@
-- **Goal:** Convert thinned defenses into quick base kills to avoid prolonged trades and protect LER.
-- **Assumptions:** Base has limited HP; Lights provide strong structure damage; Red defends close.
-- **Action Controls:** **Lock** an initial approach; **Edit** to switch from defender trades to base focus at the right moment; **Delete** pointless chip once base is open; **Insert** short follow-ups.
-- **When to use:** You can reach the base cleanly and expect to thin defenders without heavy losses.
-- **P1:** Lock a clean approach to the chosen base; hold base focus until defenders are softened; then swap to rapid structure finish.
-- **P2:** Insert an immediate transfer from the captured base toward the next nearest objective to keep momentum.
-- **P3:** Insert a final, concentrated finish onto the last base without trickling in.
-- **General:** Guard the screen while Lights finish; prefer a short, decisive base burn over extended skirmishing.
-- **Risks & Mitigations:** Premature dive → wait for a better window; screen breaks → pause, re-form, then finish.

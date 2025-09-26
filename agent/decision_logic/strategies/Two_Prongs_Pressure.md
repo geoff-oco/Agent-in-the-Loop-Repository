@@ -1,9 +1,0 @@
-- **Goal:** Create defender indecision by pinning one base while lightly probing another, then collapse onto the weaker target.
-- **Assumptions:** Red splits attention poorly across multiple fronts but stays near bases.
-- **Action Controls:** **Lock** the pin lane; **Insert** a light probe; **Delete** third lanes; **Edit** to keep the pin durable.
-- **When to use:** You can afford a safe pin and a safe probe without thinning either to risk.
-- **P1:** Lock a durable pin on the primary base; insert a light-only probe on a secondary base; abort the probe if defenders mass there.
-- **P2:** Edit to shift mass onto the weaker of the two targets; keep Ranged central so fire can refocus quickly.
-- **P3:** Insert a single-axis mass push from a held base to finish the remaining target.
-- **General:** The probe is expendable; the pin is not—protect the anchor; avoid over-splitting.
-- **Risks & Mitigations:** Probe trapped → cancel and converge; pin weakens → reinforce pin before committing elsewhere.
