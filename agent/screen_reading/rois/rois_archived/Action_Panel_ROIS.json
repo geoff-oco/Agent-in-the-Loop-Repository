@@ -1,0 +1,32 @@
+{
+  "action_scrollbar": {
+    "name": "action_scrollbar",
+    "x": 0.8115816767502161,
+    "y": 0.015384615384615385,
+    "w": 0.01296456352636128,
+    "h": 0.9507692307692308,
+    "notes": "Scrollbar for action panel - used for presence detection via color variance",
+    "char_filter": "",
+    "filter_mode": "whitelist",
+    "expected_values": "",
+    "pattern": "",
+    "ocr_scale": 1.0,
+    "preferred_method": "Auto-Select",
+    "padding_pixels": 0
+  },
+  "action_panel": {
+    "name": "action_panel",
+    "x": 0.8219533275713051,
+    "y": 0.016923076923076923,
+    "w": 0.17634488388188505,
+    "h": 0.9494068329490674,
+    "notes": "Scrollable action cards content area (excluding scrollbar)",
+    "char_filter": "",
+    "filter_mode": "whitelist",
+    "expected_values": "",
+    "pattern": "",
+    "ocr_scale": 1.0,
+    "preferred_method": "Auto-Select",
+    "padding_pixels": 0
+  }
+}

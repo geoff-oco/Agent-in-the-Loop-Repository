@@ -1,0 +1,22 @@
+# PaddleOCR-only simplified stack
+pillow
+mss
+numpy
+paddlepaddle>=2.6
+paddleocr>=3,<4
+
+# GPU acceleration (NVIDIA only)
+# To use GPU on Windows, either:
+# 1. python -m pip install paddlepaddle-gpu==3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+# 2. Download wheels from: https://www.paddlepaddle.org.cn/en/install/quick
+# 3. Stick with CPU version above (still fast enough for this use case)
+
+# Automation dependencies
+pyautogui
+opencv-python
+
+# Tesseract OCR support
+pytesseract
+
+# Development tools
+black  # Code formatter (configured in pyproject.toml)

@@ -1,0 +1,17 @@
+{
+  "Red2_FinalUnits": {
+    "name": "Red2_FinalUnits",
+    "x": 0.6064200976971389,
+    "y": 0.15756823821339952,
+    "w": 0.017445917655268678,
+    "h": 0.029776674937965257,
+    "notes": "",
+    "char_filter": "",
+    "filter_mode": "whitelist",
+    "expected_values": "",
+    "pattern": "",
+    "ocr_scale": 1.0,
+    "preferred_method": "Auto-Select",
+    "padding_pixels": 0
+  }
+}

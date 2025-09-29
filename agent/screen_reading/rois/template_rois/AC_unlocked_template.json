@@ -1,0 +1,23 @@
+{
+  "roi": {
+    "name": "AC_locked_template",
+    "x": 0.8265853541185527,
+    "y": 0.13480348131040973,
+    "w": 0.1683136667628945,
+    "h": 0.09571144470105208,
+    "notes": "",
+    "char_filter": "",
+    "filter_mode": "whitelist",
+    "expected_values": "",
+    "pattern": "",
+    "ocr_scale": 1.0,
+    "preprocess": {
+      "grayscale": false,
+      "denoise": false
+    }
+  },
+  "canonical_size": [
+    446,
+    141
+  ]
+}

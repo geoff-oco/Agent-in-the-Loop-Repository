@@ -1,0 +1,17 @@
+{
+  "Red2_FinalUnit": {
+    "name": "Red2_FinalUnit",
+    "x": 0.00995575221238938,
+    "y": 0.16527196652719664,
+    "w": 0.9745575221238938,
+    "h": 0.6851464435146443,
+    "notes": "Red2 Final Unit ROI",
+    "char_filter": "0123456789",
+    "filter_mode": "whitelist",
+    "expected_values": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21",
+    "pattern": "(number)",
+    "ocr_scale": 0.8,
+    "preferred_method": "Auto-Select",
+    "padding_pixels": 5
+  }
+}
