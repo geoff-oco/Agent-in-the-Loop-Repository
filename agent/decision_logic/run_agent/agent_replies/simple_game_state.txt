@@ -1,0 +1,64 @@
+Simple Advice
+
+Summary
+Phase 1 saw a successful capture of Red Base 1 with significant Blue unit retention. Phase 2 maintained control over Red Base 1 and applied pressure on Red Base 3, while Red Base 2 remained untouched. In Phase 3, Blue made a strong push on Red Base 2, achieving a favorable outcome.
+
+Phase 1
+Red1
+- Summary: The push to Red Base 1 was successful, with Blue capturing the base and retaining a strong presence.
+- Lock: Continue using a mix of Heavy and Light units to maintain pressure and secure control.
+- Delete: Consider reducing Ranged units as they were less effective in this phase.
+- Insert: If possible, allocate more Light units to capitalize on the captured base's momentum.
+
+Red2
+- Summary: The attempt on Red Base 2 was unsuccessful, with no Blue units remaining after the phase.
+- Lock: Avoid committing units to Red Base 2 until a stronger position is established.
+- Delete: Remove any plans to attack Red Base 2 directly until Red Base 3 is dealt with.
+- Insert: Focus on reinforcing Red Base 3 to create a pathway to Red Base 2 later.
+
+Red3
+- Summary: The assault on Red Base 3 was partially successful, with Blue units remaining for future phases.
+- Lock: Maintain a strong presence of Heavy units to absorb damage and Light units for quick strikes.
+- Delete: Limit the number of Ranged units as they are not as effective in close combat.
+- Insert: Consider adding more Heavy units to bolster the assault on Red Base 3.
+
+Phase 2
+Red1
+- Summary: Blue maintained control over Red Base 1 with a solid unit presence.
+- Lock: Keep a balanced mix of Heavy and Light units to defend and reinforce the base.
+- Delete: Reduce Ranged units as they are not necessary for holding this base.
+- Insert: If available, add more Light units to prepare for the next phase's offensive.
+
+Red2
+- Summary: Blue made a minimal attempt on Red Base 2, but it was not enough to shift control.
+- Lock: Hold off on further attempts until Red Base 3 is secured.
+- Delete: Remove any units allocated to Red Base 2 for now.
+- Insert: Focus on reinforcing Red Base 3 to create a better opportunity for attacking Red Base 2 later.
+
+Red3
+- Summary: The pressure on Red Base 3 was effective, with Blue units remaining for future phases.
+- Lock: Continue using Heavy units to sustain pressure and Light units for quick engagements.
+- Delete: Limit the number of Ranged units as they are less effective in this scenario.
+- Insert: Consider adding more Heavy units to prepare for a decisive push in the next phase.
+
+Phase 3
+Red1
+- Summary: Blue's control over Red Base 1 remained intact with minimal losses.
+- Lock: Maintain a strong presence of Heavy units to deter any potential counter-attacks.
+- Delete: Remove any excess Light units that are not contributing to the defense.
+- Insert: If possible, add more Heavy units to solidify control.
+
+Red2
+- Summary: Blue successfully launched an attack on Red Base 2, achieving a favorable outcome.
+- Lock: Continue to use a mix of Heavy and Light units for future assaults.
+- Delete: Limit any Ranged units as they are less effective in direct assaults.
+- Insert: Reinforce with additional Heavy units to ensure a strong push.
+
+Red3
+- Summary: Blue maintained a strong presence at Red Base 3, allowing for continued pressure.
+- Lock: Keep a balanced mix of Heavy and Light units for defense and offense.
+- Delete: Consider reducing Ranged units as they are not necessary in this phase.
+- Insert: If available, add more Heavy units to prepare for any potential counter-offensive.
+
+Rationale
+This advice focuses on maximizing Blue's control and minimizing losses by emphasizing unit composition and strategic positioning. By locking effective unit types and reallocating resources wisely, Blue can maintain pressure on Red bases while preparing for decisive pushes. The strategy aims to create a chain of momentum, ensuring that Blue can capitalize on successful captures and maintain a strong presence across the map.

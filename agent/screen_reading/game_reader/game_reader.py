@@ -204,7 +204,8 @@ class LiveGameReader:  # Main game reader orchestrator
                         return False
 
                     print(f"\nAutomatically advancing to Phase {phase_num + 1}...")
-                    self.progress_reporter.update(f"Advancing to Phase {phase_num + 1}...", phase=phase_num)
+                    advance_percentage = 20 + ((phase_num + 1) * 20) - 5  # Slightly less than next phase start
+                    self.progress_reporter.update(f"Advancing to Phase {phase_num + 1}...", phase=phase_num, percentage=advance_percentage)
                     if not self.navigation_controller.next_phase():
                         print(f"Warning: Failed to advance to Phase {phase_num + 1}")
 

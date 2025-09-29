@@ -41,7 +41,7 @@ def node(state: ChatState) -> ChatState:
     }
 
     
-    llm = Helpers.get_langchain_llm(state.model, temperature=0.2, max_tokens=1200)
+    llm = Helpers.get_langchain_llm(state.model, temperature=0.2, max_tokens=2500)
 
     # we finalise the structure for our model
     msgs: List[Any] = [

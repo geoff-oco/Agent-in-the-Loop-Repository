@@ -10,12 +10,14 @@ import sys
 import os
 import json
 from win_termination import terminate_process_tree_aggressive, selective_shutdown, nuclear_shutdown_delayed
+from agent_bridge import AgentBridge
 
 
 running = False
 overlay_instance = None
 current_process = None
 current_subprocess = None
+current_agent_subprocess = None
 
 def ui(tar_hwnd=None, overlay=None):
     '''Function that describes the UI layout and functionality to dearPyGui'''
@@ -88,7 +90,7 @@ def _generation_callback(sender, app_data, user_data):
 
 
 def _stopButton_callback(sender, app_data, user_data):
-    global running, current_process, current_subprocess
+    global running, current_process, current_subprocess, current_agent_subprocess
     running = False
     print("IMMEDIATE CANCEL - Using aggressive termination")
 
@@ -99,6 +101,11 @@ def _stopButton_callback(sender, app_data, user_data):
     if current_subprocess and current_subprocess.poll() is None:
         print(f"Force terminating subprocess PID: {current_subprocess.pid}")
         terminate_process_tree_aggressive(current_subprocess.pid)
+
+    # Terminate agent subprocess if running
+    if current_agent_subprocess and current_agent_subprocess.poll() is None:
+        print(f"Force terminating agent subprocess PID: {current_agent_subprocess.pid}")
+        terminate_process_tree_aggressive(current_agent_subprocess.pid)
 
     # Use selective shutdown to kill only LIVE_GAME_READER processes
     try:
@@ -115,9 +122,10 @@ def _stopButton_callback(sender, app_data, user_data):
         pass
 
     # Update chatbox with completion message
-    dpg.set_value("outputText", "CANCELLED: All processes force terminated\n\nReady for new operation...")
+    dpg.set_value("outputText", "CANCELLED: All processes terminated (screen reading & strategy generation)\n\nReady for new operation...")
 
     # Reset UI state
+    current_agent_subprocess = None
     _change_ui_state(False)
 
 
@@ -177,6 +185,53 @@ def _exit_callback(sender, app_data, user_data):
 
 
 
+def _call_agent_for_strategy():
+    # Run agent strategy generation in a separate thread to avoid blocking UI
+    thread = threading.Thread(target=_run_agent_strategy)
+    thread.start()
+    return True  # Agent successfully launched
+
+
+def _run_agent_strategy():
+    global current_agent_subprocess, running
+
+    # Set UI state to running for agent execution
+    running = True
+    _change_ui_state(True)
+
+    # Generate strategy using the agent bridge
+    try:
+        dpg.set_value("outputText", "STRATEGY GENERATION: Initialising agent...")
+
+        # Create agent bridge
+        bridge = AgentBridge()
+
+        # Update progress
+        dpg.set_value("outputText", "STRATEGY GENERATION: Bridging game state to agent...")
+
+        # Generate strategy (using simple path for faster results)
+        success, result = bridge.generate_strategy(use_simple_path=True)
+
+        if success:
+            # Strategy generated successfully - display it
+            dpg.set_value("outputText", f"STRATEGY GENERATED:\n\n{result}")
+            print("Strategy generation completed successfully")
+        else:
+            # Error occurred
+            dpg.set_value("outputText", f"STRATEGY GENERATION FAILED:\n\n{result or 'Unknown error occurred'}")
+            print(f"Strategy generation failed: {result}")
+
+    except Exception as e:
+        error_msg = f"Error in strategy generation: {str(e)}"
+        dpg.set_value("outputText", f"STRATEGY GENERATION ERROR:\n\n{error_msg}")
+        print(error_msg)
+
+    # Reset UI state when done
+    running = False
+    current_agent_subprocess = None
+    _change_ui_state(False)
+
+
 def _change_ui_state(running):
     '''Changes the ui state depending on wether the agent is currently running or not.'''
     if running:
@@ -190,10 +245,11 @@ def _change_ui_state(running):
 
 
 def _generate_button_pressed():
-    global running, current_process, current_subprocess
+    global running, current_process, current_subprocess, current_agent_subprocess
     running = True
     current_process = None
     current_subprocess = None
+    current_agent_subprocess = None
     _change_ui_state(running)
 
     # Display warning message
@@ -213,6 +269,8 @@ def _generate_button_pressed():
             print(f"Cleared stale progress file: {progress_file}")
         except Exception as e:
             print(f"Warning: Could not clear progress file: {e}")
+
+    agent_launched = False  # Track if agent was launched to avoid UI state reset
 
     try:
         # Start the process
@@ -260,7 +318,10 @@ def _generate_button_pressed():
 
                         # Check if complete
                         if progress_data.get("complete", False):
-                            dpg.set_value("outputText", f"COMPLETE: {current_status}\n\nReady to feed agent data...")
+                            dpg.set_value("outputText", f"COMPLETE: {current_status}\n\nStarting strategy generation...")
+
+                            # Call agent to generate strategy
+                            agent_launched = _call_agent_for_strategy()
                             break
 
                         # Check for errors
@@ -278,8 +339,10 @@ def _generate_button_pressed():
     except Exception as e:
         dpg.set_value("outputText", f"ERROR: {str(e)}")
 
-    running = False
-    _change_ui_state(running)
+    # Only reset UI state if agent was not launched (agent will manage its own state)
+    if not agent_launched:
+        running = False
+        _change_ui_state(running)
 
 
 def _run_agent():
