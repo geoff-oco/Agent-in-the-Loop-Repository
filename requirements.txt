@@ -1,0 +1,86 @@
+# Agent-in-the-Loop Repository - Combined Requirements
+# This file combines dependencies from all three system components
+
+# =============================================================================
+# AI & Language Model Dependencies (Decision Logic System)
+# =============================================================================
+langgraph>=0.2.27
+langchain-core>=0.2.40
+langchain-openai>=0.2.1
+openai>=1.51.0
+pydantic>=2.7.0
+python-dotenv>=1.0.1
+typing-extensions>=4.8.0
+
+# =============================================================================
+# Computer Vision & OCR Dependencies (Screen Reading System)
+# =============================================================================
+
+# Core Image Processing
+pillow
+numpy
+opencv-python
+
+# Screen Capture
+mss
+
+# OCR Engines
+paddlepaddle>=2.6
+paddleocr>=3,<4
+pytesseract
+
+# Automation
+pyautogui
+
+# GPU Acceleration (Optional - NVIDIA only)
+# To enable GPU acceleration for PaddleOCR:
+# 1. Comment out the "paddlepaddle>=2.6" line above
+# 2. Uncomment one of the following options:
+#
+# Option 1: Install via pip with CUDA 11.8
+# paddlepaddle-gpu==3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+#
+# Option 2: Download wheels manually from:
+# https://www.paddlepaddle.org.cn/en/install/quick
+#
+# Note: GPU acceleration typically improves OCR speed from ~200ms to ~50ms per region
+
+# =============================================================================
+# GUI & System Integration Dependencies (Visualization System)
+# =============================================================================
+dearpygui==1.10.1
+psutil==5.9.7
+
+# Windows-specific dependencies (required for overlay functionality)
+pywin32==306
+
+# =============================================================================
+# Development Tools (Optional)
+# =============================================================================
+black  # Code formatter (configured in pyproject.toml)
+
+# =============================================================================
+# Installation Notes
+# =============================================================================
+#
+# Prerequisites:
+# - Python 3.9+ (developed with Python 3.11)
+# - Windows OS (for PyWin32 overlay functionality)
+# - 2GB+ RAM (for PaddleOCR models)
+# - NVIDIA GPU with CUDA (optional, for GPU acceleration)
+#
+# Installation:
+# 1. Create virtual environment: python -m venv venv
+# 2. Activate environment: venv\Scripts\activate (Windows)
+# 3. Upgrade pip: python -m pip install --upgrade pip
+# 4. Install requirements: pip install -r requirements.txt
+#
+# Additional Setup:
+# - Install Tesseract OCR (optional backup engine)
+# - Configure OpenAI API key in .env file
+# - Ensure RTSViewer.exe is available in system_files/
+#
+# Component-specific requirements are also available in:
+# - agent/decision_logic/run_agent/requirements.txt
+# - agent/screen_reading/requirements.txt
+# - agent/visualisation/external_overlay/requirements.txt
