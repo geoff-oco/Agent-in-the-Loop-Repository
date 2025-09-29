@@ -96,13 +96,9 @@ venv\Scripts\Activate.ps1
 # Windows Command Prompt
 venv\Scripts\activate.bat
 
-# Linux/Mac
-source venv/bin/activate
-```
-
 3. **Install dependencies**:
 ```bash
-pip install --upgrade pip
+pip install --upgrade pip || python.exe -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 

@@ -17,9 +17,9 @@ typing-extensions>=4.8.0
 # =============================================================================
 
 # Core Image Processing
-pillow
-numpy
-opencv-python
+pillow>=10.0.0
+numpy>=1.24.0
+opencv-python>=4.8.0
 
 # Screen Capture
 mss
@@ -39,6 +39,7 @@ pyautogui
 #
 # Option 1: Install via pip with CUDA 11.8
 # paddlepaddle-gpu==3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
+# OR python -m pip install paddlepaddle-gpu==3.2.0 -i https://www.paddlepaddle.org.cn/packages/stable/cu118/
 #
 # Option 2: Download wheels manually from:
 # https://www.paddlepaddle.org.cn/en/install/quick
@@ -48,11 +49,11 @@ pyautogui
 # =============================================================================
 # GUI & System Integration Dependencies (Visualization System)
 # =============================================================================
-dearpygui==1.10.1
-psutil==5.9.7
+dearpygui>=2.0.0
+psutil>=5.9.7
 
 # Windows-specific dependencies (required for overlay functionality)
-pywin32==306
+pywin32>=306
 
 # =============================================================================
 # Development Tools (Optional)
