@@ -210,16 +210,6 @@ Building this project taught me:
 - **API Design**: Creating clean interfaces between components
 - **Error Handling**: Robust error handling for computer vision edge cases
 - **Extreme Patience**: OCR and Computer Vision is like trial and error to the max (this was painstaking at times)
-## Future Extensions
-
-Ideas for extending this project:
-- **Machine Learning**: Train custom text detection models
-- **Web Interface**: Convert GUI to web-based interface
-- **Game-Specific Plugins**: Modular game support system
-- **Cloud Processing**: Offload OCR to cloud services
-- **Mobile Support**: Android/iOS companion apps
-
----
 
 **Author**: Brody Orchard (Student ID: 10582880)
 **Course**: Computer Science - Software Engineering @ECU
