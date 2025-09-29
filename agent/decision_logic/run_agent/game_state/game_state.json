@@ -1,0 +1,121 @@
+{
+  "timestamp": "2025-09-02T11:05:54.446767",
+  "phase": 3,
+  "ler": {
+    "blue": 1.11,
+    "red": 1.0,
+    "favour": "Blue"
+  },
+  "bases": {
+    "blue": {
+      "blue": {
+        "light": 2,
+        "heavy": 4,
+        "ranged": 5
+      },
+      "red": {
+        "light": 0,
+        "heavy": 0,
+        "ranged": 0
+      }
+    },
+    "red1": {
+      "blue": {
+        "light": 5,
+        "heavy": 2,
+        "ranged": 4
+      },
+      "red": {
+        "light": 0,
+        "heavy": 0,
+        "ranged": 2
+      }
+    },
+    "red2": {
+      "blue": {
+        "light": 3,
+        "heavy": 7,
+        "ranged": 4
+      },
+      "red": {
+        "light": 0,
+        "heavy": 12,
+        "ranged": 0
+      }
+    },
+    "red3": {
+      "blue": {
+        "light": 5,
+        "heavy": 2,
+        "ranged": 2
+      },
+      "red": {
+        "light": 0,
+        "heavy": 0,
+        "ranged": 0
+      }
+    }
+  },
+  "actions": {
+    "1": [
+      {
+        "id": 1,
+        "from": "Blue",
+        "to": "Red2",
+        "L": 2,
+        "H": 4,
+        "R": 2,
+        "locked": true
+      },
+      {
+        "id": 2,
+        "from": "Blue",
+        "to": "Red3",
+        "L": 7,
+        "H": 6,
+        "R": 4,
+        "locked": true
+      },
+      {
+        "id": 3,
+        "from": "Blue",
+        "to": "Red1",
+        "L": 4,
+        "H": 1,
+        "R": 4,
+        "locked": false
+      }
+    ],
+    "2": [
+      {
+        "id": 1,
+        "from": "Red3",
+        "to": "Red1",
+        "L": 1,
+        "H": 2,
+        "R": 1,
+        "locked": false
+      },
+      {
+        "id": 2,
+        "from": "Red3",
+        "to": "Red2",
+        "L": 1,
+        "H": 2,
+        "R": 1,
+        "locked": true
+      }
+    ],
+    "3": [
+      {
+        "id": 1,
+        "from": "Red1",
+        "to": "Red2",
+        "L": 0,
+        "H": 1,
+        "R": 1,
+        "locked": false
+      }
+    ]
+  }
+}
