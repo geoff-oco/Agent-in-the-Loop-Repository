@@ -16,6 +16,7 @@ from .game_state_manager import GameStateManager
 from .models import PhaseData
 from .navigation_controller import NavigationController
 from .ocr_processor import GameOCRProcessor
+from .progress_reporter import ProgressReporter
 from .session_output_manager import SessionOutputManager
 
 
@@ -38,6 +39,7 @@ class LiveGameReader:  # Main game reader orchestrator
         self.ocr_processor = get_ocr_processor()
         self.screen_capture = get_screen_capture()
         self.output_manager = SessionOutputManager(output_dir)
+        self.progress_reporter = ProgressReporter()  # Add progress reporter
 
         # Specialized components
         self.exit_manager = ExitManager()
@@ -46,6 +48,9 @@ class LiveGameReader:  # Main game reader orchestrator
         self.navigation_controller = NavigationController(
             self.screen_capture, self.ocr_processor, self.output_manager, dry_run
         )
+
+        # Clear any stale progress file at start
+        self.progress_reporter.clear()
 
         # ROI storage
         self.base_unit_rois: Dict[str, ROIMeta] = {}  # Base unit counts
@@ -108,6 +113,9 @@ class LiveGameReader:  # Main game reader orchestrator
             print("LIVE GAME READER")
             print("=" * 60)
 
+            # Initialise progress reporting
+            self.progress_reporter.update("Initialising screen reader...", percentage=5)
+
             # Start exit monitoring
             self.exit_manager.start_exit_monitoring()
             if hasattr(self.exit_manager, 'exit_thread') and self.exit_manager.exit_thread:
@@ -123,11 +131,14 @@ class LiveGameReader:  # Main game reader orchestrator
 
             # Load ROIs
             logging.info("Loading ROI configurations...")
+            self.progress_reporter.update("Loading ROI configurations...", percentage=10)
             if not self.load_rois():
                 print("Failed to load ROIs")
                 logging.error("Failed to load ROI configurations")
+                self.progress_reporter.error("Failed to load ROI configurations")
                 return False
             logging.info("ROI configurations loaded successfully")
+            self.progress_reporter.update("ROI configurations loaded successfully", percentage=15)
 
             # Step 1: Initial setup
             print("\n=== Initial Setup ===")
@@ -153,9 +164,11 @@ class LiveGameReader:  # Main game reader orchestrator
             print(f"Phase header: {phase_header}")
 
             # Navigate to Phase 1
+            self.progress_reporter.update("Navigating to Phase 1...", percentage=20)
             if not self.navigation_controller.init_phase_one():
                 print("Failed to initialise to Phase 1")
                 if not self.dry_run:
+                    self.progress_reporter.error("Failed to initialise to Phase 1")
                     return False
 
             # Step 2: Process 3 phases
@@ -167,6 +180,10 @@ class LiveGameReader:  # Main game reader orchestrator
                 print(f"\n{'=' * 60}")
                 print(f"PHASE {phase_num}")
                 print("=" * 60)
+
+                # Update progress for phase
+                phase_percentage = 20 + (phase_num * 20)  # 40%, 60%, 80%
+                self.progress_reporter.update(f"Processing Phase {phase_num} capture...", phase=phase_num, percentage=phase_percentage)
 
                 # Process OCR for this phase (fresh capture)
                 ocr_results = self.game_ocr_processor.process_phase_ocr(
@@ -187,6 +204,7 @@ class LiveGameReader:  # Main game reader orchestrator
                         return False
 
                     print(f"\nAutomatically advancing to Phase {phase_num + 1}...")
+                    self.progress_reporter.update(f"Advancing to Phase {phase_num + 1}...", phase=phase_num)
                     if not self.navigation_controller.next_phase():
                         print(f"Warning: Failed to advance to Phase {phase_num + 1}")
 
@@ -194,6 +212,7 @@ class LiveGameReader:  # Main game reader orchestrator
             print("\n" + "=" * 60)
             print("RED2 FINAL UNIT COUNT CAPTURE")
             print("=" * 60)
+            self.progress_reporter.update("Capturing final unit counts...", phase=3, percentage=85)
 
             red2_final_count = None
             if self.red2_final_unit_roi:
@@ -220,6 +239,7 @@ class LiveGameReader:  # Main game reader orchestrator
 
             # Step 3: Generate output
             print("\n=== Generating Output ===")
+            self.progress_reporter.update("Generating game state data...", percentage=90)
 
             # Build output JSON
             output_data = {
@@ -237,6 +257,7 @@ class LiveGameReader:  # Main game reader orchestrator
             # Save JSON
             output_file = self.output_manager.export_state(output_data)
             print(f"Saved game state to: {output_file}")
+            self.progress_reporter.update("Saving game state to file...", percentage=95)
 
             # Enhanced session performance logging
             stats = self.output_manager.get_stats()
@@ -265,15 +286,20 @@ class LiveGameReader:  # Main game reader orchestrator
             print("GAME READING COMPLETE")
             print("=" * 60)
 
+            # Mark progress as complete
+            self.progress_reporter.complete("Screen reading complete! Game state generated.")
+
             return True
 
         except KeyboardInterrupt:
             print("\n\nInterrupted by user")
+            self.progress_reporter.error("Process interrupted by user")
             return False
 
         except Exception as e:
             print(f"\nError: {e}")
             logging.error(f"Game reading error: {e}", exc_info=True)
+            self.progress_reporter.error(str(e))
             return False
 
     def _display_phase_summary(self, phase_data: PhaseData):
