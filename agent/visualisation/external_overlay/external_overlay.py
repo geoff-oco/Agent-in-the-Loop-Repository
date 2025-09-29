@@ -50,8 +50,8 @@ class ExternalOverlay:
         win32gui.SetLayeredWindowAttributes(hwnd=self.overlay_hwnd,Key=win32api.RGB(0,0,0),Alpha=0, Flags=win32con.LWA_COLORKEY)
 
     def _hook_to_target(self, overlay_delay: float):
-        tar_rect = win32gui.GetWindowRect(self.target_hwnd)
-        win32gui.SetWindowPos(self.overlay_hwnd, win32con.HWND_TOPMOST, tar_rect[0], tar_rect[1], tar_rect[2]-tar_rect[0], tar_rect[3]-tar_rect[1], win32con.SWP_NOZORDER)
+        #tar_rect = win32gui.GetWindowRect(self.target_hwnd)
+        #win32gui.SetWindowPos(self.overlay_hwnd, win32con.HWND_TOPMOST, tar_rect[0], tar_rect[1], tar_rect[2]-tar_rect[0], tar_rect[3]-tar_rect[1], win32con.SWP_NOZORDER)
         while True:
             tar_rect = win32gui.GetWindowRect(self.target_hwnd)
             win32gui.SetWindowPos(self.overlay_hwnd, win32con.HWND_TOPMOST, tar_rect[0], tar_rect[1], tar_rect[2]-tar_rect[0], tar_rect[3]-tar_rect[1], win32con.SWP_NOZORDER)
