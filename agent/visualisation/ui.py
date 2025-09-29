@@ -12,17 +12,30 @@ running = False
 def ui(tar_hwnd=None):
     '''Function that describes the UI layout and functionality to dearPyGui'''
 
-    with dpg.window(tag="buttons_win", no_background=False, no_move=False, no_resize=True, no_title_bar=True, width=200, height=110):
+    # Dont start drawing screen while window is minimised
+    while win32gui.IsIconic(tar_hwnd): 
+        pass
+
+    time.sleep(0.1)
+    start_size = win32gui.GetWindowRect(tar_hwnd)
+    window_height = start_size[3] - start_size[1]
+    window_width = start_size[2] - start_size[0]
+
+    with dpg.window(tag="buttons_win", no_background=False, no_move=False, no_resize=True, no_title_bar=True,
+                    width=200, height=110,
+                    pos=(40,(window_height/3))):
         with dpg.group(tag="agent_button"):
             dpg.add_button(label='Generate Strategy', width=-1, callback=_generation_callback)
         with dpg.group(tag="cancel_button",enabled=False):
             dpg.add_button(label="Cancel", width=-1,callback=_stopButton_callback)
         dpg.add_loading_indicator(tag="loading_ind",show=False,width=50,indent=75)
 
-    with dpg.window(tag="chat_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True, width=500,height=400):
+    with dpg.window(tag="chat_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True, 
+                    width=500, height= window_height / 3 - 10,
+                    pos=((window_width/3), (window_height - 10 - window_height/3))):
         dpg.add_separator(label='Output')
         with dpg.child_window(tag='outputWindow'):
-            dpg.add_text('',tag="outputText", wrap= 490)
+            dpg.add_text('',tag="outputText", wrap= 475)
 
 """     with dpg.theme() as global_theme:
         dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 3, category=dpg.mvThemeCat_Core)
