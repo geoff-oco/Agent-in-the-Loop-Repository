@@ -1,0 +1,17 @@
+{
+  "phaseheader": {
+    "name": "phaseheader",
+    "x": 0.8280034572169404,
+    "y": 0.08923076923076922,
+    "w": 0.12186689714779603,
+    "h": 0.033846153846153845,
+    "notes": "",
+    "char_filter": "",
+    "filter_mode": "whitelist",
+    "expected_values": "",
+    "pattern": "",
+    "ocr_scale": 1.0,
+    "preferred_method": "Auto-Select",
+    "padding_pixels": 5
+  }
+}

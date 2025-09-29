@@ -1,0 +1,32 @@
+{
+  "Phasenumber": {
+    "name": "Phasenumber",
+    "x": 0.5004321521175453,
+    "y": 0.15311004784688995,
+    "w": 0.13857129138028015,
+    "h": 0.6520877684800709,
+    "notes": "Number for Phase",
+    "char_filter": "123",
+    "filter_mode": "whitelist",
+    "expected_values": "1,2,3",
+    "pattern": "(number)",
+    "ocr_scale": 0.9,
+    "preferred_method": "Auto-Select",
+    "padding_pixels": 3
+  },
+  "Lock": {
+    "name": "Lock",
+    "x": 0.8046672428694901,
+    "y": 0.028708133971291867,
+    "w": 0.17199654278305965,
+    "h": 0.8899521531100478,
+    "notes": "Lock for Phase Header",
+    "char_filter": "",
+    "filter_mode": "whitelist",
+    "expected_values": "",
+    "pattern": "",
+    "ocr_scale": 0.7,
+    "preferred_method": "Auto-Select",
+    "padding_pixels": 5
+  }
+}

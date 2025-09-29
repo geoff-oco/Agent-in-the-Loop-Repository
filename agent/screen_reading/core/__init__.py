@@ -1,6 +1,14 @@
-"""Core module - main orchestration and game state building."""
+# Core components for ROI management and validation
+from .models import ROIMeta, OCRResult, ProcessingMethod, BatchOCRResult
+from .roi_manager import ROIManager
+from .validators import TextValidator, get_text_validator
 
-from .orchestrator import ScreenReadingOrchestrator
-from .game_state_builder import GameStateBuilder
-
-__all__ = ["ScreenReadingOrchestrator", "GameStateBuilder"]
+__all__ = [
+    "ROIMeta",
+    "OCRResult",
+    "ProcessingMethod",
+    "BatchOCRResult",
+    "ROIManager",
+    "TextValidator",
+    "get_text_validator",
+]
