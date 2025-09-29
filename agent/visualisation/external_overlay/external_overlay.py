@@ -22,6 +22,7 @@ class ExternalOverlay:
         self.ui_to_run = ui_to_run
         self.target_hwnd = None
         self.overlay_hwnd = None
+        self.shutdown_flag = False
     
     def start(self, overlay_delay: float = 0.005):
         ui_thread = threading.Thread(target=self._init_ui)
@@ -29,7 +30,7 @@ class ExternalOverlay:
         time.sleep(0.5)
         if(self.target_hwnd == None or self.overlay_hwnd == None):
             raise Exception("Creating handles failed.")
-        hook_thread = threading.Thread(target=self._hook_to_target(overlay_delay))
+        hook_thread = threading.Thread(target=self._hook_to_target, args=(overlay_delay,))
         hook_thread.start()
 
     def _set_handles(self):
@@ -50,16 +51,37 @@ class ExternalOverlay:
         win32gui.SetLayeredWindowAttributes(hwnd=self.overlay_hwnd,Key=win32api.RGB(0,0,0),Alpha=0, Flags=win32con.LWA_COLORKEY)
 
     def _hook_to_target(self, overlay_delay: float):
-        #tar_rect = win32gui.GetWindowRect(self.target_hwnd)
-        #win32gui.SetWindowPos(self.overlay_hwnd, win32con.HWND_TOPMOST, tar_rect[0], tar_rect[1], tar_rect[2]-tar_rect[0], tar_rect[3]-tar_rect[1], win32con.SWP_NOZORDER)
-        while True:
-            tar_rect = win32gui.GetWindowRect(self.target_hwnd)
-            win32gui.SetWindowPos(self.overlay_hwnd, win32con.HWND_TOPMOST, tar_rect[0], tar_rect[1], tar_rect[2]-tar_rect[0], tar_rect[3]-tar_rect[1], win32con.SWP_NOZORDER)
+        while not self.shutdown_flag:
+            try:
+                # Check if window handles are still valid
+                if not win32gui.IsWindow(self.target_hwnd) or not win32gui.IsWindow(self.overlay_hwnd):
+                    break
+
+                tar_rect = win32gui.GetWindowRect(self.target_hwnd)
+                win32gui.SetWindowPos(self.overlay_hwnd, win32con.HWND_TOPMOST, tar_rect[0], tar_rect[1], tar_rect[2]-tar_rect[0], tar_rect[3]-tar_rect[1], win32con.SWP_NOZORDER)
+            except Exception:
+                # Window handles are invalid, stop the thread
+                break
             time.sleep(overlay_delay)
+
+    def stop(self):
+        """Signal the overlay to stop and clean up threads"""
+        self.shutdown_flag = True
         
     def _init_ui(self):
         dpg.create_context()
-        dpg.create_viewport(title=self.overlay_name, width=300, height=300, decorated=False, always_on_top=True, clear_color=[0.0,0.0,0.0,0.0]),
+
+        # Find target window to get its dimensions for proper viewport sizing
+        temp_target_hwnd = win32gui.FindWindow(None, self.target_window)
+        if temp_target_hwnd:
+            target_rect = win32gui.GetWindowRect(temp_target_hwnd)
+            viewport_width = target_rect[2] - target_rect[0]
+            viewport_height = target_rect[3] - target_rect[1]
+        else:
+            viewport_width, viewport_height = 1920, 1080  # Fallback to common resolution
+
+        dpg.create_viewport(title=self.overlay_name, width=viewport_width, height=viewport_height,
+                           decorated=False, always_on_top=True, clear_color=[0.0,0.0,0.0,0.0]),
         dpg.setup_dearpygui()
         dpg.show_viewport()
         self._set_handles()

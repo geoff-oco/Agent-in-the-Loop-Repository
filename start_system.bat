@@ -1,4 +1,5 @@
 @echo off
+if not DEFINED IS_MINIMIZED set IS_MINIMIZED=1 && start "" /min "%~dpnx0" %* && exit
 title Agent-in-the-Loop System Launcher
 echo =========================================
 echo    Agent-in-the-Loop System Launcher

@@ -1,19 +1,27 @@
 import dearpygui.dearpygui as dpg
 import threading
 from multiprocessing import Process
+import subprocess
 import time
 import psutil
 import win32gui
 import win32process
+import sys
+import os
 
 
 running = False
+overlay_instance = None
 
-def ui(tar_hwnd=None):
+def ui(tar_hwnd=None, overlay=None):
     '''Function that describes the UI layout and functionality to dearPyGui'''
 
+    # Store overlay reference globally for callbacks
+    global overlay_instance
+    overlay_instance = overlay
+
     # Dont start drawing screen while window is minimised
-    while win32gui.IsIconic(tar_hwnd): 
+    while win32gui.IsIconic(tar_hwnd):
         pass
 
     time.sleep(0.1)
@@ -21,27 +29,49 @@ def ui(tar_hwnd=None):
     window_height = start_size[3] - start_size[1]
     window_width = start_size[2] - start_size[0]
 
-    with dpg.window(tag="buttons_win", no_background=False, no_move=False, no_resize=True, no_title_bar=True,
-                    width=200, height=110,
+    # Main container window for buttons (resizable)
+    with dpg.window(tag="buttons_container", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
+                    width=220, height=180,
                     pos=(40,(window_height/3))):
-        with dpg.group(tag="agent_button"):
-            dpg.add_button(label='Generate Strategy', width=-1, callback=_generation_callback)
-        with dpg.group(tag="cancel_button",enabled=False):
-            dpg.add_button(label="Cancel", width=-1,callback=_stopButton_callback)
-        dpg.add_loading_indicator(tag="loading_ind",show=False,width=50,indent=75)
+        dpg.add_text("System Controls", color=(200, 200, 200))
+        # Child window inside for actual button content (makes it resizable)
+        with dpg.child_window(tag="buttons_win", width=-1, height=-1):
+            with dpg.group(tag="agent_button"):
+                dpg.add_button(label='Generate Strategy', width=-1, callback=_generation_callback)
+            with dpg.group(tag="cancel_button",enabled=False):
+                dpg.add_button(label="Cancel", width=-1,callback=_stopButton_callback)
+            dpg.add_loading_indicator(tag="loading_ind",show=False,width=50,indent=75)
+            dpg.add_separator()
+            dpg.add_button(label="Launch ROI Studio", width=-1, callback=_launch_roi_studio_callback)
+            dpg.add_button(label="Exit System", width=-1, callback=_exit_callback)
 
-    with dpg.window(tag="chat_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True, 
+    with dpg.window(tag="chat_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
                     width=500, height= window_height / 3 - 10,
                     pos=((window_width/3), (window_height - 10 - window_height/3))):
-        dpg.add_separator(label='Output')
+        dpg.add_text("Chatbox", color=(200, 200, 200))
+        dpg.add_separator()
         with dpg.child_window(tag='outputWindow'):
             dpg.add_text('',tag="outputText", wrap= 475)
 
-"""     with dpg.theme() as global_theme:
-        dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 3, category=dpg.mvThemeCat_Core)
-        dpg.add_theme_style(dpg.myStyleVar_FramePadding, (8,6), category=dpg.mvThemeCat_Core)
 
-    dpg.bind_theme(global_theme) """
+    # Style editor for real-time experimentation (positioned top-right) - COMMENTED OUT
+    # with dpg.window(tag="style_editor_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
+    #                 width=300, height=200,
+    #                 pos=(window_width - 320, 20),
+    #                 show=False):  # Hidden by default
+    #     dpg.add_text("Style Editor Controls")
+    #     dpg.add_button(label="Show Style Editor", callback=lambda: dpg.show_tool(dpg.mvTool_Style))
+    #     dpg.add_button(label="Show Metrics", callback=lambda: dpg.show_tool(dpg.mvTool_Metrics))
+    #     dpg.add_button(label="Toggle This Panel", callback=lambda: dpg.configure_item("style_editor_win", show=not dpg.is_item_shown("style_editor_win")))
+
+    # Toggle button for style editor (top-right corner) - COMMENTED OUT
+    # with dpg.window(tag="style_toggle_win", no_background=False, no_move=False, no_resize=True, no_title_bar=True,
+    #                 width=80, height=30,
+    #                 pos=(window_width - 90, 10)):
+    #     dpg.add_button(label="Styles", width=70, height=20,
+    #                   callback=lambda: dpg.configure_item("style_editor_win", show=not dpg.is_item_shown("style_editor_win")))
+
+# Theme system implementation complete - using targeted themes for specific components
 
 
 def _generation_callback(sender, app_data, user_data):
@@ -55,11 +85,61 @@ def _generation_callback(sender, app_data, user_data):
 
 def _stopButton_callback(sender, app_data, user_data):
     '''Stops Agent by setting running flag to False
-    
+
     Called on \"Cancel\" button press'''
     global running
     running = False
     print("canceling generation")
+
+
+def _launch_roi_studio_callback(sender, app_data, user_data):
+    '''Launches the ROI Studio application
+
+    Called on \"Launch ROI Studio\" button press'''
+    try:
+        print("Launching ROI Studio...")
+        # Get the project root directory
+        project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        roi_studio_path = os.path.join(project_root, "screen_reading", "LIVE_ROI_STUDIO.py")
+
+        # Launch ROI Studio as a separate process
+        subprocess.Popen([sys.executable, roi_studio_path], cwd=project_root)
+        print(f"ROI Studio launched from: {roi_studio_path}")
+    except Exception as e:
+        print(f"Failed to launch ROI Studio: {e}")
+
+
+def _exit_callback(sender, app_data, user_data):
+    '''Exits the entire application
+
+    Called on \"Exit\" button press'''
+    global overlay_instance
+    print("Exiting application...")
+
+    # Signal overlay to stop threads before shutting down DearPyGUI
+    if overlay_instance:
+        overlay_instance.stop()
+
+    dpg.stop_dearpygui()
+
+    # Kill batch processes using taskkill - more reliable approach
+    try:
+        # Kill any cmd.exe processes that contain our batch file name
+        subprocess.run(['taskkill', '/F', '/IM', 'cmd.exe', '/FI', 'WINDOWTITLE eq Agent-in-the-Loop System Launcher*'],
+                      capture_output=True, timeout=3)
+    except:
+        try:
+            # Fallback: kill parent process
+            current_pid = os.getpid()
+            current_process = psutil.Process(current_pid)
+            parent = current_process.parent()
+            if parent and 'cmd.exe' in parent.name().lower():
+                parent.terminate()
+        except:
+            pass
+
+    # Force terminate the entire process
+    os._exit(0)
 
 
 
