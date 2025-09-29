@@ -37,6 +37,14 @@ def ui(tar_hwnd=None):
         with dpg.child_window(tag='outputWindow'):
             dpg.add_text('',tag="outputText", wrap= 475)
 
+        # Chatbox section - Alexia Aletia 10500754
+        dpg.add_separator(label='Chatbox')
+        with dpg.child_window(tag="chatWindow", autosize_x=True, autosize_y=True):
+            dpg.add_text("Chat Log:", tag="chatLog", wrap=475)
+        with dpg.group(horizontal=True):
+            dpg.add_input_text(tag="chatInput", width=350, hint="Type your message here...")
+            dpg.add_button(label="Send", callback=lambda: _send_message()) 
+
 """     with dpg.theme() as global_theme:
         dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 3, category=dpg.mvThemeCat_Core)
         dpg.add_theme_style(dpg.myStyleVar_FramePadding, (8,6), category=dpg.mvThemeCat_Core)
@@ -108,6 +116,13 @@ def _generate_button_pressed():
         running = False
         _change_ui_state(running)
 
+def _send_message():
+    '''Handles sending user input to the chat log. Placeholder for agent response.'''
+    user_msg = dpg.get_value("chatInput").strip()
+    if user_msg:
+        dpg.set_value("chatLog", dpg.get_value("chatLog") + f"\nYou: {user_msg}")
+        dpg.set_value("chatInput", "")
+        dpg.set_value("chatLog", dpg.get_value("chatLog") + "\nAgent: (reply goes here)")
 
 def _run_agent():
     '''This is the function that runs the ORC and Agent, in that order.
