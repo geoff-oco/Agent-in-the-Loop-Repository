@@ -46,7 +46,7 @@ class LiveGameReader:  # Main game reader orchestrator
         self.game_state_manager = GameStateManager(self.screen_capture, self.ocr_processor, monitor_index)
         self.game_ocr_processor = GameOCRProcessor(self.ocr_processor, self.screen_capture, self.output_manager)
         self.navigation_controller = NavigationController(
-            self.screen_capture, self.ocr_processor, self.output_manager, dry_run
+            self.screen_capture, self.ocr_processor, self.output_manager, dry_run, fast_mode=True
         )
 
         # Clear any stale progress file at start
@@ -222,7 +222,7 @@ class LiveGameReader:  # Main game reader orchestrator
                     self.monitor_index, self.base_unit_rois, self.dry_run
                 ):
                     # Wait a moment for navigation to complete
-                    time.sleep(2.0)
+                    time.sleep(0.5)
 
                     # Capture the dynamic Red2 final unit count
                     red2_final_count = self.navigation_controller.capture_red2_final_unit_count(

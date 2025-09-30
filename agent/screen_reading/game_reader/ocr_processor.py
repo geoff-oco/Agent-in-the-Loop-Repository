@@ -1,6 +1,7 @@
 # OCR processing and color detection for live game reading
 import logging
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List, Optional, Tuple
 
 from PIL import Image
@@ -15,6 +16,8 @@ class GameOCRProcessor:  # Handles OCR processing and color detection for game r
         self.ocr_processor = ocr_processor
         self.screen_capture = screen_capture
         self.output_manager = output_manager
+        # Thread pool for parallel OCR processing
+        self.max_workers = 8  # Configurable number of parallel workers
 
     def _display_roi_processing_results(self, roi_name: str, results: List[Tuple], final_result: OCRResult):
         # Enhanced output showing processing attempts and final result
@@ -41,13 +44,104 @@ class GameOCRProcessor:  # Handles OCR processing and color detection for game r
         )
         print(f"    {roi_name}: {final_result.text or '0'}")
 
+    def _process_single_roi(self, roi_name: str, roi: ROIMeta, frame: Image.Image, phase_num: int, is_adjustment: bool = False) -> Tuple[str, OCRResult, Optional[List]]:
+        """Process a single ROI - designed to be called in parallel"""
+        # Crop ROI from frame
+        roi_image = ImageUtils.crop_roi(frame, roi)
+
+        # For adjustment ROIs, check if content exists
+        if is_adjustment:
+            has_content = self.has_content(roi_image)
+            if not has_content:
+                # No adjustment = 0, skip OCR processing
+                return roi_name, OCRResult(
+                    text="0",
+                    confidence=100.0,
+                    method_used="No content detected",
+                    rule_passed=True,
+                    rule_message="No adjustment needed",
+                    processing_time_ms=0
+                ), None
+
+        # Save debug image
+        self.output_manager.save_capture(roi_image, phase_num, roi_name)
+
+        # Process OCR with timing - respect engine preferences
+        accepted_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-:. "
+        start_time = time.time()
+
+        # Check preferred OCR engine from ROI settings
+        if roi.preferred_ocr_engine == "auto":
+            # Use multi-engine processing (tries all engines with early exit)
+            results = self.ocr_processor.process_multi_engine(
+                roi_image, roi, accepted_chars=accepted_chars, early_exit_enabled=True
+            )
+        elif roi.preferred_ocr_engine in ["tesseract", "paddle_gpu", "paddle_cpu"]:
+            # Use specific engine as requested
+            results = self.ocr_processor.process_single_engine(
+                roi_image, roi, roi.preferred_ocr_engine,
+                accepted_chars=accepted_chars, early_exit_enabled=True
+            )
+        else:
+            # Fallback to multi-engine if unknown preference
+            results = self.ocr_processor.process_multi_engine(
+                roi_image, roi, accepted_chars=accepted_chars, early_exit_enabled=True
+            )
+
+        processing_time_ms = (time.time() - start_time) * 1000
+
+        if results:
+            # Get the best result (first one due to early exit)
+            method_name, _, text, confidence, rule_passed, rule_message = results[0]
+            ocr_result = OCRResult(
+                text=text,
+                confidence=confidence,
+                method_used=method_name,
+                rule_passed=rule_passed,
+                rule_message=rule_message,
+                processing_time_ms=processing_time_ms,
+            )
+        else:
+            ocr_result = OCRResult(
+                text="",
+                confidence=0.0,
+                method_used="Full matrix failed",
+                rule_passed=False,
+                rule_message="No results",
+                processing_time_ms=processing_time_ms,
+            )
+
+        # Apply colour-based sign correction for adjustments if needed
+        if is_adjustment and not ocr_result.rule_passed and ocr_result.text.strip():
+            if ocr_result.text.strip().isdigit():
+                has_content, dominant_colour = self.get_content_and_colour(roi_image)
+
+                if has_content and dominant_colour in ["red", "green"]:
+                    # Add appropriate sign based on colour
+                    if dominant_colour == "red":
+                        corrected_text = f"-{ocr_result.text.strip()}"
+                    else:  # green
+                        corrected_text = f"+{ocr_result.text.strip()}"
+
+                    # Re-validate with the corrected text
+                    rule_passed, rule_message = self.ocr_processor.validator.validate_text(roi, corrected_text)
+
+                    if rule_passed:
+                        ocr_result.text = corrected_text
+                        ocr_result.rule_passed = True
+                        ocr_result.rule_message = f"Color-corrected: {rule_message}"
+                        ocr_result.method_used = f"{ocr_result.method_used} (colour-corrected)"
+                        logging.info(f"Color correction applied to {roi_name}: '{ocr_result.text}' (detected {dominant_colour} pixels)")
+
+        return roi_name, ocr_result, results
+
     def process_phase_ocr(
         self, phase_num: int, monitor_index: int, base_unit_rois: Dict[str, ROIMeta], adjustment_rois: Dict[str, ROIMeta]
     ) -> Dict[str, Any]:
-        # Process OCR for all units and adjustments in a phase
+        # Process OCR for all units and adjustments in a phase using parallel processing
         phase_start_time = time.time()
-        print(f"\n=== Processing Phase {phase_num} OCR ===")
-        logging.info(f"Starting Phase {phase_num} OCR processing")
+        print(f"\n=== Processing Phase {phase_num} OCR (Parallel) ===")
+        logging.info(f"Starting Phase {phase_num} OCR processing with {self.max_workers} workers")
 
         # Capture single frame
         frame = self.screen_capture.capture_monitor(monitor_index)
@@ -57,146 +151,74 @@ class GameOCRProcessor:  # Handles OCR processing and color detection for game r
 
         ocr_results = {}
 
-        # Process all base unit ROIs
-        print("  Base unit counts:")
-        for roi_name, roi in base_unit_rois.items():
-            # Crop ROI from frame
-            roi_image = ImageUtils.crop_roi(frame, roi)
+        # Use ThreadPoolExecutor for parallel processing
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            # Submit all tasks to the executor
+            futures = {}
 
-            # Save debug image using session manager
-            self.output_manager.save_capture(roi_image, phase_num, roi_name)
+            # Submit base unit ROI tasks
+            for roi_name, roi in base_unit_rois.items():
+                future = executor.submit(self._process_single_roi, roi_name, roi, frame, phase_num, False)
+                futures[future] = ('base', roi_name)
 
-            # Process OCR using multi-engine processing with timing
-            accepted_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-:. "
-            start_time = time.time()
-            results = self.ocr_processor.process_multi_engine(
-                roi_image, roi, accepted_chars=accepted_chars, early_exit_enabled=True
-            )
-            processing_time_ms = (time.time() - start_time) * 1000  # Convert to milliseconds
+            # Submit adjustment ROI tasks
+            for roi_name, roi in adjustment_rois.items():
+                future = executor.submit(self._process_single_roi, roi_name, roi, frame, phase_num, True)
+                futures[future] = ('adj', roi_name)
 
-            if results:
-                # Get the best result (first one due to early exit)
-                method_name, _, text, confidence, rule_passed, rule_message = results[0]
-                ocr_result = OCRResult(
-                    text=text,
-                    confidence=confidence,
-                    method_used=method_name,
-                    rule_passed=rule_passed,
-                    rule_message=rule_message,
-                    processing_time_ms=processing_time_ms,
-                )
-            else:
-                ocr_result = OCRResult(
-                    text="",
-                    confidence=0.0,
-                    method_used="Full matrix failed",
-                    rule_passed=False,
-                    rule_message="No results",
-                    processing_time_ms=processing_time_ms,
-                )
+            # Collect results as they complete
+            print("  Processing ROIs in parallel...")
+            base_results = []
+            adj_results = []
 
-            # Store result
-            ocr_results[roi_name] = ocr_result.text if ocr_result.text else "0"
+            for future in as_completed(futures):
+                roi_type, original_name = futures[future]
+                try:
+                    roi_name, ocr_result, results = future.result()
 
-            # Log result
-            logging.info(f"Phase {phase_num} - {roi_name}: '{ocr_result.text}' " f"({ocr_result.confidence:.1f}%)")
+                    # Store result
+                    ocr_results[roi_name] = ocr_result.text if ocr_result.text else "0"
 
-            # Enhanced output showing processing attempts and final result
-            self._display_roi_processing_results(roi_name, results, ocr_result)
+                    # Log result
+                    if ocr_result.text or roi_type == 'base':
+                        logging.info(f"Phase {phase_num} - {roi_name}: '{ocr_result.text}' ({ocr_result.confidence:.1f}%)")
 
-        # Process all adjustment ROIs
-        print("  Adjustment values:")
-        for roi_name, roi in adjustment_rois.items():
-            # Crop ROI from frame
-            roi_image = ImageUtils.crop_roi(frame, roi)
+                    # Store for display later
+                    if roi_type == 'base':
+                        base_results.append((roi_name, ocr_result, results))
+                    else:
+                        if ocr_result.text != "0" or (ocr_result.text == "0" and ocr_result.method_used != "No content detected"):
+                            adj_results.append((roi_name, ocr_result, results))
 
-            # Check if ROI has red/green content first
-            has_content = self.has_content(roi_image)
+                except Exception as e:
+                    logging.error(f"Error processing {original_name}: {e}")
+                    ocr_results[original_name] = "0"
 
-            if not has_content:
-                ocr_results[roi_name] = "0"  # No adjustment = 0
-                logging.debug(f"{roi_name}: No red/green pixels detected - treating as 0")
-                # Don't print anything for empty adjustment ROIs
-                continue
+        # Display results in organized fashion
+        if base_results:
+            print("  Base unit counts:")
+            for roi_name, ocr_result, results in sorted(base_results, key=lambda x: x[0]):
+                if results is not None:
+                    self._display_roi_processing_results(roi_name, results, ocr_result)
+                else:
+                    print(f"    {roi_name}: {ocr_result.text or '0'}")
 
-            # Save debug image (only if content detected)
-            self.output_manager.save_capture(roi_image, phase_num, roi_name)
-
-            # Process OCR only if content detected with timing
-            accepted_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-:. "
-            start_time = time.time()
-            results = self.ocr_processor.process_multi_engine(
-                roi_image, roi, accepted_chars=accepted_chars, early_exit_enabled=True
-            )
-            processing_time_ms = (time.time() - start_time) * 1000  # Convert to milliseconds
-
-            if results:
-                # Get the best result (first one due to early exit)
-                method_name, _, text, confidence, rule_passed, rule_message = results[0]
-                ocr_result = OCRResult(
-                    text=text,
-                    confidence=confidence,
-                    method_used=method_name,
-                    rule_passed=rule_passed,
-                    rule_message=rule_message,
-                    processing_time_ms=processing_time_ms,
-                )
-            else:
-                ocr_result = OCRResult(
-                    text="",
-                    confidence=0.0,
-                    method_used="Full matrix failed",
-                    rule_passed=False,
-                    rule_message="No results",
-                    processing_time_ms=processing_time_ms,
-                )
-
-            # Apply colour-based sign correction if pattern validation failed
-            if not ocr_result.rule_passed and ocr_result.text.strip():
-                # Check if the text is just a number without sign
-                if ocr_result.text.strip().isdigit():
-                    # Get colour information from the ROI
-                    has_content, dominant_colour = self.get_content_and_colour(roi_image)
-
-                    if has_content and dominant_colour in ["red", "green"]:
-                        # Add appropriate sign based on colour
-                        if dominant_colour == "red":
-                            corrected_text = f"-{ocr_result.text.strip()}"
-                        else:  # green
-                            corrected_text = f"+{ocr_result.text.strip()}"
-
-                        # Re-validate with the corrected text
-                        rule_passed, rule_message = self.ocr_processor.validator.validate_text(roi, corrected_text)
-
-                        if rule_passed:
-                            # Update the OCR result with corrected text
-                            ocr_result.text = corrected_text
-                            ocr_result.rule_passed = True
-                            ocr_result.rule_message = f"Color-corrected: {rule_message}"
-                            ocr_result.method_used = f"{ocr_result.method_used} (colour-corrected)"
-                            logging.info(
-                                f"Color correction applied to {roi_name}: '{ocr_result.text}' (detected {dominant_colour} pixels)"
-                            )
-
-            # Store result
-            ocr_results[roi_name] = ocr_result.text if ocr_result.text else "0"
-
-            # Log result with raw OCR text and pattern validation
-            if ocr_result.text:
-                logging.info(
-                    f"Phase {phase_num} - {roi_name}: '{ocr_result.text}' "
-                    f"(confidence: {ocr_result.confidence:.1f}%)"
-                )
-                # Enhanced output showing processing attempts and final result
-                self._display_roi_processing_results(roi_name, results, ocr_result)
-            else:
-                # Content detected but OCR failed
-                logging.warning(f"{roi_name}: Color content detected but OCR returned empty")
-                print(f"    {roi_name}: Content detected but OCR failed")
+        if adj_results:
+            print("  Adjustment values:")
+            for roi_name, ocr_result, results in sorted(adj_results, key=lambda x: x[0]):
+                if ocr_result.text:
+                    if results is not None:
+                        self._display_roi_processing_results(roi_name, results, ocr_result)
+                    else:
+                        print(f"    {roi_name}: {ocr_result.text}")
+                else:
+                    # Content detected but OCR failed
+                    logging.warning(f"{roi_name}: Color content detected but OCR returned empty")
+                    print(f"    {roi_name}: Content detected but OCR failed")
 
         # Log phase completion timing
         phase_duration = time.time() - phase_start_time
-        logging.info(f"Phase {phase_num} completed in {phase_duration:.2f}s ({len(ocr_results)} ROIs processed)")
+        logging.info(f"Phase {phase_num} completed in {phase_duration:.2f}s ({len(ocr_results)} ROIs processed in parallel)")
         print(f"Phase {phase_num} processing completed in {phase_duration:.2f}s")
 
         return ocr_results

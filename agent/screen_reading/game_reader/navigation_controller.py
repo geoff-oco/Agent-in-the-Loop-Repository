@@ -11,7 +11,7 @@ from imaging.utils import ImageUtils
 
 class NavigationController:  # Handles game navigation and special capture sequences
 
-    def __init__(self, screen_capture, ocr_processor, output_manager, dry_run: bool = False):
+    def __init__(self, screen_capture, ocr_processor, output_manager, dry_run: bool = False, fast_mode: bool = True):
         self.screen_capture = screen_capture
         self.ocr_processor = ocr_processor
         self.output_manager = output_manager
@@ -19,6 +19,9 @@ class NavigationController:  # Handles game navigation and special capture seque
 
         # Navigation state
         self.current_phase: int = 1
+
+        # Delay configuration (fast_mode reduces delays for speed)
+        self.delay_multiplier = 0.2 if fast_mode else 1.0  # Fast mode uses 20% of normal delays
 
         # Template-based button clicking setup
         self.template_dir = Path("rois/template_images")
@@ -34,6 +37,10 @@ class NavigationController:  # Handles game navigation and special capture seque
             "downphase": self.template_dir / "Downphase_button.png",
             "resetview": self.template_dir / "Resetview_button.png",
         }
+
+    def _delay(self, seconds: float):
+        """Apply configurable delay based on delay_multiplier"""
+        time.sleep(seconds * self.delay_multiplier)
 
     def navigate_to_red1_base(
         self, monitor_index: int, base_unit_rois: Dict[str, ROIMeta], dry_run: bool = False
@@ -64,7 +71,7 @@ class NavigationController:  # Handles game navigation and special capture seque
                         import pyautogui
 
                         pyautogui.click(click_x, click_y)
-                        time.sleep(1.0)  # Wait for navigation to complete
+                        time.sleep(0.2)  # Wait for navigation to complete
                     else:
                         print("Dry run: Would click on red1 base")
 
@@ -98,7 +105,7 @@ class NavigationController:  # Handles game navigation and special capture seque
                 frame = self.screen_capture.capture_monitor(monitor_index)
                 if frame is None:
                     print(f"  Failed to capture frame {i+1}")
-                    time.sleep(1.0)
+                    time.sleep(0.2)
                     continue
 
                 # Crop ROI
@@ -112,12 +119,12 @@ class NavigationController:  # Handles game navigation and special capture seque
 
                 # Wait 1 second before next capture (except after the last one)
                 if i < 4:
-                    time.sleep(1.0)
+                    time.sleep(0.2)
 
             except Exception as e:
                 print(f"  Error capturing frame {i+1}: {e}")
                 if i < 4:
-                    time.sleep(1.0)
+                    time.sleep(0.2)
 
         if not captured_images:
             print("Failed to capture any frames")
@@ -176,7 +183,7 @@ class NavigationController:  # Handles game navigation and special capture seque
         if reset_position:
             if not dry_run:
                 pyautogui.click(reset_position)
-                time.sleep(0.5)  # Brief pause after click
+                time.sleep(0.1)  # Brief pause after click
                 print("Reset view button clicked")
             else:
                 print("Dry run: Would click reset view button")
@@ -247,7 +254,7 @@ class NavigationController:  # Handles game navigation and special capture seque
                 pyautogui.click()
 
             if i < times - 1:
-                time.sleep(0.8)
+                time.sleep(0.2)
 
         return True
 
@@ -270,7 +277,7 @@ class NavigationController:  # Handles game navigation and special capture seque
                 pyautogui.click()
 
             if i < times - 1:
-                time.sleep(0.8)
+                time.sleep(0.2)
 
         return True
 
@@ -301,13 +308,13 @@ class NavigationController:  # Handles game navigation and special capture seque
         print("Attempting to navigate to Phase 1...")
         for i in range(2):
             self.click_downphase(times=1)
-            time.sleep(0.5)  # Small wait after phase change
+            time.sleep(0.1)  # Small wait after phase change
 
             # Reset view after each phase change to guard against camera movement
             print("Resetting view...")
             if not self.click_resetview():
                 print("Warning: Could not find reset view button")
-            time.sleep(0.5)
+            time.sleep(0.1)
 
         self.current_phase = 1
         print("Successfully initialised to Phase 1")
@@ -319,13 +326,13 @@ class NavigationController:  # Handles game navigation and special capture seque
 
         # Click up phase
         self.click_upphase()
-        time.sleep(1.0)  # Wait for phase transition
+        time.sleep(0.2)  # Wait for phase transition
 
         # Reset view after phase change to guard against camera movement
         print("Resetting view...")
         if not self.click_resetview():
             print("Warning: Could not find reset view button")
-        time.sleep(0.5)
+        time.sleep(0.1)
 
         self.current_phase += 1
         print(f"Advanced to Phase {self.current_phase}")
