@@ -78,7 +78,7 @@ This project implements a complete Agent-in-the-Loop system that captures, analy
 
 **Optional Enhancements**:
 - **NVIDIA GPU** with CUDA for accelerated OCR processing
-- **Tesseract OCR** for additional text recognition engine
+- **Tesseract OCR** for additional text recognition engine (see Tesseract installation guide below)
 
 ### Installation
 
@@ -113,6 +113,34 @@ STRATEGIES_DIR=./strategies
 GAME_STATE_PATH=./game_state
 ```
 
+5. **Install Tesseract OCR**:
+
+Tesseract provides an additional OCR engine for improved text recognition accuracy as a fallback to PaddleOCR.
+
+**Windows Installation**:
+
+a. Download the Tesseract installer:
+   - Visit: https://github.com/UB-Mannheim/tesseract/wiki
+   - Download the latest Windows installer (e.g., `tesseract-ocr-w64-setup-5.3.x.exe`)
+
+b. Run the installer:
+   - **Important**: During installation, note the installation path (default: `C:\Program Files\Tesseract-OCR`)
+   - Ensure "Add to PATH" is selected during installation, OR manually add it after installation
+
+c. Add Tesseract to system PATH (if not added automatically):
+   - Open System Properties → Environment Variables
+   - Under "System Variables", find and edit "Path"
+   - Add new entry: `C:\Program Files\Tesseract-OCR` (or your installation path)
+
+d. Verify installation:
+```bash
+tesseract --version
+```
+You should see version information if installed correctly.
+
+e. Configure pytesseract path (if needed):
+If Tesseract is not found automatically, you may need to set the path in your Python code or create a `tessdata` environment variable pointing to `C:\Program Files\Tesseract-OCR\tessdata`
+
 ### Usage Workflow
 
 #### Option 1: Integrated System Launch (Recommended)
@@ -142,14 +170,22 @@ python LIVE_ROI_STUDIO.py
 - Define text validation patterns
 - Save template for automated reading
 
+**Important Notes on ROI Calibration**:
+- **Pre-calibrated templates** are included in `rois/main/` directory
+- These templates are **calibrated for a specific resolution** (2560x1440)
+- If your display resolution differs, you should **recalibrate the ROIs yourself** using the ROI Studio calibrator
+- The `LIVE_GAME_READER` uses these templates from `rois/main/` to process game data
+- Each template contains position coordinates, preprocessing settings, and validation patterns optimized for accurate OCR
+
 3. **Run Automated Game Reading**:
 ```bash
 cd agent/screen_reading
 python LIVE_GAME_READER.py
 ```
-- Loads calibrated templates
-- Performs 3-phase automated reading
+- Loads calibrated templates from `rois/main/` directory
+- Performs 3-phase automated reading using template configurations
 - Exports game state as JSON for AI analysis
+- **Note**: The live game reader specifically uses the templates within `rois/main/` to locate and process text regions on screen
 
 4. **Launch Integrated System (AI Analysis & Visualization)**:
 ```bash
@@ -164,6 +200,47 @@ python main.py
 - Progress tracking shows real-time status during processing
 - View strategic recommendations in chatbox overlay
 - Processing time: ~2-2.5 minutes (optimized from 5 minutes)
+
+## ROI Templates and Calibration
+
+### Understanding ROI Templates
+
+The system uses **Region of Interest (ROI) templates** to identify and extract text from specific areas of the game interface. These templates are stored in the `rois/main/` directory and contain:
+
+- **Coordinate positions** for each text region
+- **Preprocessing method** optimized for that specific region
+- **Text validation patterns** to ensure accurate recognition
+- **Auto-scaling settings** for optimal OCR performance
+
+### How LIVE_GAME_READER Uses Templates
+
+The `LIVE_GAME_READER.py` script:
+1. Loads all template files from the `rois/main/` directory
+2. Uses the stored coordinates to capture screenshots of specific game regions
+3. Applies the calibrated preprocessing method to each captured region
+4. Runs OCR (PaddleOCR primary, Tesseract fallback) on the processed images
+5. Validates extracted text against defined patterns
+6. Compiles all results into a structured JSON game state
+
+### Resolution Compatibility
+
+**Important**: The included ROI templates in `rois/main/` are calibrated for **2560x1440 resolution**.
+
+**If your display uses a different resolution**:
+- The coordinate positions in the templates will not align correctly with your game interface
+- You **must recalibrate the ROIs** using the ROI Studio calibrator on your specific display
+- Run `python LIVE_ROI_STUDIO.py` and create new templates for your resolution
+- Save the new templates (they will be stored in `rois/main/` and used by `LIVE_GAME_READER`)
+
+### Calibration Best Practices
+
+When calibrating ROIs for your display:
+1. Ensure RTSViewer is running at your native resolution
+2. Draw ROI boxes tightly around text regions to minimize noise
+3. Test multiple preprocessing methods to find the most accurate one
+4. Define validation patterns to catch OCR errors
+5. Use the auto-scaling feature if text appears too small or large
+6. Save templates with descriptive names for easy identification
 
 ## Component Dependencies
 
