@@ -55,10 +55,12 @@ This project implements a complete Agent-in-the-Loop system that captures, analy
 
 **Key Features**:
 - **External overlay**: Hooks onto RTSViewer game window
-- **Real-time control**: Start/stop agent analysis with GUI buttons
-- **Process management**: Threaded execution for responsive interface
-- **Output display**: Shows AI recommendations in overlay window
-- **Session management**: Tracks and displays analysis results
+- **Integrated pipeline**: Single-button execution of full analysis workflow
+- **Real-time control**: Interactive buttons for all system operations
+- **Progress tracking**: Live updates during screen reading and analysis
+- **Process management**: Aggressive termination for instant cancellation
+- **Output display**: Shows AI recommendations in chatbox overlay
+- **Session management**: Automatic bridging between components
 
 **Components**:
 - `main.py` - Application entry point
@@ -113,6 +115,17 @@ GAME_STATE_PATH=./game_state
 
 ### Usage Workflow
 
+#### Option 1: Integrated System Launch (Recommended)
+
+**One-click system startup**:
+```bash
+# From repository root
+start_system.bat
+```
+This launches both RTSViewer and the integrated visualization overlay with all components ready.
+
+#### Option 2: Manual Component Launch
+
 1. **Start RTSViewer Game**:
 ```bash
 cd system_files
@@ -138,15 +151,19 @@ python LIVE_GAME_READER.py
 - Performs 3-phase automated reading
 - Exports game state as JSON for AI analysis
 
-4. **Launch AI Analysis & Visualization**:
+4. **Launch Integrated System (AI Analysis & Visualization)**:
 ```bash
 cd agent/visualisation
 python main.py
 ```
-- Overlay GUI appears on game window
-- Click "Generate" to run AI analysis
-- View strategic recommendations in real-time
-- Cancel analysis anytime with "Stop" button
+- Overlay GUI appears on game window with control buttons:
+  - **Generate Strategy**: Runs full pipeline (screen reading → AI analysis)
+  - **Cancel**: Stops current operations immediately
+  - **Launch ROI Studio**: Opens calibration tool
+  - **Exit System**: Graceful shutdown of all components
+- Progress tracking shows real-time status during processing
+- View strategic recommendations in chatbox overlay
+- Processing time: ~2-2.5 minutes (optimized from 5 minutes)
 
 ## Component Dependencies
 
@@ -180,6 +197,7 @@ Agent-in-the-Loop-Repository/
 │   │   ├── core/                # Data models and validation
 │   │   ├── ocr/                 # OCR processing pipeline
 │   │   ├── imaging/             # Computer vision utilities
+│   │   ├── rois/                # ROI templates and configurations
 │   │   └── requirements.txt
 │   ├── decision_logic/          # AI analysis system
 │   │   └── run_agent/
@@ -193,10 +211,13 @@ Agent-in-the-Loop-Repository/
 │       ├── main.py              # Application entry point
 │       ├── ui.py                # Interface components
 │       ├── external_overlay/    # Window management
+│       ├── agent_bridge.py      # Integration between components
+│       ├── win_termination.py   # Process management utilities
 │       └── finalOutput.txt      # AI analysis results
 ├── system_files/                # RTSViewer game files
 ├── project_context/             # Documentation and references
 ├── requirements.txt             # Combined dependencies
+├── start_system.bat             # One-click system launcher
 └── README.md                    # This file
 ```
 
@@ -221,6 +242,8 @@ Agent-in-the-Loop-Repository/
 - Try different OCR preprocessing methods for poor accuracy
 - Use auto-scaling feature for optimal text size
 - Run as administrator if screen capture fails
+- If processing is slow, verify GPU acceleration is enabled for PaddleOCR
+- Check that parallel processing shows "(Parallel)" in phase headers
 
 **AI Analysis Issues**:
 - Verify OpenAI API key is configured correctly
