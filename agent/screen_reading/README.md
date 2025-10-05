@@ -123,20 +123,50 @@ This is your **calibration and setup tool**. It's like a sophisticated image edi
 This is your **automation engine**. It uses the templates you created in the studio:
 
 **What it does:**
-- Loads your calibrated ROI templates
-- Performs 3-phase automated game reading:
-  1. **Navigate** - Click to specific game locations
-  2. **Read** - Extract text from predefined regions
-  3. **Capture** - Take final measurements over time
+- **Auto-detects** monitor resolution (2560x1440 or 1920x1080) and loads appropriate ROI templates
+- **Multi-monitor support**: Detects RTSViewer window and translates coordinates across monitors
+- **Smart capture planning**: Detects save_state.json or prompts for phase selection via popup
+- **Batch processing architecture**:
+  1. **Bulk Capture (~15s)**: Navigate and capture all screenshots with mouse lock
+  2. **Batch OCR (~2min)**: User freed, parallel processing of all captures
+- **Real-time stats**: Generates stats.txt with faction totals, base control, action counts
 - Validates everything against your patterns
 - Logs comprehensive session data
 
-**The 3-Phase System:**
-- **Phase 1**: Navigate to "red1 base" location automatically
-- **Phase 2**: Read initial unit counts and validate them
-- **Phase 3**: Navigate to "red2" and sample final unit counts over 5 seconds
+**Resolution-Adaptive System:**
+- Automatically selects Main_rois_2560x1440.json or Main_rois_1920x1080.json
+- Falls back to Main_rois_custom.json for unknown resolutions
+- Same logic for Element ROIs (navigation buttons, phase header, LER)
 
 ## Special Technical Features
+
+### Resolution-Adaptive ROI System
+
+**Automatic Detection:**
+- System detects monitor resolution at startup using MSS library
+- Builds resolution-specific ROI file paths (e.g., Main_rois_2560x1440.json)
+- Falls back to `_custom.json` files if resolution-specific file not found
+- Works seamlessly across 2560x1440 and 1920x1080 displays
+
+**Multi-Monitor Coordinate Translation:**
+- PyAutoGUI uses global coordinates across all monitors
+- System queries MSS for monitor offsets (mon["left"], mon["top"])
+- Adds monitor offset to ROI-relative coordinates for accurate clicking
+- Navigation works regardless of which monitor displays RTSViewer
+
+### Batch Processing Architecture
+
+**Bulk Capture Phase (~15s mouse lock):**
+- Navigate to each phase and capture single screenshot
+- Store PIL Images in memory (efficient, ~50-200MB depending on resolution)
+- Navigate to red1 base and capture 5 screenshots for averaging
+- User must not move mouse during this phase
+
+**Batch OCR Phase (~2min, user freed):**
+- Process all stored screenshots in parallel (8 workers)
+- Apply preprocessing, run OCR, validate patterns
+- Calculate phase data with mode support (full/before_only)
+- Generate game_state.json and stats.txt
 
 ### GPU vs CPU for PaddleOCR
 
@@ -199,6 +229,13 @@ The system prioritises pattern matches over raw OCR confidence - a 85% confidenc
 - Check file paths are absolute, not relative
 - Ensure JSON structure is valid
 - Verify ROI names match between studio and reader
+- For resolution issues, check that resolution-specific ROI file exists or create _custom fallback
+
+**5. "Navigation not working / clicking wrong location"**
+- Ensure RTSViewer is visible on the detected monitor
+- Check that Element ROI file exists for your resolution (contains button coordinates)
+- Multi-monitor setups: System auto-detects monitor offset, but verify RTSViewer is on expected monitor
+- If using _custom ROIs, ensure button ROIs (Upphase, Downphase, Resetview_button) are defined
 
 ## Learning Outcomes
 

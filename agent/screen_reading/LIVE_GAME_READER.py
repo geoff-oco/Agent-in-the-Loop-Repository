@@ -15,6 +15,22 @@ logging.getLogger("paddleocr").setLevel(logging.ERROR)
 
 def main():
     parser = argparse.ArgumentParser(description="Live Game Reader - Template-based 3-phase processing")
+    parser.add_argument(
+        "--monitor",
+        type=int,
+        default=None,
+        help="Monitor index to capture from (default: auto-detect RTSViewer window)",
+    )
+    parser.add_argument(
+        "--skip-save-check", action="store_true", help="Skip save_state.json check and go straight to phase selection"
+    )
+    parser.add_argument(
+        "--phase-selection",
+        type=int,
+        default=None,
+        choices=[0, 1, 2, 3],
+        help="Phase with NO actions (1/2/3) or 0 if all have actions (used when save_state.json not found)",
+    )
     args = parser.parse_args()
 
     # Logging will be configured by SessionOutputManager when session is initialised
@@ -27,11 +43,11 @@ def main():
     print("LIVE GAME READER")
     print("=" * 60 + "\n")
 
-    reader = LiveGameReader()
+    reader = LiveGameReader(monitor_index=args.monitor)
 
     # Run game reading
     try:
-        success = reader.run()
+        success = reader.run(skip_save_check=args.skip_save_check, phase_selection=args.phase_selection)
         if success:
             print("\nSUCCESS: Game reading completed")
             sys.exit(0)

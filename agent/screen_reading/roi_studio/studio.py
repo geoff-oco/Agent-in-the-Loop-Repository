@@ -59,13 +59,13 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
             self.root,
             self.roi_manager,
             get_current_frame=lambda: None,  # Placeholder
-            get_frozen_frame=lambda: None,   # Placeholder
-            set_frames=lambda img: None,     # Placeholder
+            get_frozen_frame=lambda: None,  # Placeholder
+            set_frames=lambda img: None,  # Placeholder
             draw_frame_callback=lambda img: None,  # Placeholder
             status_callback=self.status_message,
             get_selected_roi=lambda: self.selected_name,
             get_padding=lambda: self.var_padding.get(),
-            stop_capture_callback=lambda: None  # Placeholder
+            stop_capture_callback=lambda: None,  # Placeholder
         )
 
         # UI
@@ -80,7 +80,7 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
             self.roi_manager,
             self.status_message,
             lambda: self.selected_name,
-            self._schedule_capture_tick
+            self._schedule_capture_tick,
         )
 
         # Update template manager callbacks to use capture manager
@@ -105,7 +105,7 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
             self.ent_expected,
             self.ent_pattern,
             self.ent_char_filter,
-            self.var_filter_mode
+            self.var_filter_mode,
         )
 
         # Now create the OCR tester preview section
@@ -132,20 +132,44 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
         tb = ttk.Frame(self.root)
         tb.pack(fill=tk.X, padx=UIConfig.TOOLBAR_PADX, pady=UIConfig.TOOLBAR_PADY)
 
-        ttk.Button(tb, text="Start Capture", command=lambda: self.capture_manager.start_capture() if hasattr(self, 'capture_manager') else None).pack(side=tk.LEFT, padx=UIConfig.BUTTON_PADX)
-        ttk.Button(tb, text="Stop Capture", command=lambda: self.capture_manager.stop_capture() if hasattr(self, 'capture_manager') else None).pack(side=tk.LEFT, padx=UIConfig.BUTTON_PADX)
-        ttk.Button(tb, text="Freeze Frame", command=lambda: self.capture_manager.freeze_frame() if hasattr(self, 'capture_manager') else None).pack(
-            side=tk.LEFT, padx=UIConfig.BUTTON_PADX_LARGE
-        )
-        ttk.Button(tb, text="Unfreeze", command=lambda: self.capture_manager.unfreeze_frame() if hasattr(self, 'capture_manager') else None).pack(side=tk.LEFT, padx=UIConfig.BUTTON_PADX)
-        ttk.Button(tb, text="Save PNG Frame", command=lambda: self.capture_manager.save_frame_png() if hasattr(self, 'capture_manager') else None).pack(side=tk.LEFT, padx=UIConfig.BUTTON_PADX)
+        ttk.Button(
+            tb,
+            text="Start Capture",
+            command=lambda: self.capture_manager.start_capture() if hasattr(self, "capture_manager") else None,
+        ).pack(side=tk.LEFT, padx=UIConfig.BUTTON_PADX)
+        ttk.Button(
+            tb,
+            text="Stop Capture",
+            command=lambda: self.capture_manager.stop_capture() if hasattr(self, "capture_manager") else None,
+        ).pack(side=tk.LEFT, padx=UIConfig.BUTTON_PADX)
+        ttk.Button(
+            tb,
+            text="Freeze Frame",
+            command=lambda: self.capture_manager.freeze_frame() if hasattr(self, "capture_manager") else None,
+        ).pack(side=tk.LEFT, padx=UIConfig.BUTTON_PADX_LARGE)
+        ttk.Button(
+            tb,
+            text="Unfreeze",
+            command=lambda: self.capture_manager.unfreeze_frame() if hasattr(self, "capture_manager") else None,
+        ).pack(side=tk.LEFT, padx=UIConfig.BUTTON_PADX)
+        ttk.Button(
+            tb,
+            text="Save PNG Frame",
+            command=lambda: self.capture_manager.save_frame_png() if hasattr(self, "capture_manager") else None,
+        ).pack(side=tk.LEFT, padx=UIConfig.BUTTON_PADX)
 
         ttk.Label(tb, text="Source:").pack(side=tk.LEFT, padx=(20, 4))
         self.cmb_source = ttk.Combobox(
             tb, textvariable=self.source_var, width=UIConfig.COMBOBOX_WIDTH, state="readonly"
         )
         self.cmb_source.pack(side=tk.LEFT)
-        ttk.Button(tb, text="Refresh", command=lambda: self.capture_manager.refresh_monitors(self.cmb_source) if hasattr(self, 'capture_manager') else None).pack(side=tk.LEFT, padx=UIConfig.BUTTON_PADX)
+        ttk.Button(
+            tb,
+            text="Refresh",
+            command=lambda: (
+                self.capture_manager.refresh_monitors(self.cmb_source) if hasattr(self, "capture_manager") else None
+            ),
+        ).pack(side=tk.LEFT, padx=UIConfig.BUTTON_PADX)
 
         ttk.Label(tb, text="FPS").pack(side=tk.LEFT, padx=(20, 4))
         ttk.Spinbox(
@@ -369,7 +393,7 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
         self.canvas.bind("<Configure>", self.on_canvas_resize)
 
     def on_canvas_resize(self, e):  # Handle canvas resize events to auto-scale the image
-        if hasattr(self, 'capture_manager'):
+        if hasattr(self, "capture_manager"):
             self.capture_manager.redraw_frame_if_available()
 
     # -------- Essential ROI Management Methods --------
@@ -401,7 +425,7 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
                 self.var_preferred_method.set(roi.preferred_method)
 
             # Redraw to highlight selected ROI
-            if hasattr(self, 'capture_manager'):
+            if hasattr(self, "capture_manager"):
                 self.capture_manager.redraw_frame_if_available()
 
     def apply_to_selected_roi(self):  # Apply current form settings to selected ROI
@@ -443,7 +467,7 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
             self.roi_manager.delete_roi(name)
             self.selected_name = None
             self._refresh_dropdowns()
-            if hasattr(self, 'capture_manager'):
+            if hasattr(self, "capture_manager"):
                 self.capture_manager.redraw_frame_if_available()
 
     def clear_all(self):
@@ -458,7 +482,7 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
             self._update_file_status()
             self.lbl_save_status.config(text="")
             self._refresh_dropdowns()
-            if hasattr(self, 'capture_manager'):
+            if hasattr(self, "capture_manager"):
                 self.capture_manager.redraw_frame_if_available()
 
     def _refresh_dropdowns(self, select: Optional[str] = None):  # Refresh ROI dropdown with current ROIs
@@ -507,7 +531,7 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
                 self.current_roi_file = path
                 self._update_file_status()
                 self._refresh_dropdowns()
-                if hasattr(self, 'capture_manager'):
+                if hasattr(self, "capture_manager"):
                     self.capture_manager.redraw_frame_if_available()
                 self.status_message(f"Loaded {count} ROIs from {os.path.basename(path)}")
             else:
@@ -516,7 +540,7 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
     # -------- Mouse Event Handlers --------
     def on_mouse_move(self, e):
         # Update cursor based on what's under the mouse
-        if not hasattr(self, 'capture_manager') or not self.capture_manager.frame:
+        if not hasattr(self, "capture_manager") or not self.capture_manager.frame:
             return
 
         # Check if we're over a resize handle of selected ROI
@@ -525,28 +549,28 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
             if handle:
                 # Set resize cursor based on handle position
                 cursor_map = {
-                    'nw': 'size_nw_se',
-                    'ne': 'size_ne_sw',
-                    'sw': 'size_ne_sw',
-                    'se': 'size_nw_se',
-                    'n': 'sb_v_double_arrow',
-                    's': 'sb_v_double_arrow',
-                    'e': 'sb_h_double_arrow',
-                    'w': 'sb_h_double_arrow'
+                    "nw": "size_nw_se",
+                    "ne": "size_ne_sw",
+                    "sw": "size_ne_sw",
+                    "se": "size_nw_se",
+                    "n": "sb_v_double_arrow",
+                    "s": "sb_v_double_arrow",
+                    "e": "sb_h_double_arrow",
+                    "w": "sb_h_double_arrow",
                 }
-                self.canvas.config(cursor=cursor_map.get(handle, 'arrow'))
+                self.canvas.config(cursor=cursor_map.get(handle, "arrow"))
                 return
 
         # Check if we're over an ROI body
         roi_name = self._get_roi_at_position(e.x, e.y)
         if roi_name:
-            self.canvas.config(cursor='fleur')  # Move cursor
+            self.canvas.config(cursor="fleur")  # Move cursor
         else:
-            self.canvas.config(cursor='arrow')  # Default cursor
+            self.canvas.config(cursor="arrow")  # Default cursor
 
     def on_down(self, e):
         # Start drag operation
-        if not hasattr(self, 'capture_manager') or not self.capture_manager.frame:
+        if not hasattr(self, "capture_manager") or not self.capture_manager.frame:
             return
 
         self.drag_start_x = e.x
@@ -556,7 +580,7 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
         if self.selected_name and self.selected_name in self.roi_manager:
             handle = self._get_handle_at_position(e.x, e.y)
             if handle:
-                self.drag_state = f'resize_{handle}'
+                self.drag_state = f"resize_{handle}"
                 self.drag_roi_name = self.selected_name
                 roi = self.roi_manager[self.selected_name]
                 self.original_roi_coords = (roi.x, roi.y, roi.w, roi.h)
@@ -571,13 +595,13 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
             self.on_roi_dropdown_select(None)  # Update form fields
 
             # Start move operation
-            self.drag_state = 'move'
+            self.drag_state = "move"
             self.drag_roi_name = roi_name
             roi = self.roi_manager[roi_name]
             self.original_roi_coords = (roi.x, roi.y, roi.w, roi.h)
 
             # Redraw to show selection
-            if hasattr(self, 'capture_manager'):
+            if hasattr(self, "capture_manager"):
                 self.capture_manager.redraw_frame_if_available()
 
     def on_drag(self, e):
@@ -585,7 +609,7 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
         if not self.drag_state or not self.drag_roi_name:
             return
 
-        if not hasattr(self, 'capture_manager') or not self.capture_manager.frame:
+        if not hasattr(self, "capture_manager") or not self.capture_manager.frame:
             return
 
         roi = self.roi_manager[self.drag_roi_name]
@@ -607,34 +631,34 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
 
         orig_x, orig_y, orig_w, orig_h = self.original_roi_coords
 
-        if self.drag_state == 'move':
+        if self.drag_state == "move":
             # Move the ROI
             new_x = max(0, min(1 - orig_w, orig_x + rel_dx))
             new_y = max(0, min(1 - orig_h, orig_y + rel_dy))
             roi.x = new_x
             roi.y = new_y
 
-        elif self.drag_state.startswith('resize_'):
+        elif self.drag_state.startswith("resize_"):
             # Resize the ROI based on which handle is being dragged
             handle = self.drag_state[7:]  # Get handle position after 'resize_'
 
-            if 'w' in handle:  # West (left) edge
+            if "w" in handle:  # West (left) edge
                 new_x = max(0, min(orig_x + orig_w - 0.01, orig_x + rel_dx))
                 new_w = orig_w - (new_x - orig_x)
                 roi.x = new_x
                 roi.w = max(0.01, new_w)
 
-            elif 'e' in handle:  # East (right) edge
+            elif "e" in handle:  # East (right) edge
                 new_w = max(0.01, min(1 - orig_x, orig_w + rel_dx))
                 roi.w = new_w
 
-            if 'n' in handle:  # North (top) edge
+            if "n" in handle:  # North (top) edge
                 new_y = max(0, min(orig_y + orig_h - 0.01, orig_y + rel_dy))
                 new_h = orig_h - (new_y - orig_y)
                 roi.y = new_y
                 roi.h = max(0.01, new_h)
 
-            elif 's' in handle:  # South (bottom) edge
+            elif "s" in handle:  # South (bottom) edge
                 new_h = max(0.01, min(1 - orig_y, orig_h + rel_dy))
                 roi.h = new_h
 
@@ -645,7 +669,7 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
         self.var_h.set(roi.h)
 
         # Redraw the canvas
-        if hasattr(self, 'capture_manager'):
+        if hasattr(self, "capture_manager"):
             self.capture_manager.redraw_frame_if_available()
 
     def on_up(self, e):
@@ -653,11 +677,11 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
         self.drag_state = None
         self.drag_roi_name = None
         self.original_roi_coords = None
-        self.canvas.config(cursor='arrow')
+        self.canvas.config(cursor="arrow")
 
     def _get_roi_at_position(self, x, y):
         # Get the ROI at the given canvas position
-        if not hasattr(self, 'capture_manager'):
+        if not hasattr(self, "capture_manager"):
             return None
 
         for name, roi in self.roi_manager.rois.items():
@@ -671,7 +695,7 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
         if not self.selected_name or self.selected_name not in self.roi_manager:
             return None
 
-        if not hasattr(self, 'capture_manager'):
+        if not hasattr(self, "capture_manager"):
             return None
 
         roi = self.roi_manager[self.selected_name]
@@ -679,14 +703,14 @@ class LiveROIStudio:  # Live ROI Studio UI using dependency injection for all ba
 
         # Check corners
         handles = [
-            (roi_x, roi_y, 'nw'),
-            (roi_x + roi_w, roi_y, 'ne'),
-            (roi_x, roi_y + roi_h, 'sw'),
-            (roi_x + roi_w, roi_y + roi_h, 'se'),
-            (roi_x + roi_w // 2, roi_y, 'n'),
-            (roi_x + roi_w // 2, roi_y + roi_h, 's'),
-            (roi_x, roi_y + roi_h // 2, 'w'),
-            (roi_x + roi_w, roi_y + roi_h // 2, 'e'),
+            (roi_x, roi_y, "nw"),
+            (roi_x + roi_w, roi_y, "ne"),
+            (roi_x, roi_y + roi_h, "sw"),
+            (roi_x + roi_w, roi_y + roi_h, "se"),
+            (roi_x + roi_w // 2, roi_y, "n"),
+            (roi_x + roi_w // 2, roi_y + roi_h, "s"),
+            (roi_x, roi_y + roi_h // 2, "w"),
+            (roi_x + roi_w, roi_y + roi_h // 2, "e"),
         ]
 
         for hx, hy, handle_type in handles:
@@ -711,6 +735,7 @@ def main():
     except Exception as e:
         print(f"Application error: {e}")
         import traceback
+
         traceback.print_exc()
 
 

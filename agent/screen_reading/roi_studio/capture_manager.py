@@ -11,10 +11,16 @@ from .ui_components import UIConfig
 
 
 class CaptureManager:  # Handles screen capture, display and frame management
-    def __init__(self, canvas: tk.Canvas, fps_var: tk.IntVar, source_var: tk.StringVar,
-                 roi_manager: ROIManager, status_callback: Callable[[str], None],
-                 get_selected_roi: Callable[[], Optional[str]],
-                 schedule_callback: Callable[[], None]):
+    def __init__(
+        self,
+        canvas: tk.Canvas,
+        fps_var: tk.IntVar,
+        source_var: tk.StringVar,
+        roi_manager: ROIManager,
+        status_callback: Callable[[str], None],
+        get_selected_roi: Callable[[], Optional[str]],
+        schedule_callback: Callable[[], None],
+    ):
         self.canvas = canvas
         self.fps_var = fps_var
         self.source_var = source_var
@@ -239,31 +245,29 @@ class CaptureManager:  # Handles screen capture, display and frame management
         label_x = x + 2
         label_y = y - 15 if y > 15 else y + h + 2
         self.canvas.create_text(
-            label_x, label_y,
-            text=meta.name,
-            anchor=tk.NW,
-            fill=label_colour,
-            font=UIConfig.FONT_SMALL,
-            tags="roi"
+            label_x, label_y, text=meta.name, anchor=tk.NW, fill=label_colour, font=UIConfig.FONT_SMALL, tags="roi"
         )
 
         if selected:
             # Draw resize handles for selected ROI
             handle_size = UIConfig.HANDLE_SIZE
             handles = [
-                (x - handle_size//2, y - handle_size//2, "nw"),  # top-left
-                (x + w - handle_size//2, y - handle_size//2, "ne"),  # top-right
-                (x - handle_size//2, y + h - handle_size//2, "sw"),  # bottom-left
-                (x + w - handle_size//2, y + h - handle_size//2, "se"),  # bottom-right
+                (x - handle_size // 2, y - handle_size // 2, "nw"),  # top-left
+                (x + w - handle_size // 2, y - handle_size // 2, "ne"),  # top-right
+                (x - handle_size // 2, y + h - handle_size // 2, "sw"),  # bottom-left
+                (x + w - handle_size // 2, y + h - handle_size // 2, "se"),  # bottom-right
             ]
 
             for hx, hy, handle_type in handles:
                 self.canvas.create_rectangle(
-                    hx, hy, hx + handle_size, hy + handle_size,
-                    fill=UIConfig.HANDLE_FILL, outline=UIConfig.HANDLE_FILL,
-                    tags=f"handle_{handle_type}"
+                    hx,
+                    hy,
+                    hx + handle_size,
+                    hy + handle_size,
+                    fill=UIConfig.HANDLE_FILL,
+                    outline=UIConfig.HANDLE_FILL,
+                    tags=f"handle_{handle_type}",
                 )
-
 
     def redraw_frame_if_available(self) -> None:
         # Redraw current frame if available (used for ROI updates)

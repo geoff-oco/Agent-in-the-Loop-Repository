@@ -27,7 +27,11 @@ This project implements a complete Agent-in-the-Loop system that captures, analy
 - **Multi-engine OCR**: PaddleOCR (primary) and Tesseract (backup) support
 - **Advanced preprocessing**: 5 different image enhancement methods
 - **Pattern validation**: Smart text validation using custom patterns
-- **Auto-scaling**: Automatic text size optimization for OCR accuracy
+- **Auto-scaling**: Automatic text size optimisation for OCR accuracy
+- **Resolution-adaptive**: Automatic ROI selection for 2560x1440 and 1920x1080 displays
+- **Multi-monitor support**: Automatic monitor detection and coordinate translation
+- **Batch processing**: Bulk capture then batch OCR (user freed after ~15s)
+- **Real-time stats**: Live simulation statistics (faction totals, base control, actions)
 
 **Entry Points**:
 - `LIVE_ROI_STUDIO.py` - Interactive calibration and setup tool
@@ -171,21 +175,24 @@ python LIVE_ROI_STUDIO.py
 - Save template for automated reading
 
 **Important Notes on ROI Calibration**:
-- **Pre-calibrated templates** are included in `rois/main/` directory
-- These templates are **calibrated for a specific resolution** (2560x1440)
-- If your display resolution differs, you should **recalibrate the ROIs yourself** using the ROI Studio calibrator
-- The `LIVE_GAME_READER` uses these templates from `rois/main/` to process game data
-- Each template contains position coordinates, preprocessing settings, and validation patterns optimized for accurate OCR
+- **Pre-calibrated templates** are included for **2560x1440** and **1920x1080** resolutions
+- System **automatically detects** your monitor resolution and loads the appropriate ROI file
+- **Fallback templates** (`_custom.json` files) used for unknown resolutions
+- **Multi-monitor support**: Automatically detects which monitor RTSViewer is on and adjusts coordinates
+- If auto-detection doesn't work for your setup, use the ROI Studio calibrator to create custom templates
+- Each template contains position coordinates, preprocessing settings, and validation patterns optimised for accurate OCR
 
 3. **Run Automated Game Reading**:
 ```bash
 cd agent/screen_reading
 python LIVE_GAME_READER.py
 ```
-- Loads calibrated templates from `rois/main/` directory
-- Performs 3-phase automated reading using template configurations
+- Auto-detects monitor resolution and loads appropriate ROI templates
+- Detects RTSViewer window location across multiple monitors
+- Performs batch capture (~15s mouse lock) then batch OCR processing (user freed)
+- Smart popup system: detects save_state.json or prompts for phase selection
 - Exports game state as JSON for AI analysis
-- **Note**: The live game reader specifically uses the templates within `rois/main/` to locate and process text regions on screen
+- Generates real-time stats.txt with simulation statistics
 
 4. **Launch Integrated System (AI Analysis & Visualization)**:
 ```bash
@@ -215,22 +222,29 @@ The system uses **Region of Interest (ROI) templates** to identify and extract t
 ### How LIVE_GAME_READER Uses Templates
 
 The `LIVE_GAME_READER.py` script:
-1. Loads all template files from the `rois/main/` directory
-2. Uses the stored coordinates to capture screenshots of specific game regions
-3. Applies the calibrated preprocessing method to each captured region
-4. Runs OCR (PaddleOCR primary, Tesseract fallback) on the processed images
-5. Validates extracted text against defined patterns
-6. Compiles all results into a structured JSON game state
+1. Auto-detects monitor resolution and RTSViewer window location
+2. Loads resolution-specific ROI templates (or _custom fallback)
+3. **Smart capture planning**: Detects save_state.json or prompts user for phase selection
+4. **Bulk capture phase (~15s)**: Captures all screenshots with mouse lock
+5. **Batch OCR phase (~2min)**: User freed, parallel processing of all captures
+6. Applies calibrated preprocessing and validates against patterns
+7. Generates game_state.json AND real-time stats.txt with simulation data
 
-### Resolution Compatibility
+### Resolution and Multi-Monitor Support
 
-**Important**: The included ROI templates in `rois/main/` are calibrated for **2560x1440 resolution**.
+**Automatic Resolution Detection**:
+- System auto-detects monitor resolution (2560x1440 or 1920x1080)
+- Loads resolution-specific ROI templates automatically
+- Falls back to `_custom.json` templates for unknown resolutions
 
-**If your display uses a different resolution**:
-- The coordinate positions in the templates will not align correctly with your game interface
-- You **must recalibrate the ROIs** using the ROI Studio calibrator on your specific display
-- Run `python LIVE_ROI_STUDIO.py` and create new templates for your resolution
-- Save the new templates (they will be stored in `rois/main/` and used by `LIVE_GAME_READER`)
+**Multi-Monitor Support**:
+- Automatically detects which monitor RTSViewer is displayed on
+- Translates ROI coordinates using global monitor offsets
+- Navigation (button clicks) works correctly across all monitor setups
+
+**If auto-detection doesn't work for your setup**:
+- Run `python LIVE_ROI_STUDIO.py` to create custom templates for your resolution
+- Save templates with `_custom.json` suffix to be used as fallback
 
 ### Calibration Best Practices
 
@@ -321,6 +335,8 @@ Agent-in-the-Loop-Repository/
 - Run as administrator if screen capture fails
 - If processing is slow, verify GPU acceleration is enabled for PaddleOCR
 - Check that parallel processing shows "(Parallel)" in phase headers
+- For multi-monitor issues, ensure RTSViewer is visible on the detected monitor
+- If resolution detection fails, check that ROI files exist for your resolution or use _custom fallback
 
 **AI Analysis Issues**:
 - Verify OpenAI API key is configured correctly

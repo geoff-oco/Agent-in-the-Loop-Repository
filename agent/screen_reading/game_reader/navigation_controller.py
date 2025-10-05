@@ -11,7 +11,14 @@ from imaging.utils import ImageUtils
 
 class NavigationController:  # Handles game navigation and special capture sequences
 
-    def __init__(self, screen_capture, ocr_processor, output_manager, dry_run: bool = False, fast_mode: bool = True):
+    def __init__(
+        self,
+        screen_capture,
+        ocr_processor,
+        output_manager,
+        dry_run: bool = False,
+        fast_mode: bool = True,
+    ):
         self.screen_capture = screen_capture
         self.ocr_processor = ocr_processor
         self.output_manager = output_manager
@@ -21,51 +28,104 @@ class NavigationController:  # Handles game navigation and special capture seque
         self.current_phase: int = 1
 
         # Delay configuration (fast_mode reduces delays for speed)
-        self.delay_multiplier = 0.2 if fast_mode else 1.0  # Fast mode uses 20% of normal delays
+        self.delay_multiplier = 0.2 if fast_mode else 1.0
 
-        # Template-based button clicking setup
-        self.template_dir = Path("rois/template_images")
-        self.button_positions: Dict[str, Tuple[int, int]] = {}
+        # ROI-based button clicking (set after ROIs are loaded)
+        self.button_rois: Optional[Dict[str, ROIMeta]] = None
+        self.monitor_index: Optional[int] = None
 
         # Configure PyAutoGUI
         pyautogui.FAILSAFE = True
         pyautogui.PAUSE = 0.1
 
-        # Load button templates
-        self.templates = {
-            "upphase": self.template_dir / "Upphase_button.png",
-            "downphase": self.template_dir / "Downphase_button.png",
-            "resetview": self.template_dir / "Resetview_button.png",
-        }
-
     def _delay(self, seconds: float):
-        """Apply configurable delay based on delay_multiplier"""
+        # Apply delay adjusted by multiplier for fast/slow mode control
         time.sleep(seconds * self.delay_multiplier)
 
+    def _click_roi_button(self, roi: ROIMeta, button_name: str) -> bool:
+        # Click button using ROI coordinates (resolution-independent, multi-monitor aware)
+        try:
+            if self.monitor_index is None:
+                print(f"Error: monitor_index not set, cannot click {button_name}")
+                return False
+
+            # Get monitor offset position for multi-monitor support
+            import mss
+
+            with mss.mss() as sct:
+                if self.monitor_index < 1 or self.monitor_index >= len(sct.monitors):
+                    print(f"Error: Invalid monitor_index {self.monitor_index}")
+                    return False
+                mon = sct.monitors[self.monitor_index]
+                mon_left = mon["left"]
+                mon_top = mon["top"]
+                mon_width = mon["width"]
+                mon_height = mon["height"]
+
+            # Convert relative ROI coordinates to absolute screen coordinates
+            # Add monitor offset for multi-monitor setups
+            click_x = mon_left + int((roi.x + roi.w / 2) * mon_width)
+            click_y = mon_top + int((roi.y + roi.h / 2) * mon_height)
+
+            print(
+                f"Clicking {button_name} at global ({click_x}, {click_y}) [Monitor {self.monitor_index} offset: ({mon_left}, {mon_top})]"
+            )
+
+            if not self.dry_run:
+                pyautogui.click(click_x, click_y)
+                time.sleep(0.1)
+            else:
+                print(f"Dry run: Would click {button_name}")
+
+            return True
+
+        except Exception as e:
+            print(f"Error clicking {button_name}: {e}")
+            return False
+
     def navigate_to_red1_base(
-        self, monitor_index: int, base_unit_rois: Dict[str, ROIMeta], dry_run: bool = False
+        self,
+        monitor_index: int,
+        base_unit_rois: Dict[str, ROIMeta],
+        dry_run: bool = False,
     ) -> bool:
         # Navigate to red1 base by clicking on its ROI area
         try:
             # Find a suitable red1 ROI to click (prefer non-adjustment ROIs)
-            red1_roi_names = ["R1blight", "R1bheavy", "R1branged", "R1rlight", "R1rheavy", "R1rranged"]
+            red1_roi_names = [
+                "R1blight",
+                "R1bheavy",
+                "R1branged",
+                "R1rlight",
+                "R1rheavy",
+                "R1rranged",
+            ]
 
             for roi_name in red1_roi_names:
                 if roi_name in base_unit_rois:
                     roi = base_unit_rois[roi_name]
 
-                    # Calculate click position (center of ROI)
-                    # Convert relative coordinates to absolute screen coordinates
-                    frame = self.screen_capture.capture_monitor(monitor_index)
-                    if frame is None:
-                        print("Failed to capture screen for navigation")
-                        return False
+                    # Get monitor offset position for multi-monitor support
+                    import mss
 
-                    screen_width, screen_height = frame.size
-                    click_x = int((roi.x + roi.w / 2) * screen_width)
-                    click_y = int((roi.y + roi.h / 2) * screen_height)
+                    with mss.mss() as sct:
+                        if monitor_index < 1 or monitor_index >= len(sct.monitors):
+                            print(f"Error: Invalid monitor_index {monitor_index}")
+                            return False
+                        mon = sct.monitors[monitor_index]
+                        mon_left = mon["left"]
+                        mon_top = mon["top"]
+                        mon_width = mon["width"]
+                        mon_height = mon["height"]
 
-                    print(f"Navigating to red1 base by clicking {roi_name} at ({click_x}, {click_y})")
+                    # Convert relative ROI coordinates to absolute screen coordinates
+                    # Add monitor offset for multi-monitor setups
+                    click_x = mon_left + int((roi.x + roi.w / 2) * mon_width)
+                    click_y = mon_top + int((roi.y + roi.h / 2) * mon_height)
+
+                    print(
+                        f"Navigating to red1 base by clicking {roi_name} at global ({click_x}, {click_y}) [Monitor {monitor_index} offset: ({mon_left}, {mon_top})]"
+                    )
 
                     if not dry_run:
                         import pyautogui
@@ -111,8 +171,12 @@ class NavigationController:  # Handles game navigation and special capture seque
                 # Crop ROI
                 roi_image = ImageUtils.crop_roi(frame, red2_final_unit_roi)
 
-                # Save debug image for this capture
-                self.output_manager.save_capture(roi_image, phase_num=99, roi_name=f"Red2_Final_Capture_{i+1}")
+                # Save capture to final_state folder
+                self.output_manager.save_capture(
+                    roi_image,
+                    phase_num="final_state",
+                    roi_name=f"Red2_Final_Capture_{i+1}",
+                )
 
                 # Store the captured image
                 captured_images.append((i + 1, roi_image))
@@ -140,17 +204,26 @@ class NavigationController:  # Handles game navigation and special capture seque
                 # Process OCR
                 accepted_chars = "0123456789"  # Only numbers expected for unit count
                 results = self.ocr_processor.process_multi_engine(
-                    roi_image, red2_final_unit_roi, accepted_chars=accepted_chars, early_exit_enabled=True
+                    roi_image,
+                    red2_final_unit_roi,
+                    accepted_chars=accepted_chars,
+                    early_exit_enabled=True,
                 )
 
                 if results:
                     # Get the best result from this capture
-                    method_name, _, text, confidence, rule_passed, rule_message = results[0]
+                    method_name, _, text, confidence, rule_passed, rule_message = (
+                        results[0]
+                    )
 
                     # Only consider valid digit results
                     if text.strip() and text.strip().isdigit():
-                        ocr_results.append((capture_num, text.strip(), confidence, method_name))
-                        print(f"    Capture {capture_num}: '{text}' ({confidence:.1f}%, {method_name})")
+                        ocr_results.append(
+                            (capture_num, text.strip(), confidence, method_name)
+                        )
+                        print(
+                            f"    Capture {capture_num}: '{text}' ({confidence:.1f}%, {method_name})"
+                        )
                     else:
                         print(f"    Capture {capture_num}: Invalid text '{text}'")
                 else:
@@ -166,10 +239,14 @@ class NavigationController:  # Handles game navigation and special capture seque
             return None
 
         # Find the best result (highest confidence)
-        best_result = max(ocr_results, key=lambda x: x[2])  # Sort by confidence (index 2)
+        best_result = max(
+            ocr_results, key=lambda x: x[2]
+        )  # Sort by confidence (index 2)
         capture_num, text, confidence, method_name = best_result
 
-        print(f"Best result: Capture {capture_num} - '{text}' ({confidence:.1f}%, {method_name})")
+        print(
+            f"Best result: Capture {capture_num} - '{text}' ({confidence:.1f}%, {method_name})"
+        )
 
         # Click reset view button to return to normal view
         self._click_reset_view_button(dry_run)
@@ -179,79 +256,21 @@ class NavigationController:  # Handles game navigation and special capture seque
     def _click_reset_view_button(self, dry_run: bool = False):
         # Helper method to click the reset view button
         print("Clicking reset view button...")
-        reset_position = self.find_button("resetview", confidence=0.8, cache=False)
-        if reset_position:
-            if not dry_run:
-                pyautogui.click(reset_position)
-                time.sleep(0.1)  # Brief pause after click
-                print("Reset view button clicked")
-            else:
-                print("Dry run: Would click reset view button")
+        if self.click_resetview():
+            print("Reset view button clicked")
         else:
-            print("Warning: Reset view button not found")
-
-    def find_button(
-        self, button_name: str, confidence: float = 0.8, cache: bool = True
-    ) -> Optional[Tuple[int, int]]:
-        # Find button on screen using template matching
-        # Check cache first
-        if cache and button_name in self.button_positions:
-            return self.button_positions[button_name]
-
-        if button_name not in self.templates:
-            return None
-
-        template_path = self.templates[button_name]
-        if not template_path.exists():
-            return None
-
-        try:
-            print(f"Searching for {button_name} button...")
-
-            # Try to locate button on screen
-            location = pyautogui.locateCenterOnScreen(str(template_path), confidence=confidence, grayscale=False)
-
-            if location:
-                position = (location.x, location.y)
-                print(f"Found {button_name} button at {position}")
-
-                # Cache the position
-                if cache:
-                    self.button_positions[button_name] = position
-
-                return position
-            else:
-                # Don't print error for first attempts, just return None
-                if confidence > 0.6:
-                    return self.find_button(button_name, confidence - 0.1, cache)
-
-                # Only print if we've tried all confidence levels
-                print(f"Could not find {button_name} button on screen")
-                return None
-
-        except Exception as e:
-            # Only print real exceptions, not "button not found"
-            if "could not be found" not in str(e).lower():
-                print(f"Error finding button {button_name}: {e}")
-            return None
+            print("Warning: Failed to click reset view button")
 
     def click_downphase(self, times: int = 2) -> bool:
         # Click the down phase button
+        if not self.button_rois or "Downphase" not in self.button_rois:
+            print("Downphase ROI not loaded")
+            return False
+
         for i in range(times):
-            position = self.find_button("downphase", cache=False)  # Always find fresh
-
-            if not position:
-                print("Downphase button not found - likely already at Phase 1")
-                return True  # Not a failure, we're already where we want to be
-
-            x, y = position
-            if self.dry_run:
-                print(f"DRY RUN: Would click downphase at ({x}, {y}) ({i+1}/{times})")
-            else:
-                print(f"Clicking downphase button ({i+1}/{times})")
-                pyautogui.moveTo(x, y, duration=0.3)
-                time.sleep(0.1)
-                pyautogui.click()
+            print(f"Clicking downphase button ({i+1}/{times})")
+            if not self._click_roi_button(self.button_rois["Downphase"], "Downphase"):
+                return False
 
             if i < times - 1:
                 time.sleep(0.2)
@@ -260,21 +279,14 @@ class NavigationController:  # Handles game navigation and special capture seque
 
     def click_upphase(self, times: int = 1) -> bool:
         # Click the up phase button
+        if not self.button_rois or "Upphase" not in self.button_rois:
+            print("Upphase ROI not loaded")
+            return False
+
         for i in range(times):
-            position = self.find_button("upphase", cache=False)  # Always find fresh
-
-            if not position:
-                print("Upphase button not found - likely already at Phase 3")
-                return True  # Not a failure, we're at the max phase
-
-            x, y = position
-            if self.dry_run:
-                print(f"DRY RUN: Would click upphase at ({x}, {y}) ({i+1}/{times})")
-            else:
-                print(f"Clicking upphase button ({i+1}/{times})")
-                pyautogui.moveTo(x, y, duration=0.3)
-                time.sleep(0.1)
-                pyautogui.click()
+            print(f"Clicking upphase button ({i+1}/{times})")
+            if not self._click_roi_button(self.button_rois["Upphase"], "Upphase"):
+                return False
 
             if i < times - 1:
                 time.sleep(0.2)
@@ -283,22 +295,11 @@ class NavigationController:  # Handles game navigation and special capture seque
 
     def click_resetview(self) -> bool:
         # Click the reset view button
-        position = self.find_button("resetview", cache=False)
-
-        if not position:
-            print("Reset view button not found")
+        if not self.button_rois or "Resetview_button" not in self.button_rois:
+            print("Resetview_button ROI not loaded")
             return False
 
-        x, y = position
-        if self.dry_run:
-            print(f"DRY RUN: Would click resetview at ({x}, {y})")
-        else:
-            print("Clicking reset view button")
-            pyautogui.moveTo(x, y, duration=0.3)
-            time.sleep(0.1)
-            pyautogui.click()
-
-        return True
+        return self._click_roi_button(self.button_rois["Resetview_button"], "Resetview")
 
     def init_phase_one(self) -> bool:
         # Initialise game to Phase 1 with Reset View

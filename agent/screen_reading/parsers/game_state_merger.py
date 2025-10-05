@@ -75,6 +75,7 @@ class GameStateMerger:
 
     def _transform_phase_structure(self, phases: List[Dict], actions_by_phase: Dict[int, List[Dict]]) -> List[Dict]:
         # Transform phases: rename "before"→"start", insert "actions" arrays
+        # Handle cases where after=None (before_only mode from smart capture)
         transformed = []
 
         for phase in phases:
@@ -87,11 +88,14 @@ class GameStateMerger:
             phase_actions = actions_by_phase.get(phase_num, [])
 
             # Build transformed phase with correct key order: phase, start, actions, after
+            # If after is None (before_only mode), keep it as None to indicate no adjustment data
+            after_state = phase.get("after")
+
             transformed_phase = {
                 "phase": phase_num,
                 "start": phase.get("before", {}),  # Rename "before" to "start"
                 "actions": phase_actions,  # Insert actions array
-                "after": phase.get("after", {}),  # Keep "after" as-is
+                "after": after_state if after_state is not None else {},  # Use {} if None for JSON compatibility
             }
 
             transformed.append(transformed_phase)
