@@ -37,45 +37,60 @@ def ui(tar_hwnd=None, overlay=None):
 
     # Main container window for buttons (resizable)
     with dpg.window(tag="buttons_container", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
-                    width=220, height=180,
+                    width=220, height=250,
                     pos=(40,(window_height/3))):
         dpg.add_text("System Controls", color=(200, 200, 200))
         # Child window inside for actual button content (makes it resizable)
-        with dpg.child_window(tag="buttons_win", width=-1, height=-1):
+        with dpg.child_window(tag="buttons_win", width=-1, auto_resize_y=True):
             with dpg.group(tag="agent_button"):
                 dpg.add_button(label='Generate Strategy', width=-1, callback=_generation_callback)
             with dpg.group(tag="cancel_button",enabled=False):
                 dpg.add_button(label="Cancel", width=-1,callback=_stopButton_callback)
-            dpg.add_loading_indicator(tag="loading_ind",show=False,width=50,indent=75)
+            dpg.add_spacing()
             dpg.add_separator()
+            dpg.add_spacing()
             dpg.add_button(label="Launch ROI Studio", width=-1, callback=_launch_roi_studio_callback)
             dpg.add_button(label="Exit System", width=-1, callback=_exit_callback)
+        dpg.add_loading_indicator(tag="loading_ind",show=False,width=50,indent=75)
 
     with dpg.window(tag="chat_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
                     width=500, height= window_height / 3 - 10,
                     pos=((window_width/3), (window_height - 10 - window_height/3))):
         dpg.add_text("Chatbox", color=(200, 200, 200))
         dpg.add_separator()
+        dpg.add_spacing()
         with dpg.child_window(tag='outputWindow'):
             dpg.add_text('',tag="outputText", wrap= 475)
 
+    with dpg.theme() as global_theme:
+        with dpg.theme_component(dpg.mvAll):
+            dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 8, category=dpg.mvThemeCat_Core)
+            dpg.add_theme_style(dpg.mvStyleVar_WindowRounding, 6, category=dpg.mvThemeCat_Core)
+            dpg.add_theme_style(dpg.mvStyleVar_ChildRounding, 6, category=dpg.mvThemeCat_Core)
+            dpg.add_theme_style(dpg.mvStyleVar_FramePadding, 10, 6, category=dpg.mvThemeCat_Core)
+            dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 8, 5, category=dpg.mvThemeCat_Core)
+            dpg.add_theme_style(dpg.mvStyleVar_ScrollbarSize, 16, category=dpg.mvThemeCat_Core)
+
+    dpg.bind_item_theme("buttons_container",global_theme)
+    dpg.bind_item_theme("chat_win",global_theme)
+
 
     # Style editor for real-time experimentation (positioned top-right) - COMMENTED OUT
-    # with dpg.window(tag="style_editor_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
-    #                 width=300, height=200,
-    #                 pos=(window_width - 320, 20),
-    #                 show=False):  # Hidden by default
-    #     dpg.add_text("Style Editor Controls")
-    #     dpg.add_button(label="Show Style Editor", callback=lambda: dpg.show_tool(dpg.mvTool_Style))
-    #     dpg.add_button(label="Show Metrics", callback=lambda: dpg.show_tool(dpg.mvTool_Metrics))
-    #     dpg.add_button(label="Toggle This Panel", callback=lambda: dpg.configure_item("style_editor_win", show=not dpg.is_item_shown("style_editor_win")))
+    with dpg.window(tag="style_editor_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
+                    width=300, height=200,
+                    pos=(window_width - 320, 20),
+                    show=False):  # Hidden by default
+        dpg.add_text("Style Editor Controls")
+        dpg.add_button(label="Show Style Editor", callback=lambda: dpg.show_tool(dpg.mvTool_Style))
+        dpg.add_button(label="Show Metrics", callback=lambda: dpg.show_tool(dpg.mvTool_Metrics))
+        dpg.add_button(label="Toggle This Panel", callback=lambda: dpg.configure_item("style_editor_win", show=not dpg.is_item_shown("style_editor_win")))
 
     # Toggle button for style editor (top-right corner) - COMMENTED OUT
-    # with dpg.window(tag="style_toggle_win", no_background=False, no_move=False, no_resize=True, no_title_bar=True,
-    #                 width=80, height=30,
-    #                 pos=(window_width - 90, 10)):
-    #     dpg.add_button(label="Styles", width=70, height=20,
-    #                   callback=lambda: dpg.configure_item("style_editor_win", show=not dpg.is_item_shown("style_editor_win")))
+    with dpg.window(tag="style_toggle_win", no_background=False, no_move=False, no_resize=True, no_title_bar=True,
+                    width=80, height=30,
+                    pos=(window_width - 90, 10)):
+        dpg.add_button(label="Styles", width=70, height=20,
+                      callback=lambda: dpg.configure_item("style_editor_win", show=not dpg.is_item_shown("style_editor_win")))
 
 # Theme system implementation complete - using targeted themes for specific components
 
