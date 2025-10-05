@@ -46,9 +46,9 @@ def ui(tar_hwnd=None, overlay=None):
                 dpg.add_button(label='Generate Strategy', width=-1, callback=_generation_callback)
             with dpg.group(tag="cancel_button",enabled=False):
                 dpg.add_button(label="Cancel", width=-1,callback=_stopButton_callback)
-            dpg.add_spacing()
+            dpg.add_spacer(height=5)
             dpg.add_separator()
-            dpg.add_spacing()
+            dpg.add_spacer(height=5)
             dpg.add_button(label="Launch ROI Studio", width=-1, callback=_launch_roi_studio_callback)
             dpg.add_button(label="Exit System", width=-1, callback=_exit_callback)
         dpg.add_loading_indicator(tag="loading_ind",show=False,width=50,indent=75)
@@ -58,7 +58,7 @@ def ui(tar_hwnd=None, overlay=None):
                     pos=((window_width/3), (window_height - 10 - window_height/3))):
         dpg.add_text("Chatbox", color=(200, 200, 200))
         dpg.add_separator()
-        dpg.add_spacing()
+        dpg.add_spacer(height=5)
         with dpg.child_window(tag='outputWindow'):
             dpg.add_text('',tag="outputText", wrap= 475)
 
