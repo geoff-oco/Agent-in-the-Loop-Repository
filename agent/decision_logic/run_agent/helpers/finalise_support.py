@@ -23,7 +23,7 @@ class FinaliseSupport:
         #check we have a transfer and get the verb
         verb = "lock" if t.get("locked") else t.get("kind","")
         return (
-           f'{verb} {t.get("from")}→{t.get("to")} '
+           f'{verb} {t.get("from")}->{t.get("to")} '
            f'{t.get("L",0)}/{t.get("H",0)}/{t.get("R",0)}'
            )
 
@@ -33,7 +33,7 @@ class FinaliseSupport:
 
         fr, to = action.get("from","?"), action.get("to","?") #From and to
         L, H, R = action.get("L",0), action.get("H",0), action.get("R",0) #units
-        return f'{fr}→{to} {L}/{H}/{R} [{decision}]'
+        return f'{fr}->{to} {L}/{H}/{R} [{decision}]'
 
     # This method extracts deleted action IDs from flags
     @staticmethod

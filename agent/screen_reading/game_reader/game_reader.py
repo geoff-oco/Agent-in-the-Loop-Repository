@@ -3,6 +3,7 @@
 
 import json
 import logging
+import os
 import time
 from typing import Any, Dict, List, Optional
 
@@ -242,11 +243,10 @@ class LiveGameReader:  # Main game reader orchestrator
             print("\n=== Generating Output ===")
             self.progress_reporter.update("Generating game state data...", percentage=90)
 
-            # Build output JSON
+            # Build output JSON (red2_final_count used for calculations but not exported)
             output_data = {
                 "meta": {
                     "ler": self.game_state_manager.calculate_ler(self.initial_ler),
-                    "red2_final_unit_count": red2_final_count,
                 },
                 "phases": [phase.to_dict() for phase in self.phases],
                 "final_state": {
@@ -259,6 +259,56 @@ class LiveGameReader:  # Main game reader orchestrator
             output_file = self.output_manager.export_state(output_data)
             print(f"Saved game state to: {output_file}")
             self.progress_reporter.update("Saving game state to file...", percentage=95)
+
+            # Check for save state file and merge if present
+            print("\n=== Checking for Save State File ===")
+            # Look for save_state.json in project root (3 levels up: game_reader -> screen_reading -> agent -> root)
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+            save_state_path = os.path.join(project_root, "save_state.json")
+            print(f"Looking for save state at: {save_state_path}")
+
+            if os.path.exists(save_state_path):
+                print("Save state detected! Merging with OCR data...")
+                self.progress_reporter.update("Merging save state with OCR data...", percentage=96)
+
+                try:
+                    # Import merger
+                    from parsers.game_state_merger import GameStateMerger
+
+                    merger = GameStateMerger()
+
+                    # Get output directory (where game_state.json is saved)
+                    output_dir = os.path.dirname(output_file)
+
+                    # Merge and export
+                    success, final_filename = merger.merge(output_file, save_state_path, output_dir)
+
+                    if success:
+                        print(f"SUCCESS: Enriched game state created: {os.path.basename(final_filename)}")
+                        print("SUCCESS: Save state file cleaned up")
+                    else:
+                        print(f"WARNING: Merge failed, using simple export: {os.path.basename(final_filename)}")
+
+                except Exception as e:
+                    print(f"ERROR: Error during merge: {e}")
+                    print("Continuing with OCR-only export...")
+                    logging.error(f"Save state merge failed: {e}", exc_info=True)
+            else:
+                print("No save state detected - using simple export")
+                self.progress_reporter.update("Finalising game state export...", percentage=96)
+
+                # Rename to simple_game_state.json to indicate OCR-only mode
+                try:
+                    output_dir = os.path.dirname(output_file)
+                    simple_output_file = os.path.join(output_dir, "simple_game_state.json")
+
+                    # Rename the file
+                    os.rename(output_file, simple_output_file)
+                    print(f"SUCCESS: Renamed to simple_game_state.json (OCR-only mode)")
+
+                except Exception as e:
+                    print(f"Warning: Could not rename to simple_game_state.json: {e}")
+                    logging.warning(f"Failed to rename to simple export: {e}")
 
             # Enhanced session performance logging
             stats = self.output_manager.get_stats()

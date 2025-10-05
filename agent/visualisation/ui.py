@@ -209,8 +209,8 @@ def _run_agent_strategy():
         # Update progress
         dpg.set_value("outputText", "STRATEGY GENERATION: Bridging game state to agent...")
 
-        # Generate strategy (using simple path for faster results)
-        success, result = bridge.generate_strategy(use_simple_path=True)
+        # Generate strategy (auto-detects enriched vs simple based on what LIVE_GAME_READER created)
+        success, result = bridge.generate_strategy()
 
         if success:
             # Strategy generated successfully - display it
