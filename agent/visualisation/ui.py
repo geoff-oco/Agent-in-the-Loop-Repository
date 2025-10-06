@@ -92,21 +92,21 @@ def ui(tar_hwnd=None, overlay=None):
 
 
     # Style editor for real-time experimentation (positioned top-right) - COMMENTED OUT
-    with dpg.window(tag="style_editor_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
-                    width=300, height=200,
-                    pos=(window_width - 320, 20),
-                    show=False):  # Hidden by default
-        dpg.add_text("Style Editor Controls")
-        dpg.add_button(label="Show Style Editor", callback=lambda: dpg.show_tool(dpg.mvTool_Style))
-        dpg.add_button(label="Show Metrics", callback=lambda: dpg.show_tool(dpg.mvTool_Metrics))
-        dpg.add_button(label="Toggle This Panel", callback=lambda: dpg.configure_item("style_editor_win", show=not dpg.is_item_shown("style_editor_win")))
+    # with dpg.window(tag="style_editor_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
+    #                 width=300, height=200,
+    #                 pos=(window_width - 320, 20),
+    #                 show=False):  # Hidden by default
+    #     dpg.add_text("Style Editor Controls")
+    #     dpg.add_button(label="Show Style Editor", callback=lambda: dpg.show_tool(dpg.mvTool_Style))
+    #     dpg.add_button(label="Show Metrics", callback=lambda: dpg.show_tool(dpg.mvTool_Metrics))
+    #     dpg.add_button(label="Toggle This Panel", callback=lambda: dpg.configure_item("style_editor_win", show=not dpg.is_item_shown("style_editor_win")))
 
     # Toggle button for style editor (top-right corner) - COMMENTED OUT
-    with dpg.window(tag="style_toggle_win", no_background=False, no_move=False, no_resize=True, no_title_bar=True,
-                    width=80, height=30,
-                    pos=(window_width - 90, 10)):
-        dpg.add_button(label="Styles", width=70, height=20,
-                      callback=lambda: dpg.configure_item("style_editor_win", show=not dpg.is_item_shown("style_editor_win")))
+    # with dpg.window(tag="style_toggle_win", no_background=False, no_move=False, no_resize=True, no_title_bar=True,
+    #                 width=80, height=30,
+    #                 pos=(window_width - 90, 10)):
+    #     dpg.add_button(label="Styles", width=70, height=20,
+    #                   callback=lambda: dpg.configure_item("style_editor_win", show=not dpg.is_item_shown("style_editor_win")))
 
 # Theme system implementation complete - using targeted themes for specific components
 
