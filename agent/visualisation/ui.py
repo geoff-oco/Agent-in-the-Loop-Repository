@@ -35,10 +35,24 @@ def ui(tar_hwnd=None, overlay=None):
     window_height = start_size[3] - start_size[1]
     window_width = start_size[2] - start_size[0]
 
+    # Adds fonts
+    FONT_SCALE = 2
+    font_is_loaded = True
+    with dpg.font_registry():
+        try:
+            font_arial = dpg.add_font("C:/Windows/Fonts/arial.ttf", 7 * FONT_SCALE)
+            font_arialBold = dpg.add_font("C:/Windows/Fonts/arialbd.ttf", 7 * FONT_SCALE)
+        except SystemError:
+            print("Could not find font... switching to default")
+            font_is_loaded = False 
+            
+
+
     # Main container window for buttons (resizable)
     with dpg.window(tag="buttons_container", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
-                    width=220, height=250,
+                    width=220, height=255,
                     pos=(40,(window_height/3))):
+        if font_is_loaded: dpg.bind_item_font(dpg.last_item(), font_arialBold)
         dpg.add_text("System Controls", color=(200, 200, 200))
         # Child window inside for actual button content (makes it resizable)
         with dpg.child_window(tag="buttons_win", width=-1, auto_resize_y=True):
@@ -56,11 +70,13 @@ def ui(tar_hwnd=None, overlay=None):
     with dpg.window(tag="chat_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
                     width=500, height= window_height / 3 - 10,
                     pos=((window_width/3), (window_height - 10 - window_height/3))):
+        if font_is_loaded: dpg.bind_item_font(dpg.last_item(), font_arialBold)
         dpg.add_text("Chatbox", color=(200, 200, 200))
         dpg.add_separator()
         dpg.add_spacer(height=5)
         with dpg.child_window(tag='outputWindow'):
             dpg.add_text('',tag="outputText", wrap= 475)
+            if font_is_loaded: dpg.bind_item_font(dpg.last_item(), font_arial)
 
     with dpg.theme() as global_theme:
         with dpg.theme_component(dpg.mvAll):
