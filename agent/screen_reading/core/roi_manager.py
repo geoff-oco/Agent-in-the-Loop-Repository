@@ -118,7 +118,6 @@ class ROIManager:  # Manages ROI CRUD operations, handling both single ROI templ
         self.upsert_roi(name, roi_meta)
         return roi_meta
 
-
     def get_rois_by_filter(self, filter_func) -> Dict[str, ROIMeta]:  # Get ROIs that match filter function.
         return {name: roi for name, roi in self.rois.items() if filter_func(roi)}
 

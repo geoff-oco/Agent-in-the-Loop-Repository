@@ -112,4 +112,3 @@ class ImagePreprocessor:  # Handles CV2-based image preprocessing for OCR optimi
         inverted_final = cv2.dilate(inverted_closed, kernel_dilate, iterations=1)
 
         return Image.fromarray(inverted_final)
-

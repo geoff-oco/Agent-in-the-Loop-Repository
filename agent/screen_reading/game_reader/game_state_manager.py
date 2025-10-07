@@ -12,7 +12,13 @@ from .models import BaseUnits, PhaseData, UnitCounts
 
 class GameStateManager:  # Manages game state transitions and calculations
 
-    def __init__(self, screen_capture=None, ocr_processor=None, monitor_index=3):
+    def __init__(
+        self,
+        screen_capture=None,
+        ocr_processor=None,
+        monitor_index=None,
+        output_manager=None,
+    ):
         # Base names for output structure
         self.base_names = ["blue", "red1", "red2", "red3"]
 
@@ -20,6 +26,7 @@ class GameStateManager:  # Manages game state transitions and calculations
         self.screen_capture = screen_capture
         self.ocr_processor = ocr_processor
         self.monitor_index = monitor_index
+        self.output_manager = output_manager
 
         # ROI storage for game state reading
         self.phase_roi: Optional[ROIMeta] = None
@@ -92,7 +99,11 @@ class GameStateManager:  # Manages game state transitions and calculations
             if base_name and faction and unit_type:
                 try:
                     value = int(text) if text and text != "(empty)" else 0
-                    units = state[base_name].blue if faction == "blue" else state[base_name].red
+                    units = (
+                        state[base_name].blue
+                        if faction == "blue"
+                        else state[base_name].red
+                    )
                     setattr(units, unit_type, value)
                 except ValueError:
                     pass  # Keep default 0
@@ -143,7 +154,9 @@ class GameStateManager:  # Manages game state transitions and calculations
 
         return 0
 
-    def apply_adjustments(self, before_state: Dict[str, BaseUnits], ocr_results: Dict[str, str]) -> Dict[str, BaseUnits]:
+    def apply_adjustments(
+        self, before_state: Dict[str, BaseUnits], ocr_results: Dict[str, str]
+    ) -> Dict[str, BaseUnits]:
         # Apply adjustment values to create after state
         after_state = copy.deepcopy(before_state)
 
@@ -202,18 +215,27 @@ class GameStateManager:  # Manages game state transitions and calculations
 
         return after_state
 
-    def calculate_phase_data(self, phase_num: int, ocr_results: Dict[str, str]) -> PhaseData:
+    def calculate_phase_data(
+        self, phase_num: int, ocr_results: Dict[str, str], mode: str = "full"
+    ) -> PhaseData:
         # Calculate before/after states for a phase
+        # mode: "full" = before + after states, "before_only" = before state only (after = None)
+        # ocr_results: flat dict {roi_name: text_value} (same format as old code)
         phase_data = PhaseData(phase_number=phase_num)
 
-        # Build base state from OCR (no adjustments)
+        # Build base state from all OCR results (both base and adjustment ROIs are in flat dict)
         base_state = self.build_state(ocr_results)
 
         # Apply zeroing logic for before state
         phase_data.before = self.apply_zeroing(base_state)
 
-        # Apply adjustments to get after state
-        phase_data.after = self.apply_adjustments(phase_data.before, ocr_results)
+        # Only calculate after state if mode is "full"
+        if mode == "full":
+            # Apply adjustments to get after state (adjustments are in same flat dict)
+            phase_data.after = self.apply_adjustments(phase_data.before, ocr_results)
+        else:
+            # before_only mode - no after state (battle results only)
+            phase_data.after = None
 
         return phase_data
 
@@ -224,6 +246,9 @@ class GameStateManager:  # Manages game state transitions and calculations
 
         if not ler_text:
             return ler_data
+
+        # Debug logging to see actual OCR text
+        logging.info(f"Parsing LER text: '{ler_text}'")
 
         try:
             # Extract ratio
@@ -239,16 +264,24 @@ class GameStateManager:  # Manages game state transitions and calculations
                         except ValueError:
                             continue
 
-            # Extract favour
-            if "favour of" in ler_text.lower():
-                if "blue" in ler_text.lower():
+            # Extract favour - support both British and American spelling
+            text_lower = ler_text.lower()
+            if "favour of" in text_lower or "favor of" in text_lower:
+                if "blue" in text_lower:
                     ler_data["favour"] = "Blue"
-                elif "red" in ler_text.lower():
+                    logging.info(f"LER favour detected: Blue")
+                elif "red" in text_lower:
                     ler_data["favour"] = "Red"
+                    logging.info(f"LER favour detected: Red")
+                else:
+                    logging.warning(
+                        f"LER contains 'favour/favor of' but no team name found in: '{ler_text}'"
+                    )
 
         except Exception as e:
-            print(f"Error parsing LER: {e}")
+            logging.error(f"Error parsing LER: {e}")
 
+        logging.info(f"Parsed LER: {ler_data}")
         return ler_data
 
     def get_final_state(
@@ -258,12 +291,17 @@ class GameStateManager:  # Manages game state transitions and calculations
         if not phases:
             return {}
 
-        # Last phase's after state is the final state
+        # Last phase's after state is the final state (or before if after is None)
         last_phase = phases[-1]
+
+        # Use after state if available, otherwise use before state
+        source_state = (
+            last_phase.after if last_phase.after is not None else last_phase.before
+        )
 
         # Apply final battle logic if needed
         final = {}
-        for base_name, units in last_phase.after.items():
+        for base_name, units in source_state.items():
             final[base_name] = BaseUnits()
 
             # Copy existing unit data
@@ -281,7 +319,9 @@ class GameStateManager:  # Manages game state transitions and calculations
                     final[base_name].red.H = final_count
                     print(f"Updated Red2 final red heavy units to: {final_count}")
                 except ValueError:
-                    print(f"Warning: Could not parse Red2 final count '{red2_final_count}', using calculated value")
+                    print(
+                        f"Warning: Could not parse Red2 final count '{red2_final_count}', using calculated value"
+                    )
 
         # Apply zeroing logic to final state (if red units present, zero blue units)
         final = self.apply_zeroing(final)
@@ -293,7 +333,7 @@ class GameStateManager:  # Manages game state transitions and calculations
         try:
             # Use default path if not provided
             if element_roi_path is None:
-                element_roi_path = "rois/rois_main/Element_rois.json"
+                element_roi_path = "rois/rois_main/Element_rois_custom.json"
 
             # Load element ROIs (contains LER, Phase, buttons)
             element_manager = ROIManager()
@@ -335,23 +375,38 @@ class GameStateManager:  # Manages game state transitions and calculations
 
             roi_image = ImageUtils.crop_roi(frame, self.ler_roi)
 
-            # Process OCR using single-engine method (PaddleOCR GPU for speed)
-            accepted_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-:. "
-            results = self.ocr_processor.process_single_engine(
-                roi_image, self.ler_roi, "paddle_gpu", accepted_chars=accepted_chars, early_exit_enabled=True
+            # Save LER capture to setup folder
+            if self.output_manager:
+                self.output_manager.save_capture(
+                    roi_image, phase_num="setup", roi_name="LER_Panel"
+                )
+
+            # Process OCR using multi-engine method (tries multiple engines for better accuracy)
+            accepted_chars = (
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-:. "
+            )
+            results = self.ocr_processor.process_multi_engine(
+                roi_image,
+                self.ler_roi,
+                accepted_chars=accepted_chars,
+                early_exit_enabled=True,
             )
 
             # Extract best result
             if results:
                 best_result = results[0]  # Results are sorted by score
                 _, _, text, confidence, rule_passed, _ = best_result
-                ocr_result = type("OCRResult", (), {"text": text, "confidence": confidence})()
+                ocr_result = type(
+                    "OCRResult", (), {"text": text, "confidence": confidence}
+                )()
             else:
                 ocr_result = type("OCRResult", (), {"text": "", "confidence": 0})()
 
             if ocr_result.text and ocr_result.confidence > 60:
                 self.initial_ler = ocr_result.text.strip()
-                print(f"Initial LER: '{self.initial_ler}' (confidence: {ocr_result.confidence:.1f}%)")
+                print(
+                    f"Initial LER: '{self.initial_ler}' (confidence: {ocr_result.confidence:.1f}%)"
+                )
                 return self.initial_ler
 
             print(f"Low confidence LER reading: {ocr_result.confidence:.1f}%")
@@ -374,22 +429,38 @@ class GameStateManager:  # Manages game state transitions and calculations
 
             roi_image = ImageUtils.crop_roi(frame, self.phase_roi)
 
+            # Save phase header capture to setup folder
+            if self.output_manager:
+                self.output_manager.save_capture(
+                    roi_image, phase_num="setup", roi_name="Phase_Header"
+                )
+
             # Process OCR using single-engine method (PaddleOCR GPU for speed)
-            accepted_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-:. "
+            accepted_chars = (
+                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-:. "
+            )
             results = self.ocr_processor.process_single_engine(
-                roi_image, self.phase_roi, "paddle_gpu", accepted_chars=accepted_chars, early_exit_enabled=True
+                roi_image,
+                self.phase_roi,
+                "paddle_gpu",
+                accepted_chars=accepted_chars,
+                early_exit_enabled=True,
             )
 
             # Extract best result
             if results:
                 best_result = results[0]  # Results are sorted by score
                 _, _, text, confidence, rule_passed, _ = best_result
-                ocr_result = type("OCRResult", (), {"text": text, "confidence": confidence})()
+                ocr_result = type(
+                    "OCRResult", (), {"text": text, "confidence": confidence}
+                )()
             else:
                 ocr_result = type("OCRResult", (), {"text": "", "confidence": 0})()
 
             if ocr_result.text:
-                print(f"Phase header: '{ocr_result.text}' (confidence: {ocr_result.confidence:.1f}%)")
+                print(
+                    f"Phase header: '{ocr_result.text}' (confidence: {ocr_result.confidence:.1f}%)"
+                )
                 return ocr_result.text
 
             return None

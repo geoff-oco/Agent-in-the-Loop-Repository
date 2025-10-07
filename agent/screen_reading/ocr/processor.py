@@ -78,9 +78,15 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
             return self.paddle_engine.recognise_text(image, whitelist, blacklist)
 
     def _process_candidate_with_engine(
-        self, processed_img: Image.Image, method_name: str, selected_engine: EngineType,
-        engine_instance: object, whitelist: Optional[str], blacklist: Optional[str],
-        roi_meta: ROIMeta, early_exit_enabled: bool
+        self,
+        processed_img: Image.Image,
+        method_name: str,
+        selected_engine: EngineType,
+        engine_instance: object,
+        whitelist: Optional[str],
+        blacklist: Optional[str],
+        roi_meta: ROIMeta,
+        early_exit_enabled: bool,
     ) -> Tuple[str, float, bool, str, float]:
         # Process a single preprocessing candidate with specified engine
         text, confidence, scale_used = self._run_ocr(
@@ -93,8 +99,13 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
         return text, confidence, rule_passed, rule_message, score
 
     def _get_fallback_result(
-        self, image: Image.Image, selected_engine: EngineType, engine_instance: object,
-        whitelist: Optional[str], blacklist: Optional[str], roi_meta: ROIMeta
+        self,
+        image: Image.Image,
+        selected_engine: EngineType,
+        engine_instance: object,
+        whitelist: Optional[str],
+        blacklist: Optional[str],
+        roi_meta: ROIMeta,
     ) -> Tuple[str, float, bool, str]:
         # Get fallback result using Enhanced preprocessing method
         processed_img = self.preprocessor.process_single(image, ProcessingMethod.ENHANCED)
@@ -124,8 +135,14 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
 
         for method_name, processed_img in candidates:
             text, confidence, rule_passed, rule_message, score = self._process_candidate_with_engine(
-                processed_img, method_name, selected_engine, engine_instance,
-                whitelist, blacklist, roi_meta, early_exit_enabled
+                processed_img,
+                method_name,
+                selected_engine,
+                engine_instance,
+                whitelist,
+                blacklist,
+                roi_meta,
+                early_exit_enabled,
             )
 
             # Track the best result
@@ -143,7 +160,9 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
 
         # If no results, fallback to Enhanced method
         if best_result is None:
-            best_result = self._get_fallback_result(image, selected_engine, engine_instance, whitelist, blacklist, roi_meta)
+            best_result = self._get_fallback_result(
+                image, selected_engine, engine_instance, whitelist, blacklist, roi_meta
+            )
             best_method = "Enhanced"
 
         text, confidence, rule_passed, rule_message = best_result
@@ -208,7 +227,6 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
 
         return results
 
-
     def _scale_display_image(self, image: Image.Image, scale_used: float) -> Image.Image:
         # Scale image for display if needed, using consistent resampling
         if abs(scale_used - 1.0) > OCRConfig.SCALE_THRESHOLD:
@@ -217,8 +235,13 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
         return image
 
     def _select_and_run_engine(
-        self, engine_preference: str, processed_img: Image.Image, whitelist: Optional[str],
-        blacklist: Optional[str], early_exit_enabled: bool, roi_meta: Optional[object]
+        self,
+        engine_preference: str,
+        processed_img: Image.Image,
+        whitelist: Optional[str],
+        blacklist: Optional[str],
+        early_exit_enabled: bool,
+        roi_meta: Optional[object],
     ) -> Tuple[str, str, float, float]:
         # Centralized engine selection and execution logic
         if engine_preference.lower() == "tesseract":
@@ -322,7 +345,6 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
 
         results.sort(key=calculate_score, reverse=True)
 
-
     def _try_preferred_engine(
         self,
         image: Image.Image,
@@ -363,7 +385,12 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
             return None
 
     def _try_preferred_engine_first(
-        self, image: Image.Image, roi_meta: ROIMeta, whitelist: Optional[str], blacklist: Optional[str], early_exit_enabled: bool
+        self,
+        image: Image.Image,
+        roi_meta: ROIMeta,
+        whitelist: Optional[str],
+        blacklist: Optional[str],
+        early_exit_enabled: bool,
     ) -> List[Tuple[str, Image.Image, str, float, bool, str]]:
         # Try preferred engine first if specified
         results = []
@@ -438,88 +465,6 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
                     # Sort all results before returning to ensure best result is first
                     self._sort_results_by_unified_score(results, roi_meta)
                     return results
-
-        # Sort all results by unified score before returning
-        self._sort_results_by_unified_score(results, roi_meta)
-        return results
-
-    def process_single_engine(  # Process image with single engine and all preprocessing methods
-        self,
-        image: Image.Image,
-        roi_meta: ROIMeta,
-        engine_type: str,
-        accepted_chars: Optional[str] = None,
-        early_exit_enabled: bool = True,
-    ) -> List[Tuple[str, Image.Image, str, float, bool, str]]:
-        # Process image with specified engine across all preprocessing methods using unified scoring
-        # Input validation
-        if not image or not roi_meta:
-            logging.error("Invalid input: image or roi_meta is None")
-            return []
-
-        if not engine_type:
-            logging.error("Invalid input: engine_type is required")
-            return []
-
-        if not self.available:
-            logging.error("No OCR engines available")
-            return []
-
-        results = []
-
-        # Get character filtering settings
-        whitelist, blacklist = self._get_filters(roi_meta, accepted_chars)
-
-        # Get the specified engine instance
-        engine_instance = None
-        engine_display_name = ""
-
-        if engine_type.lower() == "paddle_gpu" and self.paddle_engine.gpu_available:
-            engine_instance = self.paddle_engine.get_engine(prefer_gpu=True)
-            engine_display_name = "PaddleOCR (GPU)"
-        elif engine_type.lower() == "paddle_cpu" and self.paddle_engine.available:
-            engine_instance = self.paddle_engine.get_engine(prefer_gpu=False)
-            engine_display_name = "PaddleOCR (CPU)"
-        elif engine_type.lower() == "tesseract" and self.tesseract_engine.available:
-            engine_instance = self.tesseract_engine
-            engine_display_name = "Tesseract"
-
-        if not engine_instance:
-            # Fallback to default
-            engine_instance = self.paddle_engine.get_engine(prefer_gpu=True)
-            engine_display_name = "PaddleOCR (GPU - fallback)"
-
-        # Create all preprocessing candidates
-        candidates = self.preprocessor.create_candidates(image)
-
-        # Track globally best result across all methods for early exit decisions
-        global_best_score = 0
-        global_best_result = None
-        strict_patterns = hasattr(roi_meta, "pattern") and getattr(roi_meta, "pattern", "").strip()
-
-        # Test each preprocessing method with the specified engine
-        for method_name, processed_img in candidates:
-            # Use centralized engine selection and execution
-            engine_name, text, confidence, scale_used = self._select_and_run_engine(
-                engine_type, processed_img, whitelist, blacklist, early_exit_enabled, roi_meta
-            )
-
-            # Validate against rules and calculate score
-            rule_passed, rule_message, unified_score = self._validate_and_score_result(text, confidence, roi_meta, strict_patterns)
-            scaled_display = self._scale_display_image(processed_img, scale_used)
-
-            results.append((method_name, scaled_display, text, confidence, rule_passed, rule_message))
-
-            # Track the globally best result using unified scoring
-            if unified_score > global_best_score:
-                global_best_score = unified_score
-                global_best_result = (method_name, text, confidence, rule_passed, unified_score)
-
-            # Global early exit: if we have an excellent result (high confidence AND pattern match), stop processing
-            if early_exit_enabled and self._should_early_exit(text, confidence, roi_meta, early_exit_enabled):
-                # Sort all results before returning to ensure best result is first
-                self._sort_results_by_unified_score(results, roi_meta)
-                return results
 
         # Sort all results by unified score before returning
         self._sort_results_by_unified_score(results, roi_meta)

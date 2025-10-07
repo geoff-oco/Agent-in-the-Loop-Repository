@@ -32,8 +32,12 @@ class PhaseData:  # Complete data for a single phase
     after: Dict[str, BaseUnits] = field(default_factory=dict)
 
     def to_dict(self) -> Dict:
+        # Always output full structure: before is always populated, after can be empty {} for before_only mode
+        before_dict = {name: units.to_dict() for name, units in self.before.items()}
+        after_dict = {name: units.to_dict() for name, units in self.after.items()} if self.after is not None else {}
+
         return {
             "phase": self.phase_number,
-            "before": {name: units.to_dict() for name, units in self.before.items()},
-            "after": {name: units.to_dict() for name, units in self.after.items()},
+            "before": before_dict,
+            "after": after_dict,
         }

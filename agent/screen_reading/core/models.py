@@ -80,5 +80,3 @@ class BatchOCRResult:  # Result from processing multiple ROIs
     results: Dict[str, OCRResult]
     total_processing_time_ms: float
     timestamp: float
-
-

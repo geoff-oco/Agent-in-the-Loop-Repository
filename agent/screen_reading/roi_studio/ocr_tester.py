@@ -13,20 +13,23 @@ from .ui_components import UIConfig, UIHelpers
 
 
 class OCRTester:  # Handles OCR testing, preview and results display
-    def __init__(self, roi_manager: ROIManager,
-                 get_current_frame: Callable[[], Optional[Image.Image]],
-                 get_frozen_frame: Callable[[], Optional[Image.Image]],
-                 get_selected_roi: Callable[[], Optional[str]],
-                 status_callback: Callable[[str], None],
-                 accepted_chars_var: tk.StringVar,
-                 padding_var: tk.IntVar,
-                 early_exit_var: tk.BooleanVar,
-                 preferred_method_var: tk.StringVar,
-                 ocr_engine_var: tk.StringVar,
-                 expected_entry: ttk.Entry,
-                 pattern_entry: ttk.Entry,
-                 char_filter_entry: ttk.Entry,
-                 filter_mode_var: tk.StringVar):
+    def __init__(
+        self,
+        roi_manager: ROIManager,
+        get_current_frame: Callable[[], Optional[Image.Image]],
+        get_frozen_frame: Callable[[], Optional[Image.Image]],
+        get_selected_roi: Callable[[], Optional[str]],
+        status_callback: Callable[[str], None],
+        accepted_chars_var: tk.StringVar,
+        padding_var: tk.IntVar,
+        early_exit_var: tk.BooleanVar,
+        preferred_method_var: tk.StringVar,
+        ocr_engine_var: tk.StringVar,
+        expected_entry: ttk.Entry,
+        pattern_entry: ttk.Entry,
+        char_filter_entry: ttk.Entry,
+        filter_mode_var: tk.StringVar,
+    ):
         self.roi_manager = roi_manager
         self.get_current_frame = get_current_frame
         self.get_frozen_frame = get_frozen_frame
@@ -231,9 +234,16 @@ class OCRTester:  # Handles OCR testing, preview and results display
             preferred_method=self.preferred_method_var.get(),
         )
 
-    def _create_ocr_result_tab(self, combined_name: str, processed_img: Image.Image,
-                               text: str, confidence: float, rule_passed: bool,
-                               rule_message: str, test_roi: ROIMeta) -> None:
+    def _create_ocr_result_tab(
+        self,
+        combined_name: str,
+        processed_img: Image.Image,
+        text: str,
+        confidence: float,
+        rule_passed: bool,
+        rule_message: str,
+        test_roi: ROIMeta,
+    ) -> None:
         # Create a single result tab for OCR testing
         tab = ttk.Frame(self.preview_notebook)
         self.preview_notebook.add(tab, text=combined_name)
@@ -264,7 +274,6 @@ class OCRTester:  # Handles OCR testing, preview and results display
             size_info = f"Processed size: {processed_img.width}x{processed_img.height}"
             UIHelpers.create_info_label(tab, size_info).pack(anchor=tk.W)
 
-
         except Exception as e:
             ttk.Label(tab, text=f"Display error: {e}").pack()
 
@@ -282,7 +291,9 @@ class OCRTester:  # Handles OCR testing, preview and results display
 
                 self.scrollable_frame.bind(
                     "<Configure>",
-                    lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")) if not self._destroyed else None
+                    lambda e: (
+                        self.canvas.configure(scrollregion=self.canvas.bbox("all")) if not self._destroyed else None
+                    ),
                 )
 
                 self.canvas.create_window((0, 0), window=self.scrollable_frame, anchor="nw")
@@ -368,7 +379,7 @@ class OCRTester:  # Handles OCR testing, preview and results display
                     sorted_results = sorted(
                         results,
                         key=lambda r: (r[4], r[3]),  # r[4] is rule_passed (bool), r[3] is confidence
-                        reverse=True
+                        reverse=True,
                     )
                     best_result = sorted_results[0]
                     combined_name, processed_img, text, confidence, rule_passed, rule_message = best_result
@@ -423,7 +434,7 @@ class OCRTester:  # Handles OCR testing, preview and results display
                         engine_groups[engine_name].append((result, method_name))
 
                     # Display each engine group as a row (ensure consistent ordering)
-                    engine_order = ['TESSERACT', 'PADDLEOCR']  # Preferred order
+                    engine_order = ["TESSERACT", "PADDLEOCR"]  # Preferred order
                     ordered_engines = [eng for eng in engine_order if eng in engine_groups]
                     ordered_engines.extend([eng for eng in engine_groups.keys() if eng not in engine_order])
 
@@ -453,7 +464,9 @@ class OCRTester:  # Handles OCR testing, preview and results display
                             img_label.pack(pady=2)
 
                             # Method label
-                            method_label = ttk.Label(method_frame, text=f"Method: {method_name}", font=("Arial", 8, "bold"))
+                            method_label = ttk.Label(
+                                method_frame, text=f"Method: {method_name}", font=("Arial", 8, "bold")
+                            )
                             method_label.pack()
 
                             # Result info
@@ -522,6 +535,7 @@ class OCRTester:  # Handles OCR testing, preview and results display
             roi_image = ImageUtils.crop_roi(frame, roi, self.padding_var.get())
             if roi_image:
                 from ocr.engine_selector import EngineType
+
                 engine_type = {
                     "paddle_gpu": EngineType.PADDLE_GPU,
                     "paddle_cpu": EngineType.PADDLE_CPU,

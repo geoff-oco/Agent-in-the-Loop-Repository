@@ -10,15 +10,19 @@ from imaging import ImageUtils
 
 
 class TemplateManager:  # Handles template creation, loading and saving functionality
-    def __init__(self, parent_window: tk.Tk, roi_manager: ROIManager,
-                 get_current_frame: Callable[[], Optional[Image.Image]],
-                 get_frozen_frame: Callable[[], Optional[Image.Image]],
-                 set_frames: Callable[[Image.Image], None],
-                 draw_frame_callback: Callable[[Image.Image], None],
-                 status_callback: Callable[[str], None],
-                 get_selected_roi: Callable[[], Optional[str]],
-                 get_padding: Callable[[], int],
-                 stop_capture_callback: Callable[[], None]):
+    def __init__(
+        self,
+        parent_window: tk.Tk,
+        roi_manager: ROIManager,
+        get_current_frame: Callable[[], Optional[Image.Image]],
+        get_frozen_frame: Callable[[], Optional[Image.Image]],
+        set_frames: Callable[[Image.Image], None],
+        draw_frame_callback: Callable[[Image.Image], None],
+        status_callback: Callable[[str], None],
+        get_selected_roi: Callable[[], Optional[str]],
+        get_padding: Callable[[], int],
+        stop_capture_callback: Callable[[], None],
+    ):
         self.parent_window = parent_window
         self.roi_manager = roi_manager
         self.get_current_frame = get_current_frame
@@ -105,7 +109,9 @@ class TemplateManager:  # Handles template creation, loading and saving function
 
             self.draw_frame_callback(image)
             if self.template_info:
-                self.template_info.config(text=f"Template: {os.path.basename(path)}\nSize: {image.width}x{image.height}")
+                self.template_info.config(
+                    text=f"Template: {os.path.basename(path)}\nSize: {image.width}x{image.height}"
+                )
             self.status_callback(f"Template loaded: {os.path.basename(path)}")
 
         except Exception as e:
@@ -136,4 +142,3 @@ class TemplateManager:  # Handles template creation, loading and saving function
         if path:
             roi_frame.save(path)
             self.status_callback(f"ROI template saved: {os.path.basename(path)}")
-

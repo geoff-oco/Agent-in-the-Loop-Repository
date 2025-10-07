@@ -85,7 +85,7 @@ Use `"delete"` when the original is misaligned with strategy or creates poor tra
 ---
 
 ## Inserts Policy (quality over quantity)
-- **SHOULD insert when (leave/lock) ≤ 2**, unless **no Legal** insert improves Blue’s position.  
+- **SHOULD insert when (leave/lock) ≤ 2** or **No actions in the current Phase**, unless **no Legal** insert improves Blue’s position.  
 - Prefer a small number of **high-impact** inserts aligned to chokepoints/critical paths.  
 - Never exceed per-source remaining budgets; keep vectors positive.
 - **Red2 minimum insert rule**: When proposing an **insert** to **Red2**, only do so if it passes the **Legality checklist** and required units are **available**. The insert must send **at least 4 total units** (`L+H+R ≥ 4`). **Prioritise Heavies**, then **Ranged** (H → R). If you cannot reach 4 with legally available H/R, **do not propose** this insert.  

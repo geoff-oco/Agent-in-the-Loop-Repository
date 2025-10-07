@@ -10,240 +10,127 @@ LIVE GAME READER
 ============================================================
 Press 'x' at any time to exit...
 
-Session initialised: game_session_20250930_095349
-Output directory: output\game_session_20250930_095349
+Session initialised: game_session_20251006_001440
+Output directory: output\game_session_20251006_001440
+
+=== Monitor Detection ===
+RTSViewer window found at: (-8, -8) to (2568, 1400)
+Window center: (1280, 696)
+Monitor 1: (392, 1440) to (2312, 2520) - 1920x1080
+Monitor 2: (-1920, 121) to (0, 1201) - 1920x1080
+Monitor 3: (0, 0) to (2560, 1440) - 2560x1440
+RTSViewer detected on Monitor 3: 2560x1440
+Using Monitor 3
+Monitor resolution detected: 2560x1440
+Using resolution-specific ROI file: Main_rois_2560x1440.json
+Using resolution-specific ROI file: Element_rois_2560x1440.json
 Found LER ROI in Element ROIs
 Found Phase ROI in Element ROIs
+Found Upphase button ROI in Element ROIs
+Found Downphase button ROI in Element ROIs
+Found Resetview_button button ROI in Element ROIs
 Found Red2_FinalUnitCountArea ROI in Element ROIs
 Loaded 24 base unit ROIs
 Loaded 12 adjustment ROIs
 Loaded Red2_FinalUnitCountArea ROI
+NavigationController configured with 3 button ROIs
+
+=== Smart Capture Planning ===
+Save state detected - Capture plan generated from save_state.json
+  Phases to capture: [1, 2, 3]
+  Phase modes: {1: 'full', 2: 'full', 3: 'full'}
+  Red2 final needed: True
+
+Capture plan finalised:
+  Phases: [1, 2, 3]
+  Modes: {1: 'full', 2: 'full', 3: 'full'}
+  Red2 final: True
+  Export mode: enriched
 
 === Initial Setup ===
-Resetting view to default position...
-Searching for resetview button...
-Found resetview button at (np.int64(192), np.int64(161))
-Clicking reset view button
-View reset complete
 Initializing PaddleOCR GPU...
 PaddleOCR GPU ready!
-Initial LER: 'LER 1.24:1 in  favour of Blue' (confidence: 95.8%)
-Phase header: 'Phase: 3' (confidence: 99.8%)
-Phase header: Phase: 3
+Initial LER: 'LER 1.24:1 in favour of Blue' (confidence: 99.6%)
+LER: LER 1.24:1 in favour of Blue
+
+Total OCR tasks: 114
+  LER: 1 task (complete)
+  Phase ROIs: 108 tasks
+  Red2 final: 5 tasks
+
+=== Bulk Screenshot Capture ===
+
+=== Bulk Screenshot Capture ===
+Phases to capture: [1, 2, 3]
+Red2 final needed: True
+
+DO NOT MOVE MOUSE during capture phase...
+
+Navigating to Phase 1...
 
 === Initialising to Phase 1 ===
 Attempting to navigate to Phase 1...
-Searching for downphase button...
-Found downphase button at (np.int64(1691), np.int64(1322))
 Clicking downphase button (1/1)
+Clicking Downphase at global (1692, 1323) [Monitor 3 offset: (0, 0)]
 Resetting view...
-Searching for resetview button...
-Found resetview button at (np.int64(192), np.int64(161))
-Clicking reset view button
-Searching for downphase button...
-Found downphase button at (np.int64(1691), np.int64(1322))
+Clicking Resetview at global (194, 162) [Monitor 3 offset: (0, 0)]
 Clicking downphase button (1/1)
+Clicking Downphase at global (1692, 1323) [Monitor 3 offset: (0, 0)]
 Resetting view...
-Searching for resetview button...
-Found resetview button at (np.int64(192), np.int64(161))
-Clicking reset view button
+Clicking Resetview at global (194, 162) [Monitor 3 offset: (0, 0)]
 Successfully initialised to Phase 1
+Clicking Resetview at global (194, 162) [Monitor 3 offset: (0, 0)]
+Phase 1 screenshot captured
 
-============================================================
-PHASE 1
-============================================================
+Navigating to Phase 2...
+Clicking upphase button (1/1)
+Clicking Upphase at global (2009, 1323) [Monitor 3 offset: (0, 0)]
+Clicking Resetview at global (194, 162) [Monitor 3 offset: (0, 0)]
+Phase 2 screenshot captured
 
-=== Processing Phase 1 OCR (Parallel) ===
-  Processing ROIs in parallel...
-  Base unit counts:
-    Bbheavy processing attempts:
-      #1: '15' (96.0%) from Original [PASS]
-    FINAL: '15' (96.0%, 667ms) from Original [PASS]
-    Bbheavy: 15
-    Bblight processing attempts:
-      #1: '15' (96.0%) from Original [PASS]
-    FINAL: '15' (96.0%, 594ms) from Original [PASS]
-    Bblight: 15
-    Bbranged processing attempts:
-      #1: '15' (96.0%) from Original [PASS]
-    FINAL: '15' (96.0%, 666ms) from Original [PASS]
-    Bbranged: 15
-    Brheavy processing attempts:
-      #1: '0' (94.0%) from Binary [PASS]
-      #2: '0' (93.0%) from Original [PASS]
-      #3: '0' (93.0%) from Enhanced [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (94.0%, 14064ms) from Binary [PASS]
-    Brheavy: 0
-    Brlight processing attempts:
-      #1: '0' (95.0%) from Enhanced [PASS]
-      #2: '0' (93.0%) from Binary [PASS]
-      #3: '0' (93.0%) from Inverted [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 9424ms) from Enhanced [PASS]
-    Brlight: 0
-    Brranged processing attempts:
-      #1: '0' (93.0%) from Binary [PASS]
-      #2: '0' (92.0%) from Original [PASS]
-      #3: '0' (91.0%) from Enhanced [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (93.0%, 15431ms) from Binary [PASS]
-    Brranged: 0
-    R1bheavy processing attempts:
-      #1: '0' (96.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 885ms) from Original [PASS]
-    R1bheavy: 0
-    R1blight processing attempts:
-      #1: '0' (96.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 956ms) from Original [PASS]
-    R1blight: 0
-    R1branged processing attempts:
-      #1: '0' (95.0%) from Original [PASS]
-      #2: '0' (95.0%) from Enhanced [PASS]
-      #3: '0' (94.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 8047ms) from Original [PASS]
-    R1branged: 0
-    R1rheavy processing attempts:
-      #1: '4' (97.0%) from Original [PASS]
-    FINAL: '4' (97.0%, 843ms) from Original [PASS]
-    R1rheavy: 4
-    R1rlight processing attempts:
-      #1: '4' (96.0%) from Original [PASS]
-    FINAL: '4' (96.0%, 851ms) from Original [PASS]
-    R1rlight: 4
-    R1rranged processing attempts:
-      #1: '4' (96.0%) from Original [PASS]
-    FINAL: '4' (96.0%, 918ms) from Original [PASS]
-    R1rranged: 4
-    R2bheavy processing attempts:
-      #1: '0' (95.0%) from Grey-Boost [PASS]
-      #2: '0' (94.0%) from Enhanced [PASS]
-      #3: '0' (93.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 6244ms) from Grey-Boost [PASS]
-    R2bheavy: 0
-    R2blight processing attempts:
-      #1: '0' (96.0%) from Enhanced [PASS]
-      #2: '0' (93.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 3102ms) from Enhanced [PASS]
-    R2blight: 0
-    R2branged processing attempts:
-      #1: '0' (92.0%) from Enhanced [PASS]
-      #2: '0' (91.0%) from Original [PASS]
-      #3: '0' (91.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (92.0%, 8439ms) from Enhanced [PASS]
-    R2branged: 0
-    R2rheavy processing attempts:
-      #1: '21' (96.0%) from Original [PASS]
-    FINAL: '21' (96.0%, 731ms) from Original [PASS]
-    R2rheavy: 21
-    R2rlight processing attempts:
-      #1: '0' (96.0%) from Enhanced [PASS]
-      #2: '0' (94.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 1949ms) from Enhanced [PASS]
-    R2rlight: 0
-    R2rranged processing attempts:
-      #1: '0' (96.0%) from Enhanced [PASS]
-      #2: '0' (68.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 5660ms) from Enhanced [PASS]
-    R2rranged: 0
-    R3bheavy processing attempts:
-      #1: '0' (95.0%) from Grey-Boost [PASS]
-      #2: '0' (94.0%) from Original [PASS]
-      #3: '0' (94.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 4632ms) from Grey-Boost [PASS]
-    R3bheavy: 0
-    R3blight processing attempts:
-      #1: '0' (96.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 507ms) from Original [PASS]
-    R3blight: 0
-    R3branged processing attempts:
-      #1: '0' (95.0%) from Original [PASS]
-      #2: '0' (95.0%) from Enhanced [PASS]
-      #3: '0' (94.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 7856ms) from Original [PASS]
-    R3branged: 0
-    R3rheavy processing attempts:
-      #1: '0' (95.0%) from Enhanced [PASS]
-      #2: '0' (93.0%) from Original [PASS]
-      #3: '0' (91.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 7853ms) from Enhanced [PASS]
-    R3rheavy: 0
-    R3rlight processing attempts:
-      #1: '11' (79.0%) from Binary [PASS]
-      #2: '11' (73.0%) from Enhanced [PASS]
-      #3: '1' (72.0%) from Original [PASS]
-      ... and 2 more attempts
-    FINAL: '11' (79.0%, 14839ms) from Binary [PASS]
-    R3rlight: 11
-    R3rranged processing attempts:
-      #1: '0' (96.0%) from Binary [PASS]
-      #2: '0' (93.0%) from Original [PASS]
-      #3: '0' (93.0%) from Enhanced [PASS]
-    FINAL: '0' (96.0%, 3322ms) from Binary [PASS]
-    R3rranged: 0
-  Adjustment values:
-    Bbheavy_adj processing attempts:
-      #1: '+6' (99.9%) from Original-PaddleOCR (GPU) [PASS]
-      #2: '-11' (83.0%) from Original-Tesseract [PASS]
-    FINAL: '+6' (99.9%, 3146ms) from Original-PaddleOCR (GPU) [PASS]
-    Bbheavy_adj: +6
-    Bblight_adj processing attempts:
-      #1: '-15' (98.9%) from Original-PaddleOCR (GPU) [PASS]
-      #2: '-15' (93.0%) from Original-Tesseract [PASS]
-    FINAL: '-15' (98.9%, 1340ms) from Original-PaddleOCR (GPU) [PASS]
-    Bblight_adj: -15
-    Bbranged_adj processing attempts:
-      #1: '-12' (100.0%) from Original-PaddleOCR (GPU) [PASS]
-      #2: '-12' (93.0%) from Original-Tesseract [PASS]
-    FINAL: '-12' (100.0%, 908ms) from Original-PaddleOCR (GPU) [PASS]
-    Bbranged_adj: -12
-    R1bheavy_adj processing attempts:
-      #1: '+7' (96.0%) from Original-Tesseract [PASS]
-      #2: '+' (76.7%) from Original-PaddleOCR (GPU) [FAIL]
-    FINAL: '+7' (96.0%, 882ms) from Original-Tesseract [PASS]
-    R1bheavy_adj: +7
-    R1blight_adj processing attempts:
-      #1: '+6' (99.9%) from Original-PaddleOCR (GPU) [PASS]
-      #2: '+6' (96.0%) from Original-Tesseract [PASS]
-    FINAL: '+6' (99.9%, 1165ms) from Original-PaddleOCR (GPU) [PASS]
-    R1blight_adj: +6
-    R1branged_adj processing attempts:
-      #1: '+8' (99.7%) from Original-PaddleOCR (GPU) [PASS]
-      #2: '+8' (96.0%) from Original-Tesseract [PASS]
-    FINAL: '+8' (99.7%, 812ms) from Original-PaddleOCR (GPU) [PASS]
-    R1branged_adj: +8
-    R2blight_adj processing attempts:
-      #1: '+1' (95.0%) from Original-Tesseract [PASS]
-      #2: '(empty)' (0.0%) from Original-PaddleOCR (GPU) [FAIL]
-    FINAL: '+1' (95.0%, 704ms) from Original-Tesseract [PASS]
-    R2blight_adj: +1
-    R2branged_adj processing attempts:
-      #1: '+1' (94.0%) from Original-Tesseract [PASS]
-      #2: '+' (94.7%) from Original-PaddleOCR (GPU) [FAIL]
-    FINAL: '+1' (94.0%, 880ms) from Original-Tesseract [PASS]
-    R2branged_adj: +1
-    R3bheavy_adj processing attempts:
-      #1: '+4' (99.9%) from Original-PaddleOCR (GPU) [PASS]
-      #2: '+4' (96.0%) from Original-Tesseract [PASS]
-    FINAL: '+4' (99.9%, 1412ms) from Original-PaddleOCR (GPU) [PASS]
-    R3bheavy_adj: +4
-    R3blight_adj processing attempts:
-      #1: '+8' (99.7%) from Original-PaddleOCR (GPU) [PASS]
-      #2: '+8' (96.0%) from Original-Tesseract [PASS]
-    FINAL: '+8' (99.7%, 971ms) from Original-PaddleOCR (GPU) [PASS]
-    R3blight_adj: +8
-    R3branged_adj processing attempts:
-      #1: '+3' (95.0%) from Original-Tesseract [PASS]
-      #2: '+' (98.0%) from Original-PaddleOCR (GPU) [FAIL]
-    FINAL: '+3' (95.0%, 1309ms) from Original-Tesseract [PASS]
-    R3branged_adj: +3
-Phase 1 processing completed in 23.57s
+Navigating to Phase 3...
+Clicking upphase button (1/1)
+Clicking Upphase at global (2009, 1323) [Monitor 3 offset: (0, 0)]
+Clicking Resetview at global (194, 162) [Monitor 3 offset: (0, 0)]
+Phase 3 screenshot captured
+
+Navigating to Red1 base for Red2 final count...
+Navigating to red1 base by clicking R1blight at global (1059, 370) [Monitor 3 offset: (0, 0)]
+Capturing 5 frames for Red2 final count (animation averaging)...
+  Frame 1/5 captured
+  Frame 2/5 captured
+  Frame 3/5 captured
+  Frame 4/5 captured
+  Frame 5/5 captured
+Red2 final count capture complete (5 frames)
+Resetting view...
+Clicking Resetview at global (194, 162) [Monitor 3 offset: (0, 0)]
+
+All captures complete - you can now move your mouse!
+Bulk capture complete: 3 phases captured
+Red2 final: 5 frames captured for averaging
+
+=== Bulk OCR Processing ===
+
+=== Bulk OCR Processing ===
+Processing 3 phase screenshots
+Phase modes: {1: 'full', 2: 'full', 3: 'full'}
+
+Total phase OCR tasks queued: 108
+
+Phase OCR processing complete: 108 tasks processed
+
+=== Processing Red2 Final Count (5 frames) ===
+  Frame 1: Invalid text '(empty)'
+  Frame 2: '5' (100.0%, Original-PaddleOCR (GPU))
+  Frame 3: '5' (100.0%, Original-PaddleOCR (GPU))
+  Frame 4: '5' (100.0%, Original-PaddleOCR (GPU))
+  Frame 5: '3' (8.0%, Original-Tesseract)
+Red2 Final Average: [5, 5, 5, 3] -> 4
+
+=== Constructing Game State ===
+
+Phase 1 (full mode):
 
   Before state (with zeroing applied):
     blue Blue: L=15, H=15, R=15 | Red: L=0, H=0, R=0
@@ -252,217 +139,12 @@ Phase 1 processing completed in 23.57s
     red3 Blue: L=0, H=0, R=0 | Red: L=11, H=0, R=0
 
   After state (with adjustments applied):
-    blue Blue: L=0, H=21, R=3 | Red: L=0, H=0, R=0
+    blue Blue: L=0, H=4, R=3 | Red: L=0, H=0, R=0
     red1 Blue: L=6, H=7, R=8 | Red: L=4, H=4, R=4
     red2 Blue: L=1, H=0, R=1 | Red: L=0, H=21, R=0
     red3 Blue: L=8, H=4, R=3 | Red: L=11, H=0, R=0
 
-Automatically advancing to Phase 2...
-
-=== Advancing from Phase 1 ===
-Searching for upphase button...
-Found upphase button at (np.int64(2007), np.int64(1322))
-Clicking upphase button (1/1)
-Resetting view...
-Searching for resetview button...
-Found resetview button at (np.int64(192), np.int64(161))
-Clicking reset view button
-Advanced to Phase 2
-
-============================================================
-PHASE 2
-============================================================
-
-=== Processing Phase 2 OCR (Parallel) ===
-  Processing ROIs in parallel...
-  Base unit counts:
-    Bbheavy processing attempts:
-      #1: '4' (96.0%) from Original [PASS]
-    FINAL: '4' (96.0%, 812ms) from Original [PASS]
-    Bbheavy: 4
-    Bblight processing attempts:
-      #1: '0' (96.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 776ms) from Original [PASS]
-    Bblight: 0
-    Bbranged processing attempts:
-      #1: '3' (96.0%) from Original [PASS]
-    FINAL: '3' (96.0%, 793ms) from Original [PASS]
-    Bbranged: 3
-    Brheavy processing attempts:
-      #1: '0' (95.0%) from Grey-Boost [PASS]
-      #2: '0' (94.0%) from Binary [PASS]
-      #3: '0' (93.0%) from Original [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 16218ms) from Grey-Boost [PASS]
-    Brheavy: 0
-    Brlight processing attempts:
-      #1: '0' (94.0%) from Enhanced [PASS]
-      #2: '0' (93.0%) from Binary [PASS]
-      #3: '0' (93.0%) from Inverted [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (94.0%, 10860ms) from Enhanced [PASS]
-    Brlight: 0
-    Brranged processing attempts:
-      #1: '0' (93.0%) from Enhanced [PASS]
-      #2: '0' (93.0%) from Binary [PASS]
-      #3: '0' (92.0%) from Original [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (93.0%, 21753ms) from Enhanced [PASS]
-    Brranged: 0
-    R1bheavy processing attempts:
-      #1: '7' (96.0%) from Enhanced [PASS]
-      #2: '7' (94.0%) from Original [PASS]
-    FINAL: '7' (96.0%, 2941ms) from Enhanced [PASS]
-    R1bheavy: 7
-    R1blight processing attempts:
-      #1: '6' (97.0%) from Original [PASS]
-    FINAL: '6' (97.0%, 1192ms) from Original [PASS]
-    R1blight: 6
-    R1branged processing attempts:
-      #1: '8' (96.0%) from Original [PASS]
-    FINAL: '8' (96.0%, 1045ms) from Original [PASS]
-    R1branged: 8
-    R1rheavy processing attempts:
-      #1: '0' (95.0%) from Binary [PASS]
-      #2: '0' (94.0%) from Original [PASS]
-      #3: '0' (94.0%) from Enhanced [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 11599ms) from Binary [PASS]
-    R1rheavy: 0
-    R1rlight processing attempts:
-      #1: '0' (95.0%) from Original [PASS]
-      #2: '0' (95.0%) from Enhanced [PASS]
-      #3: '0' (95.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 6418ms) from Original [PASS]
-    R1rlight: 0
-    R1rranged processing attempts:
-      #1: '0' (94.0%) from Original [PASS]
-      #2: '0' (93.0%) from Enhanced [PASS]
-      #3: '0' (93.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (94.0%, 12744ms) from Original [PASS]
-    R1rranged: 0
-    R2bheavy processing attempts:
-      #1: '0' (93.0%) from Original [PASS]
-      #2: '0' (93.0%) from Enhanced [PASS]
-      #3: '0' (93.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (93.0%, 10190ms) from Original [PASS]
-    R2bheavy: 0
-    R2blight processing attempts:
-      #1: '1' (96.0%) from Original [PASS]
-    FINAL: '1' (96.0%, 507ms) from Original [PASS]
-    R2blight: 1
-    R2branged processing attempts:
-      #1: '1' (96.0%) from Original [PASS]
-    FINAL: '1' (96.0%, 1123ms) from Original [PASS]
-    R2branged: 1
-    R2rheavy processing attempts:
-      #1: '21' (96.0%) from Original [PASS]
-    FINAL: '21' (96.0%, 1121ms) from Original [PASS]
-    R2rheavy: 21
-    R2rlight processing attempts:
-      #1: '0' (96.0%) from Enhanced [PASS]
-      #2: '0' (95.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 2710ms) from Enhanced [PASS]
-    R2rlight: 0
-    R2rranged processing attempts:
-      #1: '0' (96.0%) from Enhanced [PASS]
-      #2: '0' (58.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 6403ms) from Enhanced [PASS]
-    R2rranged: 0
-    R3bheavy processing attempts:
-      #1: '4' (96.0%) from Original [PASS]
-    FINAL: '4' (96.0%, 609ms) from Original [PASS]
-    R3bheavy: 4
-    R3blight processing attempts:
-      #1: '8' (96.0%) from Original [PASS]
-    FINAL: '8' (96.0%, 687ms) from Original [PASS]
-    R3blight: 8
-    R3branged processing attempts:
-      #1: '3' (96.0%) from Enhanced [PASS]
-      #2: '5' (29.0%) from Original [PASS]
-    FINAL: '3' (96.0%, 3866ms) from Enhanced [PASS]
-    R3branged: 3
-    R3rheavy processing attempts:
-      #1: '0' (96.0%) from Enhanced [PASS]
-      #2: '0' (94.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 2291ms) from Enhanced [PASS]
-    R3rheavy: 0
-    R3rlight processing attempts:
-      #1: '0' (95.0%) from Enhanced [PASS]
-      #2: '0' (90.0%) from Original [PASS]
-      #3: '0' (87.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 18002ms) from Enhanced [PASS]
-    R3rlight: 0
-    R3rranged processing attempts:
-      #1: '0' (96.0%) from Binary [PASS]
-      #2: '0' (93.0%) from Original [PASS]
-      #3: '0' (91.0%) from Enhanced [PASS]
-    FINAL: '0' (96.0%, 2945ms) from Binary [PASS]
-    R3rranged: 0
-  Adjustment values:
-    Bbheavy_adj processing attempts:
-      #1: '4' (95.0%) from Binary-Tesseract [FAIL]
-      #2: '4' (94.0%) from Enhanced-Tesseract [FAIL]
-      #3: '4' (77.0%) from Original-Tesseract [FAIL]
-      ... and 7 more attempts
-    FINAL: '-4' (95.0%, 12884ms) from Binary-Tesseract (colour-corrected) [PASS]
-    Bbheavy_adj: -4
-    Bbranged_adj processing attempts:
-      #1: '-3' (88.0%) from Original-Tesseract [PASS]
-      #2: '+' (96.8%) from Original-PaddleOCR (GPU) [FAIL]
-      #3: '3' (95.0%) from Binary-Tesseract [FAIL]
-      ... and 7 more attempts
-    FINAL: '-3' (88.0%, 12257ms) from Original-Tesseract [PASS]
-    Bbranged_adj: -3
-    R1bheavy_adj processing attempts:
-      #1: '-4' (90.0%) from Binary-Tesseract [PASS]
-      #2: '-4' (80.0%) from Original-Tesseract [PASS]
-      #3: '4' (87.0%) from Enhanced-Tesseract [FAIL]
-      ... and 3 more attempts
-    FINAL: '-4' (90.0%, 9670ms) from Binary-Tesseract [PASS]
-    R1bheavy_adj: -4
-    R1blight_adj processing attempts:
-      #1: '-1' (92.0%) from Original-Tesseract [PASS]
-      #2: '-' (95.4%) from Original-PaddleOCR (GPU) [FAIL]
-    FINAL: '-1' (92.0%, 2714ms) from Original-Tesseract [PASS]
-    R1blight_adj: -1
-    R1branged_adj processing attempts:
-      #1: '+3' (90.0%) from Original-Tesseract [PASS]
-      #2: '(empty)' (0.0%) from Original-PaddleOCR (GPU) [FAIL]
-    FINAL: '+3' (90.0%, 3895ms) from Original-Tesseract [PASS]
-    R1branged_adj: +3
-    R2bheavy_adj processing attempts:
-      #1: '+3' (99.7%) from Original-PaddleOCR (GPU) [PASS]
-      #2: '+3' (96.0%) from Original-Tesseract [PASS]
-    FINAL: '+3' (99.7%, 1227ms) from Original-PaddleOCR (GPU) [PASS]
-    R2bheavy_adj: +3
-    R2branged_adj processing attempts:
-      #1: '+1' (95.0%) from Original-Tesseract [PASS]
-      #2: '+' (92.3%) from Original-PaddleOCR (GPU) [FAIL]
-    FINAL: '+1' (95.0%, 1224ms) from Original-Tesseract [PASS]
-    R2branged_adj: +1
-    R3bheavy_adj processing attempts:
-      #1: '+5' (99.9%) from Original-PaddleOCR (GPU) [PASS]
-      #2: '+5' (96.0%) from Original-Tesseract [PASS]
-    FINAL: '+5' (99.9%, 1099ms) from Original-PaddleOCR (GPU) [PASS]
-    R3bheavy_adj: +5
-    R3blight_adj processing attempts:
-      #1: '+1' (96.0%) from Original-Tesseract [PASS]
-      #2: '+' (98.1%) from Original-PaddleOCR (GPU) [FAIL]
-    FINAL: '+1' (96.0%, 826ms) from Original-Tesseract [PASS]
-    R3blight_adj: +1
-    R3branged_adj processing attempts:
-      #1: '-3' (100.0%) from Binary-PaddleOCR (GPU) [PASS]
-      #2: '-1' (86.0%) from Binary-Tesseract [PASS]
-      #3: '-1' (81.0%) from Enhanced-Tesseract [PASS]
-      ... and 3 more attempts
-    FINAL: '-3' (100.0%, 7809ms) from Binary-PaddleOCR (GPU) [PASS]
-    R3branged_adj: -3
-Phase 2 processing completed in 28.95s
+Phase 2 (full mode):
 
   Before state (with zeroing applied):
     blue Blue: L=0, H=4, R=3 | Red: L=0, H=0, R=0
@@ -474,213 +156,9 @@ Phase 2 processing completed in 28.95s
     blue Blue: L=0, H=0, R=0 | Red: L=0, H=0, R=0
     red1 Blue: L=5, H=3, R=11 | Red: L=0, H=0, R=0
     red2 Blue: L=0, H=3, R=1 | Red: L=0, H=21, R=0
-    red3 Blue: L=9, H=9, R=0 | Red: L=0, H=0, R=0
+    red3 Blue: L=9, H=9, R=2 | Red: L=0, H=0, R=0
 
-Automatically advancing to Phase 3...
-
-=== Advancing from Phase 2 ===
-Searching for upphase button...
-Found upphase button at (np.int64(2007), np.int64(1322))
-Clicking upphase button (1/1)
-Resetting view...
-Searching for resetview button...
-Found resetview button at (np.int64(192), np.int64(161))
-Clicking reset view button
-Advanced to Phase 3
-
-============================================================
-PHASE 3
-============================================================
-
-=== Processing Phase 3 OCR (Parallel) ===
-  Processing ROIs in parallel...
-  Base unit counts:
-    Bbheavy processing attempts:
-      #1: '0' (95.0%) from Original [PASS]
-      #2: '0' (95.0%) from Enhanced [PASS]
-      #3: '0' (95.0%) from Inverted [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 8402ms) from Original [PASS]
-    Bbheavy: 0
-    Bblight processing attempts:
-      #1: '0' (96.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 755ms) from Original [PASS]
-    Bblight: 0
-    Bbranged processing attempts:
-      #1: '0' (96.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 484ms) from Original [PASS]
-    Bbranged: 0
-    Brheavy processing attempts:
-      #1: '0' (94.0%) from Original [PASS]
-      #2: '0' (94.0%) from Binary [PASS]
-      #3: '0' (92.0%) from Enhanced [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (94.0%, 16265ms) from Original [PASS]
-    Brheavy: 0
-    Brlight processing attempts:
-      #1: '0' (95.0%) from Enhanced [PASS]
-      #2: '0' (93.0%) from Binary [PASS]
-      #3: '0' (93.0%) from Inverted [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 11031ms) from Enhanced [PASS]
-    Brlight: 0
-    Brranged processing attempts:
-      #1: '0' (1.0%) from Original [PASS]
-      #2: '07' (43.0%) from Grey-Boost [FAIL]
-      #3: '(empty)' (0.0%) from Enhanced [FAIL]
-      ... and 2 more attempts
-    FINAL: '0' (1.0%, 24729ms) from Original [PASS]
-    Brranged: 0
-    R1bheavy processing attempts:
-      #1: '3' (96.0%) from Original [PASS]
-    FINAL: '3' (96.0%, 1225ms) from Original [PASS]
-    R1bheavy: 3
-    R1blight processing attempts:
-      #1: '5' (97.0%) from Original [PASS]
-    FINAL: '5' (97.0%, 1023ms) from Original [PASS]
-    R1blight: 5
-    R1branged processing attempts:
-      #1: '11' (96.0%) from Original [PASS]
-    FINAL: '11' (96.0%, 1253ms) from Original [PASS]
-    R1branged: 11
-    R1rheavy processing attempts:
-      #1: '0' (95.0%) from Binary [PASS]
-      #2: '0' (94.0%) from Original [PASS]
-      #3: '0' (94.0%) from Enhanced [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 10886ms) from Binary [PASS]
-    R1rheavy: 0
-    R1rlight processing attempts:
-      #1: '0' (95.0%) from Original [PASS]
-      #2: '0' (94.0%) from Enhanced [PASS]
-      #3: '0' (94.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 8892ms) from Original [PASS]
-    R1rlight: 0
-    R1rranged processing attempts:
-      #1: '0' (94.0%) from Original [PASS]
-      #2: '0' (94.0%) from Enhanced [PASS]
-      #3: '0' (93.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (94.0%, 12113ms) from Original [PASS]
-    R1rranged: 0
-    R2bheavy processing attempts:
-      #1: '3' (96.0%) from Original [PASS]
-    FINAL: '3' (96.0%, 599ms) from Original [PASS]
-    R2bheavy: 3
-    R2blight processing attempts:
-      #1: '1' (96.0%) from Original [PASS]
-    FINAL: '1' (96.0%, 740ms) from Original [PASS]
-    R2blight: 1
-    R2branged processing attempts:
-      #1: '2' (97.0%) from Original [PASS]
-    FINAL: '2' (97.0%, 1221ms) from Original [PASS]
-    R2branged: 2
-    R2rheavy processing attempts:
-      #1: '15' (96.0%) from Original [PASS]
-    FINAL: '15' (96.0%, 913ms) from Original [PASS]
-    R2rheavy: 15
-    R2rlight processing attempts:
-      #1: '0' (96.0%) from Enhanced [PASS]
-      #2: '0' (92.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 1558ms) from Enhanced [PASS]
-    R2rlight: 0
-    R2rranged processing attempts:
-      #1: '0' (96.0%) from Enhanced [PASS]
-      #2: '0' (71.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 6548ms) from Enhanced [PASS]
-    R2rranged: 0
-    R3bheavy processing attempts:
-      #1: '9' (96.0%) from Enhanced [PASS]
-      #2: '9' (95.0%) from Original [PASS]
-    FINAL: '9' (96.0%, 1520ms) from Enhanced [PASS]
-    R3bheavy: 9
-    R3blight processing attempts:
-      #1: '9' (96.0%) from Original [PASS]
-    FINAL: '9' (96.0%, 638ms) from Original [PASS]
-    R3blight: 9
-    R3branged processing attempts:
-      #1: '2' (96.0%) from Original [PASS]
-    FINAL: '2' (96.0%, 904ms) from Original [PASS]
-    R3branged: 2
-    R3rheavy processing attempts:
-      #1: '0' (96.0%) from Enhanced [PASS]
-      #2: '0' (93.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 2237ms) from Enhanced [PASS]
-    R3rheavy: 0
-    R3rlight processing attempts:
-      #1: '0' (95.0%) from Enhanced [PASS]
-      #2: '0' (91.0%) from Original [PASS]
-      #3: '0' (87.0%) from Binary [PASS]
-      ... and 2 more attempts
-    FINAL: '0' (95.0%, 18579ms) from Enhanced [PASS]
-    R3rlight: 0
-    R3rranged processing attempts:
-      #1: '0' (96.0%) from Binary [PASS]
-      #2: '0' (93.0%) from Enhanced [PASS]
-      #3: '0' (92.0%) from Original [PASS]
-    FINAL: '0' (96.0%, 3677ms) from Binary [PASS]
-    R3rranged: 0
-  Adjustment values:
-    Bbheavy_adj processing attempts:
-      #1: '+1' (95.0%) from Original-Tesseract [PASS]
-      #2: '+' (94.4%) from Original-PaddleOCR (GPU) [FAIL]
-    FINAL: '+1' (95.0%, 990ms) from Original-Tesseract [PASS]
-    Bbheavy_adj: +1
-    R1bheavy_adj processing attempts:
-      #1: '-2' (87.0%) from Original-Tesseract [PASS]
-      #2: '-2' (77.0%) from Enhanced-Tesseract [PASS]
-      #3: '2' (99.7%) from Enhanced-PaddleOCR (GPU) [FAIL]
-      ... and 7 more attempts
-    FINAL: '-2' (87.0%, 13200ms) from Original-Tesseract [PASS]
-    R1bheavy_adj: -2
-    R1blight_adj processing attempts:
-      #1: '-5' (99.4%) from Inverted-PaddleOCR (GPU) [PASS]
-      #2: '5' (99.2%) from Original-PaddleOCR (GPU) [FAIL]
-      #3: '5' (95.0%) from Original-Tesseract [FAIL]
-      ... and 7 more attempts
-    FINAL: '-5' (99.4%, 12275ms) from Inverted-PaddleOCR (GPU) [PASS]
-    R1blight_adj: -5
-    R1branged_adj processing attempts:
-      #1: '-11' (92.0%) from Original-Tesseract [PASS]
-      #2: '(empty)' (0.0%) from Original-PaddleOCR (GPU) [FAIL]
-    FINAL: '-11' (92.0%, 3195ms) from Original-Tesseract [PASS]
-    R1branged_adj: -11
-    R2bheavy_adj processing attempts:
-      #1: '+7' (100.0%) from Original-PaddleOCR (GPU) [PASS]
-      #2: '+7' (96.0%) from Original-Tesseract [PASS]
-    FINAL: '+7' (100.0%, 1341ms) from Original-PaddleOCR (GPU) [PASS]
-    R2bheavy_adj: +7
-    R2blight_adj processing attempts:
-      #1: '+9' (99.9%) from Original-PaddleOCR (GPU) [PASS]
-      #2: '+9' (96.0%) from Original-Tesseract [PASS]
-    FINAL: '+9' (99.9%, 1300ms) from Original-PaddleOCR (GPU) [PASS]
-    R2blight_adj: +9
-    R2branged_adj processing attempts:
-      #1: '+3' (100.0%) from Original-PaddleOCR (GPU) [PASS]
-      #2: '+3' (96.0%) from Original-Tesseract [PASS]
-    FINAL: '+3' (100.0%, 1169ms) from Original-PaddleOCR (GPU) [PASS]
-    R2branged_adj: +3
-    R3bheavy_adj processing attempts:
-      #1: '-6' (95.6%) from Grey-Boost-PaddleOCR (GPU) [PASS]
-      #2: '6' (99.9%) from Enhanced-PaddleOCR (GPU) [FAIL]
-      #3: '6' (96.0%) from Enhanced-Tesseract [FAIL]
-      ... and 5 more attempts
-    FINAL: '-6' (95.6%, 10726ms) from Grey-Boost-PaddleOCR (GPU) [PASS]
-    R3bheavy_adj: -6
-    R3blight_adj processing attempts:
-      #1: '9-' (99.6%) from Original-PaddleOCR (GPU) [FAIL]
-      #2: '4' (96.0%) from Enhanced-Tesseract [FAIL]
-      #3: '4' (94.0%) from Binary-Tesseract [FAIL]
-      ... and 7 more attempts
-    FINAL: '9-' (99.6%, 11596ms) from Original-PaddleOCR (GPU) [FAIL]
-    R3blight_adj: 9-
-    R3branged_adj processing attempts:
-      #1: '+8' (96.0%) from Original-Tesseract [PASS]
-      #2: '(empty)' (0.0%) from Original-PaddleOCR (GPU) [FAIL]
-    FINAL: '+8' (96.0%, 759ms) from Original-Tesseract [PASS]
-    R3branged_adj: +8
-Phase 3 processing completed in 29.23s
+Phase 3 (full mode):
 
   Before state (with zeroing applied):
     blue Blue: L=0, H=0, R=0 | Red: L=0, H=0, R=0
@@ -690,38 +168,21 @@ Phase 3 processing completed in 29.23s
 
   After state (with adjustments applied):
     blue Blue: L=0, H=1, R=0 | Red: L=0, H=0, R=0
-    red1 Blue: L=0, H=1, R=0 | Red: L=0, H=0, R=0
+    red1 Blue: L=14, H=1, R=0 | Red: L=0, H=0, R=0
     red2 Blue: L=9, H=7, R=3 | Red: L=0, H=15, R=0
-    red3 Blue: L=18, H=3, R=10 | Red: L=0, H=0, R=0
-
-============================================================
-RED2 FINAL UNIT COUNT CAPTURE
-============================================================
-Navigating to red1 base by clicking R1blight at (1059, 370)
-Capturing Red2 final unit count (5 captures over 5 seconds)...
-  Capture 1/5...
-  Capture 2/5...
-  Capture 3/5...
-  Capture 4/5...
-  Capture 5/5...
-Processing OCR on 5 captured images...
-    Capture 1: '5' (100.0%, Original-PaddleOCR (GPU))
-    Capture 2: '5' (100.0%, Original-PaddleOCR (GPU))
-    Capture 3: Invalid text '(empty)'
-    Capture 4: Invalid text '(empty)'
-    Capture 5: '3' (16.0%, Original-Tesseract)
-Best result: Capture 2 - '5' (100.0%, Original-PaddleOCR (GPU))
-Clicking reset view button...
-Searching for resetview button...
-Found resetview button at (np.int64(192), np.int64(161))
-Reset view button clicked
-Successfully captured Red2 final unit count: 5
+    red3 Blue: L=9, H=3, R=10 | Red: L=0, H=0, R=0
 
 === Generating Output ===
-Updated Red2 final red heavy units to: 5
-Game state saved: output\game_session_20250930_095349\game_state\game_state.json
-Saved game state to: output\game_session_20250930_095349\game_state\game_state.json
-Session ended: game_session_20250930_095349
+Updated Red2 final red heavy units to: 4
+Game state saved: output\game_session_20251006_001440\game_state\game_state.json
+Saved game state to: output\game_session_20251006_001440\game_state\game_state.json
+
+=== Checking for Save State File ===
+Looking for save state at: C:\Users\brody\OneDrive\Desktop\Agent-in-the-Loop-Repository\save_state.json
+Save state detected! Merging with OCR data...
+SUCCESS: Enriched game state created: game_state.json
+SUCCESS: Save state file cleaned up
+Session ended: game_session_20251006_001440
 
 ============================================================
 GAME READING COMPLETE
@@ -732,13 +193,18 @@ SUCCESS: Game reading completed
 
 STDERR:
 INFO: Could not find files for the given pattern(s).
-[2025-09-30 09:53:49,246] [    INFO] session_output_manager.py:65 - Session started: game_session_20250930_095349
-[2025-09-30 09:53:49,246] [    INFO] session_output_manager.py:66 - Output directory: output\game_session_20250930_095349
-[2025-09-30 09:53:49,246] [    INFO] session_output_manager.py:67 - Logging system initialized successfully
-[2025-09-30 09:53:49,246] [    INFO] game_reader.py:133 - Loading ROI configurations...
-[2025-09-30 09:53:49,247] [    INFO] game_reader.py:140 - ROI configurations loaded successfully
-[2025-09-30 09:53:49,248] [    INFO] game_reader.py:148 - Performing initial view reset
-[2025-09-30 09:53:50,284] [    INFO] game_reader.py:154 - Initial view reset successful
+[2025-10-06 00:14:40,205] [    INFO] session_output_manager.py:73 - Session started: game_session_20251006_001440
+[2025-10-06 00:14:40,205] [    INFO] session_output_manager.py:74 - Output directory: output\game_session_20251006_001440
+[2025-10-06 00:14:40,206] [    INFO] session_output_manager.py:75 - Logging system initialized successfully
+[2025-10-06 00:14:40,212] [    INFO] game_reader.py:183 - Auto-detected RTSViewer on monitor 3 (2560x1440)
+[2025-10-06 00:14:40,219] [    INFO] game_reader.py:288 - Monitor 3 resolution: 2560x1440
+[2025-10-06 00:14:40,219] [    INFO] game_reader.py:118 - Using resolution-specific ROI file: rois/rois_main\Main_rois_2560x1440.json
+[2025-10-06 00:14:40,219] [    INFO] game_reader.py:118 - Using resolution-specific ROI file: rois/rois_main\Element_rois_2560x1440.json
+[2025-10-06 00:14:40,219] [    INFO] game_reader.py:299 - Loading ROI configurations...
+[2025-10-06 00:14:40,221] [    INFO] game_reader.py:308 - ROI configurations loaded successfully
+[2025-10-06 00:14:40,223] [    INFO] smart_capture_planner.py:21 - save_state.json loaded successfully from: C:\Users\brody\OneDrive\Desktop\Agent-in-the-Loop-Repository\save_state.json
+[2025-10-06 00:14:40,223] [    INFO] smart_capture_planner.py:43 - Actions by phase: P1=3, P2=9, P3=7
+[2025-10-06 00:14:40,223] [    INFO] smart_capture_planner.py:100 - Capture plan from save_state: {'phases_to_capture': [1, 2, 3], 'phase_modes': {1: 'full', 2: 'full', 3: 'full'}, 'needs_red2_final': True, 'export_mode': 'enriched'}
 [32mCreating model: ('PP-LCNet_x1_0_doc_ori', None)[0m
 [32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\brody\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
 [32mCreating model: ('UVDoc', None)[0m
@@ -747,217 +213,109 @@ INFO: Could not find files for the given pattern(s).
 [32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\brody\.paddlex\official_models\PP-OCRv5_server_det`.[0m
 [32mCreating model: ('en_PP-OCRv5_mobile_rec', None)[0m
 [32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\brody\.paddlex\official_models\en_PP-OCRv5_mobile_rec`.[0m
-[2025-09-30 09:53:59,216] [    INFO] ocr_processor.py:144 - Starting Phase 1 OCR processing with 8 workers
-[2025-09-30 09:53:59,891] [    INFO] ocr_processor.py:184 - Phase 1 - Bblight: '15' (96.0%)
-[2025-09-30 09:53:59,963] [    INFO] ocr_processor.py:184 - Phase 1 - Bbranged: '15' (96.0%)
-[2025-09-30 09:53:59,964] [    INFO] ocr_processor.py:184 - Phase 1 - Bbheavy: '15' (96.0%)
-[2025-09-30 09:54:00,181] [    INFO] ocr_processor.py:184 - Phase 1 - R1bheavy: '0' (96.0%)
-[2025-09-30 09:54:00,254] [    INFO] ocr_processor.py:184 - Phase 1 - R1blight: '0' (96.0%)
-[2025-09-30 09:54:00,809] [    INFO] ocr_processor.py:184 - Phase 1 - R1rheavy: '4' (97.0%)
-[2025-09-30 09:54:00,817] [    INFO] ocr_processor.py:184 - Phase 1 - R1rlight: '4' (96.0%)
-[2025-09-30 09:54:01,101] [    INFO] ocr_processor.py:184 - Phase 1 - R1rranged: '4' (96.0%)
-[2025-09-30 09:54:03,051] [    INFO] ocr_processor.py:184 - Phase 1 - R2rlight: '0' (96.0%)
-[2025-09-30 09:54:03,358] [    INFO] ocr_processor.py:184 - Phase 1 - R2blight: '0' (96.0%)
-[2025-09-30 09:54:03,784] [    INFO] ocr_processor.py:184 - Phase 1 - R2rheavy: '21' (96.0%)
-[2025-09-30 09:54:04,300] [    INFO] ocr_processor.py:184 - Phase 1 - R3blight: '0' (96.0%)
-[2025-09-30 09:54:07,066] [    INFO] ocr_processor.py:184 - Phase 1 - R2bheavy: '0' (95.0%)
-[2025-09-30 09:54:07,939] [    INFO] ocr_processor.py:184 - Phase 1 - R1branged: '0' (95.0%)
-[2025-09-30 09:54:08,722] [    INFO] ocr_processor.py:184 - Phase 1 - Brlight: '0' (95.0%)
-[2025-09-30 09:54:08,934] [    INFO] ocr_processor.py:184 - Phase 1 - R3bheavy: '0' (95.0%)
-[2025-09-30 09:54:09,031] [    INFO] ocr_processor.py:184 - Phase 1 - R2rranged: '0' (96.0%)
-[2025-09-30 09:54:09,258] [    INFO] ocr_processor.py:184 - Phase 1 - R2branged: '0' (92.0%)
-[2025-09-30 09:54:10,375] [    INFO] ocr_processor.py:184 - Phase 1 - Bblight_adj: '-15' (98.9%)
-[2025-09-30 09:54:11,286] [    INFO] ocr_processor.py:184 - Phase 1 - Bbranged_adj: '-12' (100.0%)
-[2025-09-30 09:54:12,265] [    INFO] ocr_processor.py:184 - Phase 1 - R3rranged: '0' (96.0%)
-[2025-09-30 09:54:12,407] [    INFO] ocr_processor.py:184 - Phase 1 - Bbheavy_adj: '+6' (99.9%)
-[2025-09-30 09:54:12,454] [    INFO] ocr_processor.py:184 - Phase 1 - R1blight_adj: '+6' (99.9%)
-[2025-09-30 09:54:13,156] [    INFO] ocr_processor.py:184 - Phase 1 - R1bheavy_adj: '+7' (96.0%)
-[2025-09-30 09:54:13,157] [    INFO] ocr_processor.py:184 - Phase 1 - R2bheavy_adj: '0' (100.0%)
-[2025-09-30 09:54:13,161] [    INFO] ocr_processor.py:184 - Phase 1 - R2blight_adj: '+1' (95.0%)
-[2025-09-30 09:54:13,222] [    INFO] ocr_processor.py:184 - Phase 1 - R1branged_adj: '+8' (99.7%)
-[2025-09-30 09:54:13,363] [    INFO] ocr_processor.py:184 - Phase 1 - Brheavy: '0' (94.0%)
-[2025-09-30 09:54:14,039] [    INFO] ocr_processor.py:184 - Phase 1 - R2branged_adj: '+1' (94.0%)
-[2025-09-30 09:54:14,135] [    INFO] ocr_processor.py:184 - Phase 1 - R3blight_adj: '+8' (99.7%)
-[2025-09-30 09:54:14,637] [    INFO] ocr_processor.py:184 - Phase 1 - R3bheavy_adj: '+4' (99.9%)
-[2025-09-30 09:54:14,674] [    INFO] ocr_processor.py:184 - Phase 1 - R3branged_adj: '+3' (95.0%)
-[2025-09-30 09:54:14,734] [    INFO] ocr_processor.py:184 - Phase 1 - Brranged: '0' (93.0%)
-[2025-09-30 09:54:14,937] [    INFO] ocr_processor.py:184 - Phase 1 - R3branged: '0' (95.0%)
-[2025-09-30 09:54:16,577] [    INFO] ocr_processor.py:184 - Phase 1 - R3rheavy: '0' (95.0%)
-[2025-09-30 09:54:22,781] [    INFO] ocr_processor.py:184 - Phase 1 - R3rlight: '11' (79.0%)
-[2025-09-30 09:54:22,786] [    INFO] ocr_processor.py:221 - Phase 1 completed in 23.57s (36 ROIs processed in parallel)
-[2025-09-30 09:54:22,787] [    INFO] game_state_manager.py:115 - Zeroing blue units at red1 due to red presence
-[2025-09-30 09:54:22,787] [    INFO] game_state_manager.py:115 - Zeroing blue units at red2 due to red presence
-[2025-09-30 09:54:22,787] [    INFO] game_state_manager.py:115 - Zeroing blue units at red3 due to red presence
-[2025-09-30 09:54:22,787] [    INFO] game_state_manager.py:162 - Processing adjustment Bblight_adj: -15
-[2025-09-30 09:54:22,787] [    INFO] game_state_manager.py:198 - Applied adjustment to blue blue L: 15 + (-15) = 0
-[2025-09-30 09:54:22,787] [    INFO] game_state_manager.py:162 - Processing adjustment Bbranged_adj: -12
-[2025-09-30 09:54:22,787] [    INFO] game_state_manager.py:198 - Applied adjustment to blue blue R: 15 + (-12) = 3
-[2025-09-30 09:54:22,787] [    INFO] game_state_manager.py:162 - Processing adjustment Bbheavy_adj: +6
-[2025-09-30 09:54:22,787] [    INFO] game_state_manager.py:198 - Applied adjustment to blue blue H: 15 + (6) = 21
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:162 - Processing adjustment R1blight_adj: +6
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:198 - Applied adjustment to red1 blue L: 0 + (6) = 6
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:162 - Processing adjustment R1bheavy_adj: +7
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:198 - Applied adjustment to red1 blue H: 0 + (7) = 7
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:162 - Processing adjustment R2blight_adj: +1
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:198 - Applied adjustment to red2 blue L: 0 + (1) = 1
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:162 - Processing adjustment R1branged_adj: +8
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:198 - Applied adjustment to red1 blue R: 0 + (8) = 8
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:162 - Processing adjustment R2branged_adj: +1
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:198 - Applied adjustment to red2 blue R: 0 + (1) = 1
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:162 - Processing adjustment R3blight_adj: +8
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:198 - Applied adjustment to red3 blue L: 0 + (8) = 8
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:162 - Processing adjustment R3bheavy_adj: +4
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:198 - Applied adjustment to red3 blue H: 0 + (4) = 4
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:162 - Processing adjustment R3branged_adj: +3
-[2025-09-30 09:54:22,788] [    INFO] game_state_manager.py:198 - Applied adjustment to red3 blue R: 0 + (3) = 3
-[2025-09-30 09:54:25,195] [    INFO] ocr_processor.py:144 - Starting Phase 2 OCR processing with 8 workers
-[2025-09-30 09:54:26,044] [    INFO] ocr_processor.py:184 - Phase 2 - Bblight: '0' (96.0%)
-[2025-09-30 09:54:26,063] [    INFO] ocr_processor.py:184 - Phase 2 - Bbranged: '3' (96.0%)
-[2025-09-30 09:54:26,080] [    INFO] ocr_processor.py:184 - Phase 2 - Bbheavy: '4' (96.0%)
-[2025-09-30 09:54:26,463] [    INFO] ocr_processor.py:184 - Phase 2 - R1blight: '6' (97.0%)
-[2025-09-30 09:54:27,091] [    INFO] ocr_processor.py:184 - Phase 2 - R1branged: '8' (96.0%)
-[2025-09-30 09:54:27,601] [    INFO] ocr_processor.py:184 - Phase 2 - R2blight: '1' (96.0%)
-[2025-09-30 09:54:28,214] [    INFO] ocr_processor.py:184 - Phase 2 - R1bheavy: '7' (96.0%)
-[2025-09-30 09:54:29,339] [    INFO] ocr_processor.py:184 - Phase 2 - R2branged: '1' (96.0%)
-[2025-09-30 09:54:32,052] [    INFO] ocr_processor.py:184 - Phase 2 - R2rlight: '0' (96.0%)
-[2025-09-30 09:54:32,489] [    INFO] ocr_processor.py:184 - Phase 2 - R1rlight: '0' (95.0%)
-[2025-09-30 09:54:33,176] [    INFO] ocr_processor.py:184 - Phase 2 - R2rheavy: '21' (96.0%)
-[2025-09-30 09:54:33,865] [    INFO] ocr_processor.py:184 - Phase 2 - R3blight: '8' (96.0%)
-[2025-09-30 09:54:34,476] [    INFO] ocr_processor.py:184 - Phase 2 - R3bheavy: '4' (96.0%)
-[2025-09-30 09:54:36,129] [    INFO] ocr_processor.py:184 - Phase 2 - Brlight: '0' (94.0%)
-[2025-09-30 09:54:37,683] [    INFO] ocr_processor.py:184 - Phase 2 - R1rheavy: '0' (95.0%)
-[2025-09-30 09:54:37,801] [    INFO] ocr_processor.py:184 - Phase 2 - R2bheavy: '0' (93.0%)
-[2025-09-30 09:54:38,346] [    INFO] ocr_processor.py:184 - Phase 2 - R3branged: '3' (96.0%)
-[2025-09-30 09:54:38,347] [    INFO] ocr_processor.py:184 - Phase 2 - Bblight_adj: '0' (100.0%)
-[2025-09-30 09:54:38,896] [    INFO] ocr_processor.py:184 - Phase 2 - R2rranged: '0' (96.0%)
-[2025-09-30 09:54:39,209] [    INFO] ocr_processor.py:184 - Phase 2 - R1rranged: '0' (94.0%)
-[2025-09-30 09:54:39,987] [    INFO] ocr_processor.py:184 - Phase 2 - R3rheavy: '0' (96.0%)
-[2025-09-30 09:54:40,749] [    INFO] ocr_processor.py:184 - Phase 2 - R3rranged: '0' (96.0%)
-[2025-09-30 09:54:41,490] [    INFO] ocr_processor.py:184 - Phase 2 - Brheavy: '0' (95.0%)
-[2025-09-30 09:54:41,490] [    INFO] ocr_processor.py:184 - Phase 2 - R2blight_adj: '0' (100.0%)
-[2025-09-30 09:54:41,926] [    INFO] ocr_processor.py:184 - Phase 2 - R1blight_adj: '-1' (92.0%)
-[2025-09-30 09:54:42,727] [    INFO] ocr_processor.py:184 - Phase 2 - R2bheavy_adj: '+3' (99.7%)
-[2025-09-30 09:54:43,161] [    INFO] ocr_processor.py:184 - Phase 2 - R2branged_adj: '+1' (95.0%)
-[2025-09-30 09:54:43,556] [    INFO] ocr_processor.py:184 - Phase 2 - R3blight_adj: '+1' (96.0%)
-[2025-09-30 09:54:44,263] [    INFO] ocr_processor.py:184 - Phase 2 - R3bheavy_adj: '+5' (99.9%)
-[2025-09-30 09:54:44,654] [    INFO] ocr_processor.py:184 - Phase 2 - R1branged_adj: '+3' (90.0%)
-[2025-09-30 09:54:47,024] [    INFO] ocr_processor.py:184 - Phase 2 - Brranged: '0' (93.0%)
-[2025-09-30 09:54:49,676] [    INFO] ocr_processor.py:184 - Phase 2 - R1bheavy_adj: '-4' (90.0%)
-[2025-09-30 09:54:51,155] [    INFO] ocr_processor.py:184 - Phase 2 - Bbranged_adj: '-3' (88.0%)
-[2025-09-30 09:54:51,233] [    INFO] ocr_processor.py:134 - Color correction applied to Bbheavy_adj: '-4' (detected red pixels)
-[2025-09-30 09:54:51,234] [    INFO] ocr_processor.py:184 - Phase 2 - Bbheavy_adj: '-4' (95.0%)
-[2025-09-30 09:54:51,367] [    INFO] ocr_processor.py:184 - Phase 2 - R3branged_adj: '-3' (100.0%)
-[2025-09-30 09:54:54,142] [    INFO] ocr_processor.py:184 - Phase 2 - R3rlight: '0' (95.0%)
-[2025-09-30 09:54:54,145] [    INFO] ocr_processor.py:221 - Phase 2 completed in 28.95s (36 ROIs processed in parallel)
-[2025-09-30 09:54:54,146] [    INFO] game_state_manager.py:115 - Zeroing blue units at red2 due to red presence
-[2025-09-30 09:54:54,146] [    INFO] game_state_manager.py:162 - Processing adjustment R1blight_adj: -1
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:198 - Applied adjustment to red1 blue L: 6 + (-1) = 5
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:162 - Processing adjustment R2bheavy_adj: +3
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:198 - Applied adjustment to red2 blue H: 0 + (3) = 3
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:162 - Processing adjustment R2branged_adj: +1
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:198 - Applied adjustment to red2 blue R: 0 + (1) = 1
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:162 - Processing adjustment R3blight_adj: +1
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:198 - Applied adjustment to red3 blue L: 8 + (1) = 9
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:162 - Processing adjustment R3bheavy_adj: +5
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:198 - Applied adjustment to red3 blue H: 4 + (5) = 9
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:162 - Processing adjustment R1branged_adj: +3
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:198 - Applied adjustment to red1 blue R: 8 + (3) = 11
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:162 - Processing adjustment R1bheavy_adj: -4
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:198 - Applied adjustment to red1 blue H: 7 + (-4) = 3
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:162 - Processing adjustment Bbranged_adj: -3
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:198 - Applied adjustment to blue blue R: 3 + (-3) = 0
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:162 - Processing adjustment Bbheavy_adj: -4
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:198 - Applied adjustment to blue blue H: 4 + (-4) = 0
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:162 - Processing adjustment R3branged_adj: -3
-[2025-09-30 09:54:54,147] [    INFO] game_state_manager.py:198 - Applied adjustment to red3 blue R: 3 + (-3) = 0
-[2025-09-30 09:54:56,561] [    INFO] ocr_processor.py:144 - Starting Phase 3 OCR processing with 8 workers
-[2025-09-30 09:54:57,122] [    INFO] ocr_processor.py:184 - Phase 3 - Bbranged: '0' (96.0%)
-[2025-09-30 09:54:57,393] [    INFO] ocr_processor.py:184 - Phase 3 - Bblight: '0' (96.0%)
-[2025-09-30 09:54:57,663] [    INFO] ocr_processor.py:184 - Phase 3 - R1blight: '5' (97.0%)
-[2025-09-30 09:54:57,866] [    INFO] ocr_processor.py:184 - Phase 3 - R1bheavy: '3' (96.0%)
-[2025-09-30 09:54:58,377] [    INFO] ocr_processor.py:184 - Phase 3 - R1branged: '11' (96.0%)
-[2025-09-30 09:54:59,132] [    INFO] ocr_processor.py:184 - Phase 3 - R2blight: '1' (96.0%)
-[2025-09-30 09:54:59,733] [    INFO] ocr_processor.py:184 - Phase 3 - R2bheavy: '3' (96.0%)
-[2025-09-30 09:55:00,957] [    INFO] ocr_processor.py:184 - Phase 3 - R2branged: '2' (97.0%)
-[2025-09-30 09:55:02,517] [    INFO] ocr_processor.py:184 - Phase 3 - R2rlight: '0' (96.0%)
-[2025-09-30 09:55:03,433] [    INFO] ocr_processor.py:184 - Phase 3 - R2rheavy: '15' (96.0%)
-[2025-09-30 09:55:05,040] [    INFO] ocr_processor.py:184 - Phase 3 - Bbheavy: '0' (95.0%)
-[2025-09-30 09:55:05,681] [    INFO] ocr_processor.py:184 - Phase 3 - R3blight: '9' (96.0%)
-[2025-09-30 09:55:06,287] [    INFO] ocr_processor.py:184 - Phase 3 - R1rlight: '0' (95.0%)
-[2025-09-30 09:55:07,194] [    INFO] ocr_processor.py:184 - Phase 3 - R3branged: '2' (96.0%)
-[2025-09-30 09:55:07,203] [    INFO] ocr_processor.py:184 - Phase 3 - R3bheavy: '9' (96.0%)
-[2025-09-30 09:55:07,670] [    INFO] ocr_processor.py:184 - Phase 3 - Brlight: '0' (95.0%)
-[2025-09-30 09:55:08,554] [    INFO] ocr_processor.py:184 - Phase 3 - R1rheavy: '0' (95.0%)
-[2025-09-30 09:55:08,555] [    INFO] ocr_processor.py:184 - Phase 3 - Bblight_adj: '0' (100.0%)
-[2025-09-30 09:55:09,455] [    INFO] ocr_processor.py:184 - Phase 3 - R3rheavy: '0' (96.0%)
-[2025-09-30 09:55:09,456] [    INFO] ocr_processor.py:184 - Phase 3 - Bbranged_adj: '0' (100.0%)
-[2025-09-30 09:55:09,547] [    INFO] ocr_processor.py:184 - Phase 3 - Bbheavy_adj: '+1' (95.0%)
-[2025-09-30 09:55:09,983] [    INFO] ocr_processor.py:184 - Phase 3 - R1rranged: '0' (94.0%)
-[2025-09-30 09:55:09,983] [    INFO] ocr_processor.py:184 - Phase 3 - R2rranged: '0' (96.0%)
-[2025-09-30 09:55:11,292] [    INFO] ocr_processor.py:184 - Phase 3 - R2blight_adj: '+9' (99.9%)
-[2025-09-30 09:55:11,356] [    INFO] ocr_processor.py:184 - Phase 3 - R3rranged: '0' (96.0%)
-[2025-09-30 09:55:12,529] [    INFO] ocr_processor.py:184 - Phase 3 - R2branged_adj: '+3' (100.0%)
-[2025-09-30 09:55:12,641] [    INFO] ocr_processor.py:184 - Phase 3 - R2bheavy_adj: '+7' (100.0%)
-[2025-09-30 09:55:12,906] [    INFO] ocr_processor.py:184 - Phase 3 - Brheavy: '0' (94.0%)
-[2025-09-30 09:55:13,185] [    INFO] ocr_processor.py:184 - Phase 3 - R1branged_adj: '-11' (92.0%)
-[2025-09-30 09:55:13,668] [    INFO] ocr_processor.py:184 - Phase 3 - R3branged_adj: '+8' (96.0%)
-[2025-09-30 09:55:21,368] [    INFO] ocr_processor.py:184 - Phase 3 - Brranged: '0' (1.0%)
-[2025-09-30 09:55:21,738] [    INFO] ocr_processor.py:184 - Phase 3 - R1blight_adj: '-5' (99.4%)
-[2025-09-30 09:55:22,750] [    INFO] ocr_processor.py:184 - Phase 3 - R1bheavy_adj: '-2' (87.0%)
-[2025-09-30 09:55:23,371] [    INFO] ocr_processor.py:184 - Phase 3 - R3bheavy_adj: '-6' (95.6%)
-[2025-09-30 09:55:24,128] [    INFO] ocr_processor.py:184 - Phase 3 - R3blight_adj: '9-' (99.6%)
-[2025-09-30 09:55:25,781] [    INFO] ocr_processor.py:184 - Phase 3 - R3rlight: '0' (95.0%)
-[2025-09-30 09:55:25,787] [    INFO] ocr_processor.py:221 - Phase 3 completed in 29.23s (36 ROIs processed in parallel)
-[2025-09-30 09:55:25,788] [    INFO] game_state_manager.py:115 - Zeroing blue units at red2 due to red presence
-[2025-09-30 09:55:25,788] [    INFO] game_state_manager.py:162 - Processing adjustment Bbheavy_adj: +1
-[2025-09-30 09:55:25,788] [    INFO] game_state_manager.py:198 - Applied adjustment to blue blue H: 0 + (1) = 1
-[2025-09-30 09:55:25,788] [    INFO] game_state_manager.py:162 - Processing adjustment R2blight_adj: +9
-[2025-09-30 09:55:25,788] [    INFO] game_state_manager.py:198 - Applied adjustment to red2 blue L: 0 + (9) = 9
-[2025-09-30 09:55:25,788] [    INFO] game_state_manager.py:162 - Processing adjustment R2branged_adj: +3
-[2025-09-30 09:55:25,788] [    INFO] game_state_manager.py:198 - Applied adjustment to red2 blue R: 0 + (3) = 3
-[2025-09-30 09:55:25,788] [    INFO] game_state_manager.py:162 - Processing adjustment R2bheavy_adj: +7
-[2025-09-30 09:55:25,788] [    INFO] game_state_manager.py:198 - Applied adjustment to red2 blue H: 0 + (7) = 7
-[2025-09-30 09:55:25,788] [    INFO] game_state_manager.py:162 - Processing adjustment R1branged_adj: -11
-[2025-09-30 09:55:25,789] [    INFO] game_state_manager.py:198 - Applied adjustment to red1 blue R: 11 + (-11) = 0
-[2025-09-30 09:55:25,789] [    INFO] game_state_manager.py:162 - Processing adjustment R3branged_adj: +8
-[2025-09-30 09:55:25,789] [    INFO] game_state_manager.py:198 - Applied adjustment to red3 blue R: 2 + (8) = 10
-[2025-09-30 09:55:25,789] [    INFO] game_state_manager.py:162 - Processing adjustment R1blight_adj: -5
-[2025-09-30 09:55:25,789] [    INFO] game_state_manager.py:198 - Applied adjustment to red1 blue L: 5 + (-5) = 0
-[2025-09-30 09:55:25,789] [    INFO] game_state_manager.py:162 - Processing adjustment R1bheavy_adj: -2
-[2025-09-30 09:55:25,789] [    INFO] game_state_manager.py:198 - Applied adjustment to red1 blue H: 3 + (-2) = 1
-[2025-09-30 09:55:25,789] [    INFO] game_state_manager.py:162 - Processing adjustment R3bheavy_adj: -6
-[2025-09-30 09:55:25,789] [    INFO] game_state_manager.py:198 - Applied adjustment to red3 blue H: 9 + (-6) = 3
-[2025-09-30 09:55:25,789] [    INFO] game_state_manager.py:162 - Processing adjustment R3blight_adj: +9
-[2025-09-30 09:55:25,789] [    INFO] game_state_manager.py:198 - Applied adjustment to red3 blue L: 9 + (9) = 18
-[2025-09-30 09:55:57,040] [    INFO] game_state_manager.py:115 - Zeroing blue units at red2 due to red presence
-[2025-09-30 09:55:57,042] [    INFO] session_output_manager.py:140 - Exported game state to: game_state.json
-[2025-09-30 09:55:57,042] [    INFO] game_reader.py:275 - Session performance summary:
-[2025-09-30 09:55:57,043] [    INFO] game_reader.py:276 -   Total duration: 127.80s
-[2025-09-30 09:55:57,043] [    INFO] game_reader.py:277 -   Phases processed: 3
-[2025-09-30 09:55:57,043] [    INFO] game_reader.py:278 -   Average phase duration: 42.60s
-[2025-09-30 09:55:57,043] [    INFO] game_reader.py:279 -   Total OCR operations: 108
-[2025-09-30 09:55:57,043] [    INFO] game_reader.py:280 -   Images captured: 108
-[2025-09-30 09:55:57,043] [    INFO] game_reader.py:281 - Session complete: {
-  "session_name": "game_session_20250930_095349",
-  "duration_seconds": 127.8,
-  "captures_saved": 108,
+[2025-10-06 00:15:34,403] [    INFO] ocr_processor.py:106 - [Phase 2] Colour correction applied to Bbheavy_adj: '-4' (detected red pixels)
+[2025-10-06 00:15:45,044] [    INFO] ocr_processor.py:106 - [Phase 3] Colour correction applied to R3blight_adj: '-0' (detected red pixels)
+[2025-10-06 00:16:11,670] [    INFO] game_state_manager.py:126 - Zeroing blue units at red1 due to red presence
+[2025-10-06 00:16:11,670] [    INFO] game_state_manager.py:126 - Zeroing blue units at red2 due to red presence
+[2025-10-06 00:16:11,670] [    INFO] game_state_manager.py:126 - Zeroing blue units at red3 due to red presence
+[2025-10-06 00:16:11,670] [    INFO] game_state_manager.py:175 - Processing adjustment Bbranged_adj: -12
+[2025-10-06 00:16:11,670] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue R: 15 + (-12) = 3
+[2025-10-06 00:16:11,670] [    INFO] game_state_manager.py:175 - Processing adjustment Bblight_adj: -15
+[2025-10-06 00:16:11,670] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue L: 15 + (-15) = 0
+[2025-10-06 00:16:11,670] [    INFO] game_state_manager.py:175 - Processing adjustment R1blight_adj: +6
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue L: 0 + (6) = 6
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:175 - Processing adjustment R1bheavy_adj: +7
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue H: 0 + (7) = 7
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:175 - Processing adjustment R1branged_adj: +8
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue R: 0 + (8) = 8
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:175 - Processing adjustment R2blight_adj: +1
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue L: 0 + (1) = 1
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:175 - Processing adjustment R2branged_adj: +1
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue R: 0 + (1) = 1
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:175 - Processing adjustment R3blight_adj: +8
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue L: 0 + (8) = 8
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:175 - Processing adjustment R3branged_adj: +3
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue R: 0 + (3) = 3
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:175 - Processing adjustment R3bheavy_adj: +4
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue H: 0 + (4) = 4
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:175 - Processing adjustment Bbheavy_adj: -11
+[2025-10-06 00:16:11,671] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue H: 15 + (-11) = 4
+[2025-10-06 00:16:11,672] [    INFO] game_state_manager.py:126 - Zeroing blue units at red2 due to red presence
+[2025-10-06 00:16:11,672] [    INFO] game_state_manager.py:175 - Processing adjustment R1blight_adj: -1
+[2025-10-06 00:16:11,672] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue L: 6 + (-1) = 5
+[2025-10-06 00:16:11,672] [    INFO] game_state_manager.py:175 - Processing adjustment R2bheavy_adj: +3
+[2025-10-06 00:16:11,672] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue H: 0 + (3) = 3
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:175 - Processing adjustment R2branged_adj: +1
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue R: 0 + (1) = 1
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:175 - Processing adjustment R3blight_adj: +1
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue L: 8 + (1) = 9
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:175 - Processing adjustment R3bheavy_adj: +5
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue H: 4 + (5) = 9
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:175 - Processing adjustment Bbranged_adj: -3
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue R: 3 + (-3) = 0
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:175 - Processing adjustment R3branged_adj: -1
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue R: 3 + (-1) = 2
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:175 - Processing adjustment R1bheavy_adj: -4
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue H: 7 + (-4) = 3
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:175 - Processing adjustment Bbheavy_adj: -4
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue H: 4 + (-4) = 0
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:175 - Processing adjustment R1branged_adj: +3
+[2025-10-06 00:16:11,673] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue R: 8 + (3) = 11
+[2025-10-06 00:16:11,674] [    INFO] game_state_manager.py:126 - Zeroing blue units at red2 due to red presence
+[2025-10-06 00:16:11,674] [    INFO] game_state_manager.py:175 - Processing adjustment Bbheavy_adj: +1
+[2025-10-06 00:16:11,674] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue H: 0 + (1) = 1
+[2025-10-06 00:16:11,674] [    INFO] game_state_manager.py:175 - Processing adjustment R2blight_adj: +9
+[2025-10-06 00:16:11,674] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue L: 0 + (9) = 9
+[2025-10-06 00:16:11,674] [    INFO] game_state_manager.py:175 - Processing adjustment R1blight_adj: +9
+[2025-10-06 00:16:11,674] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue L: 5 + (9) = 14
+[2025-10-06 00:16:11,675] [    INFO] game_state_manager.py:175 - Processing adjustment R2branged_adj: +3
+[2025-10-06 00:16:11,675] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue R: 0 + (3) = 3
+[2025-10-06 00:16:11,675] [    INFO] game_state_manager.py:175 - Processing adjustment R2bheavy_adj: +7
+[2025-10-06 00:16:11,675] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue H: 0 + (7) = 7
+[2025-10-06 00:16:11,675] [    INFO] game_state_manager.py:175 - Processing adjustment R1branged_adj: -11
+[2025-10-06 00:16:11,675] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue R: 11 + (-11) = 0
+[2025-10-06 00:16:11,675] [    INFO] game_state_manager.py:175 - Processing adjustment R3branged_adj: +8
+[2025-10-06 00:16:11,675] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue R: 2 + (8) = 10
+[2025-10-06 00:16:11,675] [    INFO] game_state_manager.py:175 - Processing adjustment R3bheavy_adj: -6
+[2025-10-06 00:16:11,675] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue H: 9 + (-6) = 3
+[2025-10-06 00:16:11,675] [    INFO] game_state_manager.py:175 - Processing adjustment R1bheavy_adj: -2
+[2025-10-06 00:16:11,675] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue H: 3 + (-2) = 1
+[2025-10-06 00:16:11,676] [    INFO] game_state_manager.py:251 - Parsing LER text: 'LER 1.24:1 in favour of Blue'
+[2025-10-06 00:16:11,676] [    INFO] game_state_manager.py:272 - LER favour detected: Blue
+[2025-10-06 00:16:11,676] [    INFO] game_state_manager.py:284 - Parsed LER: {'blue': 1.24, 'red': 1.0, 'favour': 'Blue'}
+[2025-10-06 00:16:11,677] [    INFO] game_state_manager.py:126 - Zeroing blue units at red2 due to red presence
+[2025-10-06 00:16:11,678] [    INFO] session_output_manager.py:156 - Exported game state to: game_state.json
+[2025-10-06 00:16:11,694] [    INFO] save_state_parser.py:40 - Parsed 19 allocations across 3 phases
+[2025-10-06 00:16:11,696] [    INFO] game_state_merger.py:123 - Exported enriched game state to: output\game_session_20251006_001440\game_state\game_state.json
+[2025-10-06 00:16:11,696] [    INFO] game_state_merger.py:149 - Cleaned up save state file: C:\Users\brody\OneDrive\Desktop\Agent-in-the-Loop-Repository\save_state.json
+[2025-10-06 00:16:11,696] [    INFO] game_state_merger.py:53 - Successfully merged save state with OCR data: output\game_session_20251006_001440\game_state\game_state.json
+[2025-10-06 00:16:11,696] [    INFO] game_reader.py:623 - Session performance summary:
+[2025-10-06 00:16:11,696] [    INFO] game_reader.py:624 -   Total duration: 91.50s
+[2025-10-06 00:16:11,696] [    INFO] game_reader.py:625 -   Phases processed: 3
+[2025-10-06 00:16:11,696] [    INFO] game_reader.py:626 -   Average phase duration: 30.50s
+[2025-10-06 00:16:11,697] [    INFO] game_reader.py:629 -   Total OCR operations: 108
+[2025-10-06 00:16:11,697] [    INFO] game_reader.py:632 -   Images captured: 109
+[2025-10-06 00:16:11,697] [    INFO] game_reader.py:633 - Session complete: {
+  "session_name": "game_session_20251006_001440",
+  "duration_seconds": 91.5,
+  "captures_saved": 109,
   "json_exports": 1,
-  "output_directory": "output\\game_session_20250930_095349",
+  "output_directory": "output\\game_session_20251006_001440",
   "phases_processed": 3,
   "total_base_rois": 24,
   "total_adjustment_rois": 12,
   "session_performance": {
-    "avg_phase_duration": 42.6,
+    "avg_phase_duration": 30.5,
     "total_ocr_operations": 108,
-    "captures_per_phase": 36.0
+    "captures_per_phase": 36.3
   }
 }
-[2025-09-30 09:55:57,043] [    INFO] session_output_manager.py:163 - Session stats: {
-  "session_name": "game_session_20250930_095349",
-  "duration_seconds": 127.8,
-  "captures_saved": 108,
+[2025-10-06 00:16:11,697] [    INFO] session_output_manager.py:179 - Session stats: {
+  "session_name": "game_session_20251006_001440",
+  "duration_seconds": 91.5,
+  "captures_saved": 109,
   "json_exports": 1,
-  "output_directory": "output\\game_session_20250930_095349"
+  "output_directory": "output\\game_session_20251006_001440"
 }
 
 

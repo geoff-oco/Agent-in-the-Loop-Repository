@@ -35,4 +35,3 @@ class ImageUtils:  # Utilities for image manipulation and ROI processing
         y1 = min(image.height, y + h + padding)
 
         return image.crop((x0, y0, x1, y1))
-

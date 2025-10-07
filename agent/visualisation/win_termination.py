@@ -24,9 +24,7 @@ def terminate_process_tree_aggressive(pid):
     # Nuclear option - immediately terminate process tree using WinAPI
     try:
         # Use taskkill with /F /T flags for immediate force termination of tree
-        subprocess.run([
-            'taskkill', '/F', '/T', '/PID', str(pid)
-        ], capture_output=True, timeout=2)
+        subprocess.run(["taskkill", "/F", "/T", "/PID", str(pid)], capture_output=True, timeout=2)
         print(f"Terminated process tree for PID {pid} with taskkill")
         return True
     except Exception as e:
@@ -60,18 +58,28 @@ def kill_python_processes_by_script(script_name, exclude_current_pid=True):
     killed_count = 0
     current_pid = os.getpid()
 
+    # CRITICAL: Never kill main.py (UI process) to prevent UI crash during cancel
+    ui_scripts = ["main.py", "ui.py"]
+
     try:
-        for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+        for proc in psutil.process_iter(["pid", "name", "cmdline"]):
             try:
-                if proc.info['name'] and 'python' in proc.info['name'].lower():
-                    if proc.info['cmdline'] and any(script_name in arg for arg in proc.info['cmdline']):
+                if proc.info["name"] and "python" in proc.info["name"].lower():
+                    if proc.info["cmdline"] and any(script_name in arg for arg in proc.info["cmdline"]):
                         # Skip current process if requested
-                        if exclude_current_pid and proc.info['pid'] == current_pid:
+                        if exclude_current_pid and proc.info["pid"] == current_pid:
                             print(f"Skipping current UI process: PID {proc.info['pid']}")
                             continue
 
+                        # CRITICAL: Never kill UI processes (main.py, ui.py) regardless of script_name
+                        if proc.info["cmdline"] and any(
+                            ui_script in arg for ui_script in ui_scripts for arg in proc.info["cmdline"]
+                        ):
+                            print(f"SAFETY: Skipping UI process main.py/ui.py: PID {proc.info['pid']}")
+                            continue
+
                         print(f"Found Python process running {script_name}: PID {proc.info['pid']}")
-                        terminate_process_tree_aggressive(proc.info['pid'])
+                        terminate_process_tree_aggressive(proc.info["pid"])
                         killed_count += 1
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 pass
@@ -91,10 +99,11 @@ def selective_shutdown():
 
     # Kill cmd windows with our batch file title only if needed
     try:
-        subprocess.run([
-            'taskkill', '/F', '/FI',
-            'WINDOWTITLE eq Agent-in-the-Loop System Launcher*'
-        ], capture_output=True, timeout=1)
+        subprocess.run(
+            ["taskkill", "/F", "/FI", "WINDOWTITLE eq Agent-in-the-Loop System Launcher*"],
+            capture_output=True,
+            timeout=1,
+        )
     except:
         pass
 
@@ -105,6 +114,7 @@ def nuclear_shutdown_delayed():
 
     def delayed_kill():
         import time
+
         time.sleep(1)  # Give UI time to shut down gracefully
         print("DELAYED NUCLEAR SHUTDOWN - Killing remaining processes...")
 
@@ -116,11 +126,15 @@ def nuclear_shutdown_delayed():
             current_dir = os.path.dirname(os.path.abspath(__file__))
             project_root = os.path.dirname(os.path.dirname(current_dir))
 
-            for proc in psutil.process_iter(['pid', 'name', 'cwd']):
+            for proc in psutil.process_iter(["pid", "name", "cwd"]):
                 try:
-                    if (proc.info['name'] and 'python' in proc.info['name'].lower() and
-                        proc.info['cwd'] and project_root in proc.info['cwd']):
-                        terminate_process_tree_aggressive(proc.info['pid'])
+                    if (
+                        proc.info["name"]
+                        and "python" in proc.info["name"].lower()
+                        and proc.info["cwd"]
+                        and project_root in proc.info["cwd"]
+                    ):
+                        terminate_process_tree_aggressive(proc.info["pid"])
                 except:
                     pass
         except:

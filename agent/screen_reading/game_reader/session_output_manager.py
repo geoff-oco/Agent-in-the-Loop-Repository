@@ -6,7 +6,7 @@ import logging
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from PIL import Image
 
@@ -51,6 +51,14 @@ class SessionOutputManager:  # Manages all output for a game session in a single
         for phase_num in [1, 2, 3]:
             phase_dir = self.ocr_captures_dir / f"phase_{phase_num}"
             phase_dir.mkdir(exist_ok=True)
+
+        # Create setup folder for LER and phase header captures
+        setup_dir = self.ocr_captures_dir / "setup"
+        setup_dir.mkdir(exist_ok=True)
+
+        # Create final_state folder for Red2 final unit captures
+        final_state_dir = self.ocr_captures_dir / "final_state"
+        final_state_dir.mkdir(exist_ok=True)
 
         self.logs_dir = self.session_dir / "logs"
         self.logs_dir.mkdir(exist_ok=True)
@@ -103,23 +111,31 @@ class SessionOutputManager:  # Manages all output for a game session in a single
             logger.addHandler(console_handler)
 
     def save_capture(
-        self, image: Image.Image, phase_num: int, roi_name: str
-    ) -> Path:  # Save OCR capture image to phase folder
+        self, image: Image.Image, phase_num: Union[int, str], roi_name: str
+    ) -> Path:  # Save OCR capture image to phase/setup/final_state folder
 
         if not self.ocr_captures_dir:
             raise ValueError("Session not initialised")
 
-        # Get phase directory
-        phase_dir = self.ocr_captures_dir / f"phase_{phase_num}"
-        phase_dir.mkdir(exist_ok=True)
+        # Determine folder name based on phase_num type
+        if isinstance(phase_num, str):
+            # String phase names: "setup" or "final_state"
+            folder_name = phase_num
+        else:
+            # Integer phase numbers: "phase_1", "phase_2", "phase_3"
+            folder_name = f"phase_{phase_num}"
+
+        # Get/create directory
+        capture_dir = self.ocr_captures_dir / folder_name
+        capture_dir.mkdir(exist_ok=True)
 
         # Save image
         filename = f"{roi_name}.png"
-        filepath = phase_dir / filename
+        filepath = capture_dir / filename
         image.save(filepath)
 
         self.capture_count += 1
-        logging.debug(f"Saved OCR capture: phase_{phase_num}/{filename}")
+        logging.debug(f"Saved OCR capture: {folder_name}/{filename}")
 
         return filepath
 

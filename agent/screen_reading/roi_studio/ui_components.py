@@ -78,7 +78,9 @@ class UIHelpers:  # Reusable UI component creation helpers
         return label
 
     @staticmethod
-    def create_result_display(parent: tk.Widget, text: str, confidence: float, rule_passed: bool, rule_message: str = "") -> None:
+    def create_result_display(
+        parent: tk.Widget, text: str, confidence: float, rule_passed: bool, rule_message: str = ""
+    ) -> None:
         # Create a standardised result display with text, confidence and validation
         # Text result
         UIHelpers.create_bold_label(parent, "Text:", "small").pack(anchor=tk.W)

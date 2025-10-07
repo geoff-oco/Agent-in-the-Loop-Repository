@@ -1,0 +1,29 @@
+Summary
+Focus on crushing Red 3 with concentrated heavies and support units in Phase 1. Secure and consolidate the Red 3 position before pivoting to attack Red 1 in Phase 2. Finish the map by grouping units to eliminate Red 1 and Red 2 efficiently in Phase 3.
+
+Current LER
+1.0 / 1.0 | Favour: Neutral
+
+Phase 1
+Actions
+lock blue->red1 6/7/8
+delete blue->red3 8/4/3 [delete] (#2)
+Inserts
+—
+
+Phase 2
+Actions
+—
+Inserts
+insert red1->red2 1/0/0
+insert red1->red3 0/1/0
+insert blue->red2 0/0/1
+
+Phase 3
+Actions
+—
+Inserts
+insert red1->red2 0/4/0
+
+Rationale
+Focusing on Red 3 first allows Blue to secure a strategic chokepoint and eliminate a key enemy position early, reducing Red's defensive options. Pivoting quickly to Red 1 afterward consolidates control and prevents Red from regrouping or counterattacking effectively. Finishing with a grouped, single-axis push minimizes unit exposure and maximizes LER, though it risks overcommitting if Red reallocates units or defenses unexpectedly.

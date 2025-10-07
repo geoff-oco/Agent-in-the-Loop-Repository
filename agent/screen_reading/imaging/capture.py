@@ -97,7 +97,6 @@ class ScreenCapture:  # Handles screen capture using MSS library.
         except Exception:
             return None
 
-
     def get_monitor_info(
         self, monitor_index: int
     ) -> Optional[Dict]:  # Get dimensions and properties about specific monitor.

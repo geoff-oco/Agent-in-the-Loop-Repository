@@ -38,3 +38,39 @@ def run_agent(json_filename: str) -> str:
     out_path.write_text(output_text, encoding="utf-8")
 
     return out_path.as_posix()
+
+if __name__ == "__main__":
+    import sys
+    from dotenv import load_dotenv
+
+    # Load environment variables
+    load_dotenv()
+
+    # Check if filename argument provided
+    if len(sys.argv) < 2:
+        print("Usage: python run_agent.py <json_filename>")
+        print("Example: python run_agent.py game_state.json")
+        sys.exit(1)
+
+    # Get filename from command line
+    filename = sys.argv[1]
+
+    # Run the agent
+    try:
+        result_path = run_agent(filename)
+        print(f"\nAgent completed successfully!")
+        print(f"Output saved to: {result_path}")
+
+        # Display the output (handle encoding errors for Windows console)
+        with open(result_path, 'r', encoding='utf-8') as f:
+            output_text = f.read()
+            try:
+                print(f"\n=== Agent Output ===\n{output_text}")
+            except UnicodeEncodeError:
+                # Windows console can't handle some characters, use ASCII-safe version
+                print(f"\n=== Agent Output ===\n{output_text.encode('ascii', errors='replace').decode('ascii')}")
+    except Exception as e:
+        print(f"Error running agent: {e}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
