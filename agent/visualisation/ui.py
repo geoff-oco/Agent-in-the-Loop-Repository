@@ -5,6 +5,15 @@ import time
 import psutil
 import win32gui
 import win32process
+import os
+import sys
+from pathlib import Path
+
+
+# Ensure repository root is on sys.path
+repo_root = Path(__file__).resolve().parents[2]  # two levels up from visualisation/
+if str(repo_root) not in sys.path:
+    sys.path.append(str(repo_root))
 
 
 running = False
@@ -30,20 +39,27 @@ def ui(tar_hwnd=None):
             dpg.add_button(label="Cancel", width=-1,callback=_stopButton_callback)
         dpg.add_loading_indicator(tag="loading_ind",show=False,width=50,indent=75)
 
+    #Chatbox section - Alexia 
     with dpg.window(tag="chat_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True, 
-                    width=500, height= window_height / 3 - 10,
-                    pos=((window_width/3), (window_height - 10 - window_height/3))):
-        dpg.add_separator(label='Output')
-        with dpg.child_window(tag='outputWindow'):
-            dpg.add_text('',tag="outputText", wrap= 475)
-
-        # Chatbox section - Alexia Aletia 10500754
-        dpg.add_separator(label='Chatbox')
-        with dpg.child_window(tag="chatWindow", autosize_x=True, autosize_y=True):
-            dpg.add_text("Chat Log:", tag="chatLog", wrap=475)
+                    width=600, 
+                    height=int(window_height / 2),
+                    pos=((window_width/3), (window_height - int(window_height / 2) - 10))):
+    
+        # Strategy output section
+        dpg.add_separator(label="Output")
+        with dpg.child_window(tag="outputWindow", width=580, height=150):
+            dpg.add_text('', tag="outputText", wrap=560)
+        
+        # Chat section
+        dpg.add_separator(label="Chatbox")
+        with dpg.child_window(tag="chatWindow", width=580, height=200):
+            dpg.add_text("Chat Log:", tag="chatLog", wrap=560)
+    
+    # Input area
         with dpg.group(horizontal=True):
-            dpg.add_input_text(tag="chatInput", width=350, hint="Type your message here...")
-            dpg.add_button(label="Send", callback=lambda: _send_message()) 
+            dpg.add_input_text(tag="chatInput", width=400, hint="Type your message here...")
+            dpg.add_button(label="Send", callback=lambda: _send_message())
+
 
 """     with dpg.theme() as global_theme:
         dpg.add_theme_style(dpg.mvStyleVar_FrameRounding, 3, category=dpg.mvThemeCat_Core)
@@ -94,7 +110,7 @@ def _generate_button_pressed():
 
         This function also manages the ui state changes while running'''
     
-    with open("agent/visualisation/finalOutput.txt") as file:
+    with open("agent/visualisation/finalOutput.txt", 'r') as file:
         global running
         running = True
         _change_ui_state(running)
@@ -111,18 +127,82 @@ def _generate_button_pressed():
         if running:
             file.seek(0)
             dpg.set_value("outputText",file.read())
+            dpg.set_value("chatLog", "Strategy generated. Ask questions about it!")
 
         
         running = False
         _change_ui_state(running)
 
 def _send_message():
-    '''Handles sending user input to the chat log. Placeholder for agent response.'''
+    '''Handles sending user input to agent chat system'''
     user_msg = dpg.get_value("chatInput").strip()
-    if user_msg:
-        dpg.set_value("chatLog", dpg.get_value("chatLog") + f"\nYou: {user_msg}")
-        dpg.set_value("chatInput", "")
-        dpg.set_value("chatLog", dpg.get_value("chatLog") + "\nAgent: (reply goes here)")
+    if not user_msg:
+        return
+    
+    # Clear input immediately
+    dpg.set_value("chatInput", "")
+
+    # Display user message
+    current_log = dpg.get_value("chatLog")
+    dpg.set_value("chatLog", f"{current_log}\n\nYou: {user_msg}\n\nAgent: Thinking...")
+    
+    # Calling Geoff's chat function in background
+    threading.Thread(target=_process_chat_message, args=(user_msg,), daemon=True).start()
+    
+
+def _process_chat_message(user_question):
+    '''Calls Geoff's discuss_strategy function'''
+    try:
+        # Import it inside this thread function (so it's available when running)
+        from agent.decision_logic.run_agent.chat_discuss import discuss_strategy
+
+        # Finds the most recent JSON file in game_state directory
+        game_state_dir = Path("agent/decision_logic/run_agent/game_state")
+        json_files = list(game_state_dir.glob("*.json"))
+        
+        if not json_files:
+            raise FileNotFoundError("No game state JSON found. Generate a strategy first.")
+        
+        # Uses most recent file
+        latest_json = max(json_files, key=lambda p: p.stat().st_mtime)
+        json_filename = latest_json.name
+        
+        # Calling Geoff's working chat function
+        answer = discuss_strategy(json_filename, user_question)
+        
+        # Update display with response
+        current_log = dpg.get_value("chatLog")
+        updated = current_log.replace("Agent: Thinking...", f"Agent: {answer}")
+        dpg.set_value("chatLog", updated)
+        
+    except Exception as e:
+        current_log = dpg.get_value("chatLog")
+        updated = current_log.replace("Agent: Thinking...", f"Agent: Error - {str(e)}")
+        dpg.set_value("chatLog", updated)
+
+def _refresh_chat_display():
+    '''Reads entire conversation from file and updates display'''
+    try:
+        with open("agent/visualisation/finalOutput.txt", 'r', encoding='utf-8') as f:
+            content = f.read()
+        
+        # Parse and format for display
+        if 'Model/User Strategy Discussion:' in content:
+            qa_start = content.find('Model/User Strategy Discussion:')
+            conversation = content[qa_start:].strip()
+            
+            # Format for chat display
+            formatted = conversation.replace('Model/User Strategy Discussion:', 'Chat History:')
+            formatted = formatted.replace('[User]', '\n\nYou:')
+            formatted = formatted.replace('Q:', '\n\nYou:')
+            formatted = formatted.replace('A:', '\n\nAgent:')
+            
+            dpg.set_value("chatLog", formatted)
+        else:
+            dpg.set_value("chatLog", "No conversation yet. Ask a question about the strategy.")
+            
+    except Exception as e:
+        dpg.set_value("chatLog", f"Error loading chat: {e}")
 
 def _run_agent():
     '''This is the function that runs the ORC and Agent, in that order.
@@ -130,4 +210,3 @@ def _run_agent():
 
         Contains timer to serve as an example for now.'''
     time.sleep(8)
-    
