@@ -19,6 +19,7 @@ from agent_bridge import AgentBridge
 
 
 running = False  # Only global state flag we need - controls all operations
+hidden = False
 overlay_instance = None
 current_process = None
 current_subprocess = None
@@ -55,11 +56,18 @@ def ui(tar_hwnd=None, overlay=None):
 
 
     # Main container window for buttons (resizable)
-    with dpg.window(tag="buttons_container", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
-                    width=220, height=255,
-                    pos=(40,(window_height/3))):
+    with dpg.window(tag="buttons_container", 
+                    no_background=False, 
+                    no_move=False, 
+                    no_resize=False, 
+                    no_title_bar=True,
+                    width=220, height=280,
+                    pos=(40,(window_height/3))
+                    ):
+        
         if font_is_loaded: dpg.bind_item_font(dpg.last_item(), font_arialBold)
         dpg.add_text("System Controls", color=(200, 200, 200))
+
         # Child window inside for actual button content (makes it resizable)
         with dpg.child_window(tag="buttons_win", width=-1, auto_resize_y=True):
             with dpg.group(tag="agent_button"):
@@ -70,12 +78,19 @@ def ui(tar_hwnd=None, overlay=None):
             dpg.add_separator()
             dpg.add_spacer(height=5)
             dpg.add_button(label="Launch ROI Studio", width=-1, callback=_launch_roi_studio_callback)
+            dpg.add_button(label="Hide", tag="hide_button", width=-1,callback=_hide_callback)
             dpg.add_button(label="Exit System", width=-1, callback=_exit_callback)
         dpg.add_loading_indicator(tag="loading_ind",show=False,width=50,indent=75)
 
-    with dpg.window(tag="chat_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
+    with dpg.window(tag="chat_win", 
+                    no_background=False, 
+                    no_move=False, 
+                    no_resize=False, 
+                    no_title_bar=True,
                     width=500, height= window_height / 3 - 10,
-                    pos=((window_width/3), (window_height - 10 - window_height/3))):
+                    pos=((window_width/3), (window_height - 10 - window_height/3))
+                    ):
+        
         if font_is_loaded: dpg.bind_item_font(dpg.last_item(), font_arialBold)
         dpg.add_text("Chatbox", color=(200, 200, 200))
         dpg.add_separator()
@@ -117,7 +132,7 @@ def ui(tar_hwnd=None, overlay=None):
 
 # Theme system implementation complete - using targeted themes for specific components
 
-
+#MARK: Callbacks
 def _generation_callback(sender, app_data, user_data):
     """Handles button press response of \"Generate Strategy\"
 
@@ -208,6 +223,16 @@ def _launch_roi_studio_callback(sender, app_data, user_data):
     except Exception as e:
         print(f"Failed to launch ROI Studio: {e}")
 
+def _hide_callback(sender, app_data, user_data):
+    global hidden;
+    if hidden == False:
+        hidden = True
+        dpg.set_item_label(sender,"Show")
+        dpg.hide_item("chat_win")
+    else:
+        hidden = False
+        dpg.show_item("chat_win")
+        dpg.set_item_label(sender,"Hide")
 
 def _exit_callback(sender, app_data, user_data):
     """Exit System button - shuts down everything and exits"""
@@ -276,7 +301,7 @@ def _exit_callback(sender, app_data, user_data):
     print("Exiting...")
     os._exit(0)
 
-
+#MARK: Callbacks end
 def _start_save_state_check():
     """Check for save_state.json and show popup if not found"""
     # Get project root path
