@@ -107,15 +107,6 @@ class AgentBridge:
             shutil.copy2(latest_file, bridge_path)
             print(f"Bridged {filename} to agent")
 
-            # Step 2b: Copy stats file if present (non-critical)
-            stats_source = latest_file.parent.parent / "stats.json"
-            if stats_source.exists():
-                stats_dest = self.agent_game_state_dir / "stats.json"
-                shutil.copy2(stats_source, stats_dest)
-                print(f"Stats file bridged to agent game_state directory")
-            else:
-                print("No stats file found in session (skipping)")
-
             # Step 3: Run agent subprocess
             if not self.agent_dir.exists():
                 return False, f"Agent directory not found: {self.agent_dir}"
@@ -160,6 +151,5 @@ class AgentBridge:
         except Exception as e:
             print(f"Error in strategy generation: {e}")
             import traceback
-
             traceback.print_exc()
             return False, f"Strategy generation error: {str(e)}"

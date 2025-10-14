@@ -34,6 +34,13 @@ class StatsCalculator:
 
             stats[phase_key] = {"blue": blue_stats, "red": red_stats}
 
+        # Add summary section at the end
+        total_actions = 0
+        if actions_by_phase:
+            total_actions = sum(len(actions_by_phase.get(p.phase_number, [])) for p in phases)
+
+        stats["summary"] = {"total_phases": len(phases), "total_actions": total_actions if actions_by_phase else None}
+
         return stats
 
     def _calculate_faction_stats(
