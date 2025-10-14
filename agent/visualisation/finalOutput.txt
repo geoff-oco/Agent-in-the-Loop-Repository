@@ -10,8 +10,8 @@ LIVE GAME READER
 ============================================================
 Press 'x' at any time to exit...
 
-Session initialised: game_session_20251014_182545
-Output directory: output\game_session_20251014_182545
+Session initialised: game_session_20251014_190142
+Output directory: output\game_session_20251014_190142
 
 === Monitor Detection ===
 RTSViewer window found at: (-8, -8) to (2568, 1400)
@@ -37,32 +37,31 @@ NavigationController configured with 3 button ROIs
 
 === Smart Capture Planning ===
 Save state detected - Capture plan generated from save_state.json
-  Phases to capture: [1, 2, 3]
-  Phase modes: {1: 'full', 2: 'full', 3: 'full'}
-  Red2 final needed: True
+  Phases to capture: [1, 2]
+  Phase modes: {1: 'full', 2: 'before_only'}
+  Red2 final needed: False
 
 Capture plan finalised:
-  Phases: [1, 2, 3]
-  Modes: {1: 'full', 2: 'full', 3: 'full'}
-  Red2 final: True
+  Phases: [1, 2]
+  Modes: {1: 'full', 2: 'before_only'}
+  Red2 final: False
   Export mode: enriched
 
 === Initial Setup ===
 Initializing PaddleOCR GPU...
 PaddleOCR GPU ready!
-Initial LER: 'LER 1.24:1 in favour of Blue' (confidence: 99.5%)
-LER: LER 1.24:1 in favour of Blue
+Initial LER: 'LER 1.19:1 in favour of Bue' (confidence: 98.8%)
+LER: LER 1.19:1 in favour of Bue
 
-Total OCR tasks: 114
+Total OCR tasks: 61
   LER: 1 task (complete)
-  Phase ROIs: 108 tasks
-  Red2 final: 5 tasks
+  Phase ROIs: 60 tasks
 
 === Bulk Screenshot Capture ===
 
 === Bulk Screenshot Capture ===
-Phases to capture: [1, 2, 3]
-Red2 final needed: True
+Phases to capture: [1, 2]
+Red2 final needed: False
 
 DO NOT MOVE MOUSE during capture phase...
 
@@ -88,45 +87,18 @@ Clicking Upphase at global (2009, 1323) [Monitor 3 offset: (0, 0)]
 Clicking Resetview at global (194, 162) [Monitor 3 offset: (0, 0)]
 Phase 2 screenshot captured
 
-Navigating to Phase 3...
-Clicking upphase button (1/1)
-Clicking Upphase at global (2009, 1323) [Monitor 3 offset: (0, 0)]
-Clicking Resetview at global (194, 162) [Monitor 3 offset: (0, 0)]
-Phase 3 screenshot captured
-
-Navigating to Red1 base for Red2 final count...
-Navigating to red1 base by clicking R1blight at global (1059, 370) [Monitor 3 offset: (0, 0)]
-Capturing 5 frames for Red2 final count (animation averaging)...
-  Frame 1/5 captured
-  Frame 2/5 captured
-  Frame 3/5 captured
-  Frame 4/5 captured
-  Frame 5/5 captured
-Red2 final count capture complete (5 frames)
-Resetting view...
-Clicking Resetview at global (194, 162) [Monitor 3 offset: (0, 0)]
-
 All captures complete - you can now move your mouse!
-Bulk capture complete: 3 phases captured
-Red2 final: 5 frames captured for averaging
+Bulk capture complete: 2 phases captured
 
 === Bulk OCR Processing ===
 
 === Bulk OCR Processing ===
-Processing 3 phase screenshots
-Phase modes: {1: 'full', 2: 'full', 3: 'full'}
+Processing 2 phase screenshots
+Phase modes: {1: 'full', 2: 'before_only'}
 
-Total phase OCR tasks queued: 108
+Total phase OCR tasks queued: 60
 
-Phase OCR processing complete: 108 tasks processed
-
-=== Processing Red2 Final Count (5 frames) ===
-  Frame 1: Invalid text '(empty)'
-  Frame 2: '5' (100.0%, Original-PaddleOCR (GPU))
-  Frame 3: '5' (100.0%, Original-PaddleOCR (GPU))
-  Frame 4: '5' (100.0%, Original-PaddleOCR (GPU))
-  Frame 5: Invalid text '(empty)'
-Red2 Final Average: [5, 5, 5] -> 5
+Phase OCR processing complete: 60 tasks processed
 
 === Constructing Game State ===
 
@@ -141,10 +113,10 @@ Phase 1 (full mode):
   After state (with adjustments applied):
     blue Blue: L=0, H=4, R=3 | Red: L=0, H=0, R=0
     red1 Blue: L=6, H=7, R=8 | Red: L=4, H=4, R=4
-    red2 Blue: L=1, H=0, R=1 | Red: L=0, H=21, R=0
-    red3 Blue: L=8, H=4, R=8 | Red: L=11, H=0, R=0
+    red2 Blue: L=1, H=0, R=8 | Red: L=0, H=21, R=0
+    red3 Blue: L=8, H=4, R=3 | Red: L=11, H=0, R=0
 
-Phase 2 (full mode):
+Phase 2 (before_only mode):
 
   Before state (with zeroing applied):
     blue Blue: L=0, H=4, R=3 | Red: L=0, H=0, R=0
@@ -153,36 +125,18 @@ Phase 2 (full mode):
     red3 Blue: L=8, H=4, R=3 | Red: L=0, H=0, R=0
 
   After state (with adjustments applied):
-    blue Blue: L=0, H=0, R=0 | Red: L=0, H=0, R=0
-    red1 Blue: L=5, H=3, R=11 | Red: L=0, H=0, R=0
-    red2 Blue: L=0, H=3, R=1 | Red: L=0, H=21, R=0
-    red3 Blue: L=9, H=9, R=2 | Red: L=0, H=0, R=0
-
-Phase 3 (full mode):
-
-  Before state (with zeroing applied):
-    blue Blue: L=0, H=0, R=0 | Red: L=0, H=0, R=0
-    red1 Blue: L=5, H=3, R=11 | Red: L=0, H=0, R=0
-    red2 Blue: L=0, H=0, R=0 | Red: L=0, H=15, R=0
-    red3 Blue: L=9, H=9, R=2 | Red: L=0, H=0, R=0
-
-  After state (with adjustments applied):
-    blue Blue: L=0, H=1, R=0 | Red: L=0, H=0, R=0
-    red1 Blue: L=13, H=1, R=0 | Red: L=0, H=0, R=0
-    red2 Blue: L=9, H=7, R=3 | Red: L=0, H=15, R=0
-    red3 Blue: L=18, H=3, R=10 | Red: L=0, H=0, R=0
+    (No actions in this phase - before_only mode)
 
 === Generating Output ===
-Updated Red2 final red heavy units to: 5
-Game state saved: output\game_session_20251014_182545\game_state\game_state.json
-Saved game state to: output\game_session_20251014_182545\game_state\game_state.json
+Game state saved: output\game_session_20251014_190142\game_state\game_state.json
+Saved game state to: output\game_session_20251014_190142\game_state\game_state.json
 
 === Checking for Save State File ===
 Looking for save state at: C:\Users\brody\OneDrive\Desktop\Agent-in-the-Loop-Repository\save_state.json
 Save state detected! Merging with OCR data...
 SUCCESS: Enriched game state created: game_state.json
 SUCCESS: Save state file cleaned up
-Session ended: game_session_20251014_182545
+Session ended: game_session_20251014_190142
 
 ============================================================
 GAME READING COMPLETE
@@ -193,18 +147,18 @@ SUCCESS: Game reading completed
 
 STDERR:
 INFO: Could not find files for the given pattern(s).
-[2025-10-14 18:25:45,460] [    INFO] session_output_manager.py:77 - Session started: game_session_20251014_182545
-[2025-10-14 18:25:45,460] [    INFO] session_output_manager.py:78 - Output directory: output\game_session_20251014_182545
-[2025-10-14 18:25:45,460] [    INFO] session_output_manager.py:79 - Logging system initialized successfully
-[2025-10-14 18:25:45,466] [    INFO] game_reader.py:155 - Auto-detected RTSViewer on monitor 3 (2560x1440)
-[2025-10-14 18:25:45,467] [    INFO] game_reader.py:253 - Monitor 3 resolution: 2560x1440
-[2025-10-14 18:25:45,467] [    INFO] game_reader.py:105 - Using resolution-specific ROI file: rois/rois_main\Main_rois_2560x1440.json
-[2025-10-14 18:25:45,467] [    INFO] game_reader.py:105 - Using resolution-specific ROI file: rois/rois_main\Element_rois_2560x1440.json
-[2025-10-14 18:25:45,467] [    INFO] game_reader.py:262 - Loading ROI configurations...
-[2025-10-14 18:25:45,489] [    INFO] game_reader.py:269 - ROI configurations loaded successfully
-[2025-10-14 18:25:45,491] [    INFO] smart_capture_planner.py:21 - save_state.json loaded successfully from: C:\Users\brody\OneDrive\Desktop\Agent-in-the-Loop-Repository\save_state.json
-[2025-10-14 18:25:45,491] [    INFO] smart_capture_planner.py:43 - Actions by phase: P1=3, P2=9, P3=7
-[2025-10-14 18:25:45,491] [    INFO] smart_capture_planner.py:100 - Capture plan from save_state: {'phases_to_capture': [1, 2, 3], 'phase_modes': {1: 'full', 2: 'full', 3: 'full'}, 'needs_red2_final': True, 'export_mode': 'enriched'}
+[2025-10-14 19:01:42,335] [    INFO] session_output_manager.py:77 - Session started: game_session_20251014_190142
+[2025-10-14 19:01:42,335] [    INFO] session_output_manager.py:78 - Output directory: output\game_session_20251014_190142
+[2025-10-14 19:01:42,335] [    INFO] session_output_manager.py:79 - Logging system initialized successfully
+[2025-10-14 19:01:42,341] [    INFO] game_reader.py:155 - Auto-detected RTSViewer on monitor 3 (2560x1440)
+[2025-10-14 19:01:42,342] [    INFO] game_reader.py:253 - Monitor 3 resolution: 2560x1440
+[2025-10-14 19:01:42,342] [    INFO] game_reader.py:105 - Using resolution-specific ROI file: rois/rois_main\Main_rois_2560x1440.json
+[2025-10-14 19:01:42,342] [    INFO] game_reader.py:105 - Using resolution-specific ROI file: rois/rois_main\Element_rois_2560x1440.json
+[2025-10-14 19:01:42,342] [    INFO] game_reader.py:262 - Loading ROI configurations...
+[2025-10-14 19:01:42,344] [    INFO] game_reader.py:269 - ROI configurations loaded successfully
+[2025-10-14 19:01:42,346] [    INFO] smart_capture_planner.py:21 - save_state.json loaded successfully from: C:\Users\brody\OneDrive\Desktop\Agent-in-the-Loop-Repository\save_state.json
+[2025-10-14 19:01:42,346] [    INFO] smart_capture_planner.py:43 - Actions by phase: P1=3, P2=0, P3=0
+[2025-10-14 19:01:42,346] [    INFO] smart_capture_planner.py:100 - Capture plan from save_state: {'phases_to_capture': [1, 2], 'phase_modes': {1: 'full', 2: 'before_only'}, 'needs_red2_final': False, 'export_mode': 'enriched'}
 [32mCreating model: ('PP-LCNet_x1_0_doc_ori', None)[0m
 [32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\brody\.paddlex\official_models\PP-LCNet_x1_0_doc_ori`.[0m
 [32mCreating model: ('UVDoc', None)[0m
@@ -213,110 +167,68 @@ INFO: Could not find files for the given pattern(s).
 [32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\brody\.paddlex\official_models\PP-OCRv5_server_det`.[0m
 [32mCreating model: ('en_PP-OCRv5_mobile_rec', None)[0m
 [32mModel files already exist. Using cached files. To redownload, please delete the directory manually: `C:\Users\brody\.paddlex\official_models\en_PP-OCRv5_mobile_rec`.[0m
-[2025-10-14 18:26:26,780] [    INFO] ocr_processor.py:106 - [Phase 2] Colour correction applied to Bbheavy_adj: '-11' (detected red pixels)
-[2025-10-14 18:26:58,896] [    INFO] game_state_manager.py:126 - Zeroing blue units at red1 due to red presence
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:126 - Zeroing blue units at red2 due to red presence
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:126 - Zeroing blue units at red3 due to red presence
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:175 - Processing adjustment Bbranged_adj: -12
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue R: 15 + (-12) = 3
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:175 - Processing adjustment Bblight_adj: -15
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue L: 15 + (-15) = 0
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:175 - Processing adjustment R1branged_adj: +8
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue R: 0 + (8) = 8
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:175 - Processing adjustment R1bheavy_adj: +7
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue H: 0 + (7) = 7
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:175 - Processing adjustment R1blight_adj: +6
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue L: 0 + (6) = 6
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:175 - Processing adjustment R2blight_adj: +1
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue L: 0 + (1) = 1
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:175 - Processing adjustment R2branged_adj: +1
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue R: 0 + (1) = 1
-[2025-10-14 18:26:58,897] [    INFO] game_state_manager.py:175 - Processing adjustment R3blight_adj: +8
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue L: 0 + (8) = 8
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:175 - Processing adjustment R3branged_adj: +8
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue R: 0 + (8) = 8
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:175 - Processing adjustment R3bheavy_adj: +4
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue H: 0 + (4) = 4
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:175 - Processing adjustment Bbheavy_adj: -11
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue H: 15 + (-11) = 4
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:126 - Zeroing blue units at red2 due to red presence
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:175 - Processing adjustment R1blight_adj: -1
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue L: 6 + (-1) = 5
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:175 - Processing adjustment R1branged_adj: +3
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue R: 8 + (3) = 11
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:175 - Processing adjustment R2branged_adj: +1
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue R: 0 + (1) = 1
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:175 - Processing adjustment R2bheavy_adj: +3
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue H: 0 + (3) = 3
-[2025-10-14 18:26:58,898] [    INFO] game_state_manager.py:175 - Processing adjustment R3bheavy_adj: +5
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue H: 4 + (5) = 9
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:175 - Processing adjustment R3blight_adj: +1
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue L: 8 + (1) = 9
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:175 - Processing adjustment Bbranged_adj: -3
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue R: 3 + (-3) = 0
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:175 - Processing adjustment R1bheavy_adj: -4
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue H: 7 + (-4) = 3
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:175 - Processing adjustment Bbheavy_adj: -11
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue H: 4 + (-11) = 0
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:175 - Processing adjustment R3branged_adj: -1
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue R: 3 + (-1) = 2
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:126 - Zeroing blue units at red2 due to red presence
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:175 - Processing adjustment Bbheavy_adj: +1
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue H: 0 + (1) = 1
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:175 - Processing adjustment R2blight_adj: +9
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue L: 0 + (9) = 9
-[2025-10-14 18:26:58,899] [    INFO] game_state_manager.py:175 - Processing adjustment R2bheavy_adj: +7
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue H: 0 + (7) = 7
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:175 - Processing adjustment R2branged_adj: +3
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue R: 0 + (3) = 3
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:175 - Processing adjustment R1branged_adj: -11
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue R: 11 + (-11) = 0
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:175 - Processing adjustment R3branged_adj: +8
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue R: 2 + (8) = 10
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:175 - Processing adjustment R1blight_adj: +8
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue L: 5 + (8) = 13
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:175 - Processing adjustment R3bheavy_adj: -6
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue H: 9 + (-6) = 3
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:175 - Processing adjustment R1bheavy_adj: -2
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue H: 3 + (-2) = 1
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:175 - Processing adjustment R3blight_adj: +9
-[2025-10-14 18:26:58,900] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue L: 9 + (9) = 18
-[2025-10-14 18:26:58,901] [    INFO] game_state_manager.py:126 - Zeroing blue units at red2 due to red presence
-[2025-10-14 18:26:58,901] [    INFO] game_state_manager.py:251 - Parsing LER text: 'LER 1.24:1 in favour of Blue'
-[2025-10-14 18:26:58,901] [    INFO] game_state_manager.py:272 - LER favour detected: Blue
-[2025-10-14 18:26:58,902] [    INFO] game_state_manager.py:284 - Parsed LER: {'blue': 1.24, 'red': 1.0, 'favour': 'Blue'}
-[2025-10-14 18:26:58,904] [    INFO] session_output_manager.py:160 - Exported game state to: game_state.json
-[2025-10-14 18:26:58,918] [    INFO] save_state_parser.py:40 - Parsed 19 allocations across 3 phases
-[2025-10-14 18:26:58,920] [    INFO] game_state_merger.py:123 - Exported enriched game state to: output\game_session_20251014_182545\game_state\game_state.json
-[2025-10-14 18:26:58,920] [    INFO] game_state_merger.py:149 - Cleaned up save state file: C:\Users\brody\OneDrive\Desktop\Agent-in-the-Loop-Repository\save_state.json
-[2025-10-14 18:26:58,920] [    INFO] game_state_merger.py:53 - Successfully merged save state with OCR data: output\game_session_20251014_182545\game_state\game_state.json
-[2025-10-14 18:26:58,920] [    INFO] game_reader.py:522 - Session performance summary:
-[2025-10-14 18:26:58,920] [    INFO] game_reader.py:523 -   Total duration: 73.47s
-[2025-10-14 18:26:58,920] [    INFO] game_reader.py:524 -   Phases processed: 3
-[2025-10-14 18:26:58,920] [    INFO] game_reader.py:525 -   Average phase duration: 24.49s
-[2025-10-14 18:26:58,921] [    INFO] game_reader.py:526 -   Total OCR operations: 108
-[2025-10-14 18:26:58,921] [    INFO] game_reader.py:527 -   Images captured: 109
-[2025-10-14 18:26:58,921] [    INFO] game_reader.py:528 - Session complete: {
-  "session_name": "game_session_20251014_182545",
-  "duration_seconds": 73.47,
-  "captures_saved": 109,
+[2025-10-14 19:02:02,560] [    INFO] game_state_manager.py:126 - Zeroing blue units at red1 due to red presence
+[2025-10-14 19:02:02,560] [    INFO] game_state_manager.py:126 - Zeroing blue units at red2 due to red presence
+[2025-10-14 19:02:02,560] [    INFO] game_state_manager.py:126 - Zeroing blue units at red3 due to red presence
+[2025-10-14 19:02:02,560] [    INFO] game_state_manager.py:175 - Processing adjustment Bblight_adj: -15
+[2025-10-14 19:02:02,560] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue L: 15 + (-15) = 0
+[2025-10-14 19:02:02,560] [    INFO] game_state_manager.py:175 - Processing adjustment Bbranged_adj: -12
+[2025-10-14 19:02:02,560] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue R: 15 + (-12) = 3
+[2025-10-14 19:02:02,560] [    INFO] game_state_manager.py:175 - Processing adjustment R1blight_adj: +6
+[2025-10-14 19:02:02,560] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue L: 0 + (6) = 6
+[2025-10-14 19:02:02,560] [    INFO] game_state_manager.py:175 - Processing adjustment R1bheavy_adj: +7
+[2025-10-14 19:02:02,560] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue H: 0 + (7) = 7
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:175 - Processing adjustment R2blight_adj: +1
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue L: 0 + (1) = 1
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:175 - Processing adjustment R1branged_adj: +8
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:211 - Applied adjustment to red1 blue R: 0 + (8) = 8
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:175 - Processing adjustment R3blight_adj: +8
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue L: 0 + (8) = 8
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:175 - Processing adjustment R2branged_adj: +8
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:211 - Applied adjustment to red2 blue R: 0 + (8) = 8
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:175 - Processing adjustment R3bheavy_adj: +4
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue H: 0 + (4) = 4
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:175 - Processing adjustment R3branged_adj: +3
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:211 - Applied adjustment to red3 blue R: 0 + (3) = 3
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:175 - Processing adjustment Bbheavy_adj: -11
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:211 - Applied adjustment to blue blue H: 15 + (-11) = 4
+[2025-10-14 19:02:02,561] [    INFO] game_state_manager.py:126 - Zeroing blue units at red2 due to red presence
+[2025-10-14 19:02:02,562] [    INFO] game_state_manager.py:126 - Zeroing blue units at red2 due to red presence
+[2025-10-14 19:02:02,562] [    INFO] game_state_manager.py:251 - Parsing LER text: 'LER 1.19:1 in favour of Bue'
+[2025-10-14 19:02:02,562] [ WARNING] game_state_manager.py:277 - LER contains 'favour/favor of' but no team name found in: 'LER 1.19:1 in favour of Bue'
+[2025-10-14 19:02:02,562] [    INFO] game_state_manager.py:284 - Parsed LER: {'blue': 1.19, 'red': 1.0, 'favour': 'Neutral'}
+[2025-10-14 19:02:02,564] [    INFO] session_output_manager.py:160 - Exported game state to: game_state.json
+[2025-10-14 19:02:02,580] [    INFO] save_state_parser.py:40 - Parsed 3 allocations across 3 phases
+[2025-10-14 19:02:02,581] [    INFO] game_state_merger.py:123 - Exported enriched game state to: output\game_session_20251014_190142\game_state\game_state.json
+[2025-10-14 19:02:02,581] [    INFO] game_state_merger.py:149 - Cleaned up save state file: C:\Users\brody\OneDrive\Desktop\Agent-in-the-Loop-Repository\save_state.json
+[2025-10-14 19:02:02,581] [    INFO] game_state_merger.py:53 - Successfully merged save state with OCR data: output\game_session_20251014_190142\game_state\game_state.json
+[2025-10-14 19:02:02,582] [    INFO] game_reader.py:522 - Session performance summary:
+[2025-10-14 19:02:02,582] [    INFO] game_reader.py:523 -   Total duration: 20.25s
+[2025-10-14 19:02:02,582] [    INFO] game_reader.py:524 -   Phases processed: 2
+[2025-10-14 19:02:02,582] [    INFO] game_reader.py:525 -   Average phase duration: 10.12s
+[2025-10-14 19:02:02,582] [    INFO] game_reader.py:526 -   Total OCR operations: 72
+[2025-10-14 19:02:02,582] [    INFO] game_reader.py:527 -   Images captured: 60
+[2025-10-14 19:02:02,582] [    INFO] game_reader.py:528 - Session complete: {
+  "session_name": "game_session_20251014_190142",
+  "duration_seconds": 20.25,
+  "captures_saved": 60,
   "json_exports": 1,
-  "output_directory": "output\\game_session_20251014_182545",
-  "phases_processed": 3,
+  "output_directory": "output\\game_session_20251014_190142",
+  "phases_processed": 2,
   "total_base_rois": 24,
   "total_adjustment_rois": 12,
   "session_performance": {
-    "avg_phase_duration": 24.49,
-    "total_ocr_operations": 108,
-    "captures_per_phase": 36.3
+    "avg_phase_duration": 10.12,
+    "total_ocr_operations": 72,
+    "captures_per_phase": 30.0
   }
 }
-[2025-10-14 18:26:58,921] [    INFO] session_output_manager.py:183 - Session stats: {
-  "session_name": "game_session_20251014_182545",
-  "duration_seconds": 73.47,
-  "captures_saved": 109,
+[2025-10-14 19:02:02,582] [    INFO] session_output_manager.py:183 - Session stats: {
+  "session_name": "game_session_20251014_190142",
+  "duration_seconds": 20.25,
+  "captures_saved": 60,
   "json_exports": 1,
-  "output_directory": "output\\game_session_20251014_182545"
+  "output_directory": "output\\game_session_20251014_190142"
 }
 
 

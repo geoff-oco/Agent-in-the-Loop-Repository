@@ -1,8 +1,8 @@
 Summary
-Focus on a concentrated, heavy push targeting Red 3 to secure a quick base capture in Phase 1. Transition to a grouped, single-axis attack towards Red 1 in Phase 2, avoiding unnecessary engagements. Finalize map control by consolidating units and pressuring Red 2 from Red 1 in Phase 3 for maximum LER.
+Focus on securing Red 3 with a concentrated heavy push to quickly eliminate its threat. Pivot to reinforce and prepare for a grouped, single-axis assault on Red 1. Maintain a safe, steady buildup for Phase 3 to maximize LER while avoiding overextension.
 
 Current LER
-1.24 / 1.0 | Favour: Blue
+1.19 / 1.0 | Favour: Neutral
 
 Phase 1
 Actions
@@ -14,29 +14,18 @@ Inserts
 
 Phase 2
 Actions
-lock red3->red2 0/1/1
-leave blue->red1 0/1/0
-leave red1->red3 1/3/0
-leave blue->red1 0/0/3
-leave blue->red3 0/3/1
-delete red3->blue 0/0/1 [delete] (#5)
-delete red3->red1 0/0/1 [delete] (#6)
-delete red1->red2 0/2/0 [delete] (#9)
-delete red1->blue 0/0/1 [delete] (#10)
-Inserts
 —
+Inserts
+insert red1->red3 0/1/0
+insert blue->red2 0/4/0
 
 Phase 3
 Actions
-lock red3->red2 0/3/0
-leave red1->blue 0/1/0
-leave red3->red1 0/2/0
-lock red3->red2 2/4/2
-leave red1->red3 5/3/10
-delete red1->red2 0/0/1 [delete] (#14)
-delete red3->red2 7/0/0 [delete] (#18)
-Inserts
 —
+Inserts
+insert red1->red2 1/0/0
+insert red1->red3 0/1/0
+insert blue->red2 0/0/1
 
 Rationale
-Focusing on a heavy, concentrated push to Red 3 in Phase 1 quickly secures a valuable base, establishing map control early. Transitioning to a grouped, single-axis attack in Phase 2 minimizes overextension and reduces exposure to Red's chokepoint defenses. Final pressure on Red 2 from Red 1 consolidates gains and maximizes LER by maintaining unit advantage while avoiding risky multi-front engagements. This approach balances aggression with safety, leveraging chokepoint advantages and unit positioning to optimize Blue's strategic gains across all phases.
+Focusing on Red 3 allows Blue to eliminate a key chokepoint threat early, creating a safer approach for subsequent phases. Pivoting to reinforce Red 1 ensures a strong, consolidated push that minimizes overextension and trickling. Maintaining a steady buildup in Phase 3 balances aggression with safety, maximizing LER while avoiding risky overcommitment at any single point. The strategy leverages concentrated attacks and map control, but risks include potential overreliance on early success and underestimating Red's defensive adaptations.

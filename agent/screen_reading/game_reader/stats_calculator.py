@@ -15,6 +15,10 @@ class StatsCalculator:
         stats = {}
 
         for i, phase in enumerate(phases):
+            # Skip before_only mode phases (phase.after is None)
+            if phase.after is None:
+                continue
+
             phase_num = phase.phase_number
             phase_key = f"phase_{phase_num}"
 
@@ -35,11 +39,15 @@ class StatsCalculator:
             stats[phase_key] = {"blue": blue_stats, "red": red_stats}
 
         # Add summary section at the end
+        # Count only phases with actions (full mode, not before_only)
+        phases_with_actions = [p for p in phases if p.after is not None]
+        total_phases = len(phases_with_actions)
+
         total_actions = 0
         if actions_by_phase:
-            total_actions = sum(len(actions_by_phase.get(p.phase_number, [])) for p in phases)
+            total_actions = sum(len(actions_by_phase.get(p.phase_number, [])) for p in phases_with_actions)
 
-        stats["summary"] = {"total_phases": len(phases), "total_actions": total_actions if actions_by_phase else None}
+        stats["summary"] = {"total_phases": total_phases, "total_actions": total_actions if actions_by_phase else None}
 
         return stats
 
@@ -77,8 +85,13 @@ class StatsCalculator:
         else:
             actions_taken = None
 
-        # Bases controlled (use phase start state)
-        bases_controlled_dict = self._count_bases_controlled(phase.before)
+        # Bases controlled (use state after battle - same as units_remaining)
+        if next_phase_start:
+            bases_controlled_dict = self._count_bases_controlled(next_phase_start)
+        elif phase.after:
+            bases_controlled_dict = self._count_bases_controlled(phase.after)
+        else:
+            bases_controlled_dict = {"blue": 0, "red": 0}
         bases_controlled = bases_controlled_dict.get(faction, 0)
 
         return {

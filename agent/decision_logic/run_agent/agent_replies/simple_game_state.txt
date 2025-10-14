@@ -1,86 +1,69 @@
 Simple Advice
 
 Summary
-Phase 1 saw a successful push on Red Base 1, gaining control with minimal losses. Phase 2 maintained pressure on Red Base 1 while Red Base 2 remained untouched. In Phase 3, focus should shift to a concentrated attack on Red Base 2 to maximize gains.
+Phase 1 shows a successful push on Red 3, capturing key units and controlling the base. Phase 2 indicates a partial retreat from Red 2, with Blue maintaining control but losing some units. Phase 3 consolidates control of Red 1, with minimal Blue losses and no remaining Red units.
 
-LER: {'blue': 1.0, 'red': 1.0} in favour of: Neutral
+LER: {} in favour of: Neutral
 
 Phase 1
 Red1
-- Summary: The attack on Red Base 1 was successful, with Blue gaining control and leaving 6 Lights and 7 Heavies. This indicates a strong initial push.
-- Lock: Continue using a mix of Lights and Heavies for future pushes, as they effectively softened defenders and secured the base.
-- Delete: Consider reducing Ranged units as they did not contribute significantly to the success at Red Base 1.
-- Insert: If possible, add more Lights to capitalize on the momentum and secure further advances.
+- Summary: Initial attack on Red 1 was neutral; some Blue units remain, but Red still controls the base.
+- Lock: Focus on heavy units for sustained pressure; support with ranged units to keep Red 1 contested.
+- Delete: Reduce Light units in favor of more Heavy or Ranged to maximize damage and control.
+- Insert: Add more Heavy units to reinforce the push, especially from Blue reserves.
 
 Red2
-- Summary: Red Base 2 remains untouched, with no Blue units committed. This base is still heavily defended by Red.
-- Lock: No moves to Red Base 2 should be locked in at this time; focus on other bases first.
-- Delete: Do not allocate any units to Red Base 2 until a strategy to approach from Red Base 3 is established.
-- Insert: Prepare to allocate units from Red Base 1 to Red Base 2 in the next phase once Red Base 3 is neutralized.
+- Summary: Red 2 was not directly attacked; remains under Red control with high Red units.
+- Lock: Maintain support units for Red 2, but avoid overcommitting; consider repositioning for future attack.
+- Delete: Reduce Light units supporting Red 2, as they are less effective here.
+- Insert: Reallocate some units to prepare for Red 3 attack or reinforce Red 1 push.
 
 Red3
-- Summary: Blue has a strong presence at Red Base 3, with 8 Lights and 4 Heavies remaining. This base is well-positioned for future attacks.
-- Lock: Maintain the current unit composition at Red Base 3, as it can support future moves effectively.
-- Delete: Consider reducing any surplus Ranged units here, as they are less effective in direct confrontations.
-- Insert: If unallocated units are available, reinforce with additional Heavies to prepare for a push towards Red Base 2.
+- Summary: Red 3 was heavily attacked and partially captured; Blue controls key parts but some units remain.
+- Lock: Consolidate control with Heavy units, keep Ranged units protected for finishing.
+- Delete: Limit Light units here; focus on sustained Heavy and Ranged support.
+- Insert: Add more Heavy units to secure the base and prepare for final push.
 
 Phase 2
 Red1
-- Summary: Blue has maintained control of Red Base 1 with a strong presence. No Red units were lost, indicating a stable hold.
-- Lock: Continue to use a mix of Lights and Heavies to reinforce this base and prepare for future attacks.
-- Delete: Remove any Ranged units that are not contributing to the defense or offense at Red Base 1.
-- Insert: Consider adding more Lights to increase mobility and flexibility in future engagements.
+- Summary: Red 1 remains under Blue control, with some units lost but key units intact.
+- Lock: Hold current force composition; reinforce with additional units if available.
+- Delete: Reduce Light units supporting Red 1, as they are less impactful.
+- Insert: Add Heavy units to strengthen control and prepare for final consolidation.
 
 Red2
-- Summary: Red Base 2 remains untouched, with Blue units still not allocated here. Red maintains a strong defense.
-- Lock: No moves should be locked in for Red Base 2 until a strategy is developed to approach it effectively.
-- Delete: Avoid committing any units to Red Base 2 until a coordinated attack from Red Base 3 is planned.
-- Insert: Prepare to allocate units from Red Base 1 to Red Base 2 in the next phase once Red Base 3 is neutralized.
+- Summary: Red 2 was pushed back, with Blue gaining control but some units lost.
+- Lock: Maintain support units; avoid overextension to prevent counterattack.
+- Delete: Reduce Light units supporting Red 2, focus on Heavy and Ranged for control.
+- Insert: Reallocate units from reserves to reinforce Red 2 or prepare for final push.
 
 Red3
-- Summary: Blue has a solid presence at Red Base 3, with no Red units remaining. This base is ready for an offensive push.
-- Lock: Maintain the current unit composition at Red Base 3 to support future attacks.
-- Delete: Consider reducing any surplus Ranged units, as they are less effective in direct confrontations.
-- Insert: If unallocated units are available, reinforce with additional Heavies to prepare for a push towards Red Base 2.
+- Summary: Red 3 was heavily contested; Blue controls it with minimal losses.
+- Lock: Hold current units; prepare to push towards Red 2 from Red 3.
+- Delete: Limit Light units supporting Red 3, focus on Heavy and Ranged support.
+- Insert: Add more Heavy units to secure Red 3 and facilitate final map closure.
 
 Phase 3
 Red1
-- Summary: Blue continues to hold Red Base 1 with a strong presence. The base is stable and can support further operations.
-- Lock: Keep the mix of Lights and Heavies to ensure continued control and support for future pushes.
-- Delete: Remove any Ranged units that are not contributing to the defense or offense at Red Base 1.
-- Insert: Consider adding more Lights to increase mobility and flexibility in future engagements.
+- Summary: Red 1 is fully controlled by Blue with minimal losses; final consolidation achieved.
+- Lock: Maintain current force; no further moves needed.
+- Delete: Reduce unnecessary Light units; focus on Heavy and Ranged for efficiency.
+- Insert: Reallocate surplus units to reserves or prepare for final map closure.
 
 Red2
-- Summary: Red Base 2 remains heavily defended, with no Blue units allocated. This base is a priority for the next phase.
-- Lock: No moves should be locked in for Red Base 2 until a strategy is developed to approach it effectively.
-- Delete: Avoid committing any units to Red Base 2 until a coordinated attack from Red Base 3 is planned.
-- Insert: Prepare to allocate units from Red Base 1 to Red Base 2 in the next phase once Red Base 3 is neutralized.
+- Summary: Red 2 is fully captured; Blue maintains control with remaining units.
+- Lock: Hold current units; prepare for map closure.
+- Delete: Reduce Light units supporting Red 2, as they are no longer needed.
+- Insert: Reallocate units to reserves or reinforce Red 1 for final push.
 
 Red3
-- Summary: Blue has a strong presence at Red Base 3, with no Red units remaining. This base is ready for an offensive push.
-- Lock: Maintain the current unit composition at Red Base 3 to support future attacks.
-- Delete: Consider reducing any surplus Ranged units, as they are less effective in direct confrontations.
-- Insert: If unallocated units are available, reinforce with additional Heavies to prepare for a push towards Red Base 2.
+- Summary: Red 3 is secured with Blue units; final control established.
+- Lock: Hold position; avoid overextension.
+- Delete: Limit Light units supporting Red 3; focus on consolidating control.
+- Insert: Reallocate surplus units to reserves or prepare for map closure.
 
 Rationale
-<<<<<<< Updated upstream
-This advice focuses on maximizing Blue's control while minimizing losses. By reinforcing successful strategies and reallocating units effectively, Blue can maintain pressure on Red bases. The emphasis on coordinated attacks, particularly on Red Base 2 from Red Base 3, is crucial for future success. The tradeoff involves ensuring that Blue does not overcommit to any single base, maintaining flexibility for future phases.
-=======
-<<<<<<< Updated upstream
-This advice focuses on maximizing Blue's control while minimizing losses. By reinforcing successful strategies and reallocating units effectively, Blue can maintain pressure on Red bases. The emphasis on coordinated attacks, particularly on Red Base 2 from Red Base 3, is crucial for future success. The tradeoff involves ensuring that Blue does not overcommit to any single base, maintaining flexibility for future phases.
-=======
-This advice focuses on maximizing Blue's unit efficiency while minimizing losses. By reinforcing successful strategies and reallocating ineffective units, Blue can maintain control over key bases and prepare for future offensives. The emphasis on Heavy and Ranged units ensures that Blue can effectively counter Red's defenses while maintaining a strong presence on the map.
+The strategy leverages a concentrated, heavy-first attack on Red 3, aligning with the target base crush plan. By securing Red 3 early, Blue can pivot to Red 1 and Red 2 with minimal risk, avoiding trickle phases. Maintaining support units and reallocating surplus units ensures sustained pressure while minimizing Blue losses. The approach balances aggression with safety, aiming for a decisive map control with minimal Red counterattack potential.
 
 Notes
-Consider the overall strategy of maintaining pressure and consolidating forces for maximum effectiveness.
-
-
-Model/User Strategy Discussion:
-
-[2025-09-30 14:30] Q: Considering advice given to me would it help if i wore a top hat and a monocle while i played, reference how this would effect my pushes to each red base
-[2025-09-30 14:30] A: Wearing a top hat and monocle might boost your confidence and focus, but the real key to improving your pushes lies in disciplined unit management and strategic positioning. Maintain your emphasis on coordinated Heavy and Ranged units for sustained pressure, especially when attacking Red2 via Red3, and avoid overcommitting Light units that lack staying power. Keep consolidating forces from Red1 and Red3 to maximize your offensive potential while minimizing losses, ensuring your moves remain safe, consistent, and evolvable as advised. In short, your success depends more on tactical clarity than on sartorial flair.
-
-[2025-09-30 14:32] Q: But what if i have learned to love my enemy, how can i overcome this to crush red forces, do i turn a blind eye?
-[2025-09-30 14:32] A: Loving your enemy can cloud judgment and lead to hesitation, which Red will exploit. To crush Red forces effectively, you must prioritize objective analysis over emotion—treat each engagement as a tactical puzzle rather than a personal conflict. Turn a blind eye to any sympathy and focus on maximizing unit synergy, coordinated pushes (especially via Red3 to Red2), and minimizing Blue losses to steadily erode Red’s defenses. Discipline and clear-headed decision-making are your best tools to convert respect into decisive victory.
->>>>>>> Stashed changes
->>>>>>> Stashed changes
+Focus on reinforcing Red 3 early, then pivot to Red 1 and Red 2. Avoid overcommitting Light units; prioritize Heavy for durability and damage. Support with Ranged units to maximize control and minimize Blue losses.

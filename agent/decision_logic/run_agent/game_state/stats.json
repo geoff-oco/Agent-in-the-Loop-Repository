@@ -4,41 +4,17 @@
       "units_remaining": 43,
       "units_lost": 2,
       "actions_taken": 3,
-      "bases_controlled": 1
+      "bases_controlled": 3
     },
     "red": {
       "units_remaining": 21,
       "units_lost": 23,
       "actions_taken": null,
-      "bases_controlled": 3
-    }
-  },
-  "phase_2": {
-    "blue": {
-      "units_remaining": 39,
-      "units_lost": 4,
-      "actions_taken": 9,
-      "bases_controlled": 3
-    },
-    "red": {
-      "units_remaining": 15,
-      "units_lost": 6,
-      "actions_taken": null,
       "bases_controlled": 1
     }
   },
-  "phase_3": {
-    "blue": {
-      "units_remaining": 19,
-      "units_lost": 20,
-      "actions_taken": 7,
-      "bases_controlled": 2
-    },
-    "red": {
-      "units_remaining": 5,
-      "units_lost": 10,
-      "actions_taken": null,
-      "bases_controlled": 1
-    }
+  "summary": {
+    "total_phases": 1,
+    "total_actions": 3
   }
 }
