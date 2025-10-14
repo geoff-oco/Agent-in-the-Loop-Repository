@@ -34,12 +34,8 @@ class LiveGameReader:  # Main game reader orchestrator
     ):
         self.main_roi_path_template = main_roi_path  # Template path for fallback
         self.element_roi_path_template = element_roi_path  # Template path for fallback
-        self.main_roi_path = (
-            main_roi_path  # Will be updated with resolution-specific path
-        )
-        self.element_roi_path = (
-            element_roi_path  # Will be updated with resolution-specific path
-        )
+        self.main_roi_path = main_roi_path  # Will be updated with resolution-specific path
+        self.element_roi_path = element_roi_path  # Will be updated with resolution-specific path
         self.monitor_index = monitor_index  # Will be auto-detected if None
         self.dry_run = dry_run
 
@@ -48,16 +44,14 @@ class LiveGameReader:  # Main game reader orchestrator
         self.screen_capture = get_screen_capture()
         self.output_manager = SessionOutputManager(output_dir)
         self.progress_reporter = ProgressReporter()
-        self.stats_reporter = StatsReporter()
+        self.stats_reporter = None  # Initialised after session creation
 
         # Specialized components
         self.exit_manager = ExitManager()
         self.game_state_manager = GameStateManager(
             self.screen_capture, self.ocr_processor, monitor_index, self.output_manager
         )
-        self.game_ocr_processor = GameOCRProcessor(
-            self.ocr_processor, self.screen_capture, self.output_manager
-        )
+        self.game_ocr_processor = GameOCRProcessor(self.ocr_processor, self.screen_capture, self.output_manager)
         self.navigation_controller = NavigationController(
             self.screen_capture,
             self.ocr_processor,
@@ -66,9 +60,8 @@ class LiveGameReader:  # Main game reader orchestrator
             fast_mode=True,
         )
 
-        # Clear any stale progress and stats files at start
+        # Clear any stale progress file at start
         self.progress_reporter.clear()
-        self.stats_reporter.clear()
 
         # ROI storage
         self.base_unit_rois: Dict[str, ROIMeta] = {}  # Base unit counts
@@ -79,9 +72,7 @@ class LiveGameReader:  # Main game reader orchestrator
         # Game data
         self.phases: List[PhaseData] = []
         self.initial_ler: Optional[str] = None
-        self.actions_by_phase: Optional[Dict[int, List]] = (
-            None  # Actions from save_state.json
-        )
+        self.actions_by_phase: Optional[Dict[int, List]] = None  # Actions from save_state.json
 
     def get_monitor_resolution(self, monitor_index: int) -> tuple[int, int]:
         try:
@@ -96,9 +87,7 @@ class LiveGameReader:  # Main game reader orchestrator
             logging.error(f"Failed to get monitor resolution: {e}")
             return 1920, 1080
 
-    def build_resolution_specific_roi_path(
-        self, base_path: str, width: int, height: int
-    ) -> str:
+    def build_resolution_specific_roi_path(self, base_path: str, width: int, height: int) -> str:
         # Extract directory and filename components
         dir_name = os.path.dirname(base_path)
         file_name = os.path.basename(base_path)
@@ -109,18 +98,12 @@ class LiveGameReader:  # Main game reader orchestrator
         base_name = name_without_ext.replace("_custom", "")
 
         # Build resolution-specific path: Main_rois_2560x1440.json
-        resolution_specific_path = os.path.join(
-            dir_name, f"{base_name}_{width}x{height}{ext}"
-        )
+        resolution_specific_path = os.path.join(dir_name, f"{base_name}_{width}x{height}{ext}")
 
         # Check if resolution-specific file exists
         if os.path.exists(resolution_specific_path):
-            logging.info(
-                f"Using resolution-specific ROI file: {resolution_specific_path}"
-            )
-            print(
-                f"Using resolution-specific ROI file: {os.path.basename(resolution_specific_path)}"
-            )
+            logging.info(f"Using resolution-specific ROI file: {resolution_specific_path}")
+            print(f"Using resolution-specific ROI file: {os.path.basename(resolution_specific_path)}")
             return resolution_specific_path
         else:
             logging.info(
@@ -140,9 +123,7 @@ class LiveGameReader:  # Main game reader orchestrator
             # Find RTSViewer window
             hwnd = win32gui.FindWindow(None, "RTSViewer")
             if not hwnd:
-                print(
-                    "WARNING: RTSViewer window not found - using monitor 1 as fallback"
-                )
+                print("WARNING: RTSViewer window not found - using monitor 1 as fallback")
                 logging.warning("RTSViewer window not found for monitor detection")
                 return 1
 
@@ -152,16 +133,12 @@ class LiveGameReader:  # Main game reader orchestrator
             window_center_x = (window_left + window_right) // 2
             window_center_y = (window_top + window_bottom) // 2
 
-            print(
-                f"RTSViewer window found at: ({window_left}, {window_top}) to ({window_right}, {window_bottom})"
-            )
+            print(f"RTSViewer window found at: ({window_left}, {window_top}) to ({window_right}, {window_bottom})")
             print(f"Window center: ({window_center_x}, {window_center_y})")
 
             # Get all monitors with position data from MSS
             with mss.mss() as sct:
-                for i in range(
-                    1, len(sct.monitors)
-                ):  # Skip index 0 (all monitors combined)
+                for i in range(1, len(sct.monitors)):  # Skip index 0 (all monitors combined)
                     mon = sct.monitors[i]
                     mon_left = mon["left"]
                     mon_top = mon["top"]
@@ -173,22 +150,13 @@ class LiveGameReader:  # Main game reader orchestrator
                     )
 
                     # Check if window center is within this monitor's bounds
-                    if (
-                        mon_left <= window_center_x < mon_right
-                        and mon_top <= window_center_y < mon_bottom
-                    ):
-                        print(
-                            f"RTSViewer detected on Monitor {i}: {mon['width']}x{mon['height']}"
-                        )
-                        logging.info(
-                            f"Auto-detected RTSViewer on monitor {i} ({mon['width']}x{mon['height']})"
-                        )
+                    if mon_left <= window_center_x < mon_right and mon_top <= window_center_y < mon_bottom:
+                        print(f"RTSViewer detected on Monitor {i}: {mon['width']}x{mon['height']}")
+                        logging.info(f"Auto-detected RTSViewer on monitor {i} ({mon['width']}x{mon['height']})")
                         return i
 
             # Fallback if window not found in any monitor bounds
-            print(
-                f"WARNING: RTSViewer window not within any monitor bounds - using monitor 1 as fallback"
-            )
+            print(f"WARNING: RTSViewer window not within any monitor bounds - using monitor 1 as fallback")
             logging.warning("RTSViewer window position outside all monitor bounds")
             return 1
 
@@ -207,9 +175,7 @@ class LiveGameReader:  # Main game reader orchestrator
 
             # Load Red2 final unit count ROI and navigation button ROIs from Element file
             element_manager = ROIManager()
-            success, message, count = element_manager.load_from_file(
-                self.element_roi_path
-            )
+            success, message, count = element_manager.load_from_file(self.element_roi_path)
             if success:
                 for name, roi in element_manager.rois.items():
                     if name == "Red2_FinalUnitCountArea":
@@ -246,9 +212,7 @@ class LiveGameReader:  # Main game reader orchestrator
             print(f"Error loading ROIs: {e}")
             return False
 
-    def run(
-        self, skip_save_check: bool = False, phase_selection: Optional[int] = None
-    ) -> bool:
+    def run(self, skip_save_check: bool = False, phase_selection: Optional[int] = None) -> bool:
         # Main execution flow with smart capture planning
         try:
             print("\n" + "=" * 60)
@@ -260,10 +224,7 @@ class LiveGameReader:  # Main game reader orchestrator
 
             # Start exit monitoring
             self.exit_manager.start_exit_monitoring()
-            if (
-                hasattr(self.exit_manager, "exit_thread")
-                and self.exit_manager.exit_thread
-            ):
+            if hasattr(self.exit_manager, "exit_thread") and self.exit_manager.exit_thread:
                 print("Press 'x' at any time to exit...")
             else:
                 print("Use Ctrl+C to exit...")
@@ -273,6 +234,10 @@ class LiveGameReader:  # Main game reader orchestrator
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             session_name = f"game_session_{timestamp}"
             self.output_manager.init_session(session_name)
+
+            # Initialise stats reporter with session-specific path
+            self.stats_reporter = StatsReporter(self.output_manager.get_stats_file_path())
+            self.stats_reporter.clear()
 
             # Auto-detect monitor if not specified (BEFORE loading ROIs)
             if self.monitor_index is None:
@@ -288,85 +253,57 @@ class LiveGameReader:  # Main game reader orchestrator
             logging.info(f"Monitor {self.monitor_index} resolution: {width}x{height}")
 
             # Build resolution-specific ROI paths
-            self.main_roi_path = self.build_resolution_specific_roi_path(
-                self.main_roi_path_template, width, height
-            )
+            self.main_roi_path = self.build_resolution_specific_roi_path(self.main_roi_path_template, width, height)
             self.element_roi_path = self.build_resolution_specific_roi_path(
                 self.element_roi_path_template, width, height
             )
 
             # Load ROIs (now with resolution-specific paths)
             logging.info("Loading ROI configurations...")
-            self.progress_reporter.update(
-                "Loading ROI configurations...", percentage=10
-            )
+            self.progress_reporter.update("Loading ROI configurations...", percentage=10)
             if not self.load_rois():
                 print("Failed to load ROIs")
                 logging.error("Failed to load ROI configurations")
                 self.progress_reporter.error("Failed to load ROI configurations")
                 return False
             logging.info("ROI configurations loaded successfully")
-            self.progress_reporter.update(
-                "ROI configurations loaded successfully", percentage=15
-            )
+            self.progress_reporter.update("ROI configurations loaded successfully", percentage=15)
 
             # Set button ROIs and monitor index on NavigationController
             self.navigation_controller.button_rois = self.button_rois
             self.navigation_controller.monitor_index = self.monitor_index
-            print(
-                f"NavigationController configured with {len(self.button_rois)} button ROIs"
-            )
+            print(f"NavigationController configured with {len(self.button_rois)} button ROIs")
 
             # SMART CAPTURE PLANNING - Check for save_state.json before any navigation
             print("\n=== Smart Capture Planning ===")
             from .smart_capture_planner import SmartCapturePlanner
 
-            project_root = os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "..", "..", "..")
-            )
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
             capture_plan = None
 
             # Step 1: Check for save_state.json
-            save_state_exists, save_state_data = SmartCapturePlanner.check_save_state(
-                project_root
-            )
+            save_state_exists, save_state_data = SmartCapturePlanner.check_save_state(project_root)
 
             if save_state_exists:
                 # Parse actions and generate capture plan from save_state
-                self.actions_by_phase = (
-                    SmartCapturePlanner.parse_actions_from_save_state(save_state_data)
-                )
-                capture_plan = (
-                    SmartCapturePlanner.calculate_capture_plan_from_save_state(
-                        self.actions_by_phase
-                    )
-                )
-                print(
-                    f"Save state detected - Capture plan generated from save_state.json"
-                )
+                self.actions_by_phase = SmartCapturePlanner.parse_actions_from_save_state(save_state_data)
+                capture_plan = SmartCapturePlanner.calculate_capture_plan_from_save_state(self.actions_by_phase)
+                print(f"Save state detected - Capture plan generated from save_state.json")
                 print(f"  Phases to capture: {capture_plan['phases_to_capture']}")
                 print(f"  Phase modes: {capture_plan['phase_modes']}")
                 print(f"  Red2 final needed: {capture_plan['needs_red2_final']}")
 
             elif phase_selection is not None:
                 # User provided phase selection via UI popup
-                print(
-                    f"Using user-provided phase selection: phase {phase_selection} has no actions"
-                )
-                capture_plan = (
-                    SmartCapturePlanner.calculate_capture_plan_from_user_selection(
-                        phase_selection
-                    )
-                )
+                print(f"Using user-provided phase selection: phase {phase_selection} has no actions")
+                capture_plan = SmartCapturePlanner.calculate_capture_plan_from_user_selection(phase_selection)
                 print(f"  Phases to capture: {capture_plan['phases_to_capture']}")
                 print(f"  Phase modes: {capture_plan['phase_modes']}")
                 print(f"  Red2 final needed: {capture_plan['needs_red2_final']}")
 
             else:
                 # No save_state and no user selection - default to full 3-phase capture
-                print(
-                    "No save_state.json found and no user selection - defaulting to full 3-phase capture"
-                )
+                print("No save_state.json found and no user selection - defaulting to full 3-phase capture")
                 capture_plan = {
                     "phases_to_capture": [1, 2, 3],
                     "phase_modes": {1: "full", 2: "full", 3: "full"},
@@ -405,9 +342,7 @@ class LiveGameReader:  # Main game reader orchestrator
 
             print(f"\nTotal OCR tasks: {total_ocr_tasks}")
             print(f"  LER: 1 task (complete)")
-            print(
-                f"  Phase ROIs: {total_ocr_tasks - 1 - (5 if capture_plan['needs_red2_final'] else 0)} tasks"
-            )
+            print(f"  Phase ROIs: {total_ocr_tasks - 1 - (5 if capture_plan['needs_red2_final'] else 0)} tasks")
             if capture_plan["needs_red2_final"]:
                 print(f"  Red2 final: 5 tasks")
 
@@ -422,9 +357,7 @@ class LiveGameReader:  # Main game reader orchestrator
             )
 
             # Execute captures based on plan
-            self.progress_reporter.update(
-                "Executing bulk screenshot capture...", percentage=20
-            )
+            self.progress_reporter.update("Executing bulk screenshot capture...", percentage=20)
             capture_results = capture_manager.execute_capture_plan(
                 capture_plan, self.monitor_index, self.base_unit_rois
             )
@@ -435,9 +368,7 @@ class LiveGameReader:  # Main game reader orchestrator
 
             print(f"Bulk capture complete: {len(phase_screenshots)} phases captured")
             if red2_final_screenshots:
-                print(
-                    f"Red2 final: {len(red2_final_screenshots)} frames captured for averaging"
-                )
+                print(f"Red2 final: {len(red2_final_screenshots)} frames captured for averaging")
 
             # BULK OCR PROCESSING - Process all screenshots
             print("\n=== Bulk OCR Processing ===")
@@ -456,12 +387,8 @@ class LiveGameReader:  # Main game reader orchestrator
                 total_ocr_tasks,
             )
 
-            logging.debug(
-                f"OCR results returned for phases: {list(phase_ocr_results.keys())}"
-            )
-            logging.debug(
-                f"Capture plan expected phases: {capture_plan['phases_to_capture']}"
-            )
+            logging.debug(f"OCR results returned for phases: {list(phase_ocr_results.keys())}")
+            logging.debug(f"Capture plan expected phases: {capture_plan['phases_to_capture']}")
 
             # Process red2 final screenshots if captured
             red2_final_count = None
@@ -482,23 +409,16 @@ class LiveGameReader:  # Main game reader orchestrator
                 phase_mode = capture_plan["phase_modes"][phase_num]
 
                 # Calculate phase data (handles "full" vs "before_only" modes)
-                phase_data = self.game_state_manager.calculate_phase_data(
-                    phase_num, ocr_data, mode=phase_mode
-                )
+                phase_data = self.game_state_manager.calculate_phase_data(phase_num, ocr_data, mode=phase_mode)
                 self.phases.append(phase_data)
 
                 # Display summary
                 print(f"\nPhase {phase_num} ({phase_mode} mode):")
                 self._display_phase_summary(phase_data)
 
-                # Update stats file after each phase completes (with actions if available)
-                self.stats_reporter.update(self.phases, self.actions_by_phase)
-
             # Step 3: Generate output
             print("\n=== Generating Output ===")
-            self.progress_reporter.update(
-                "Generating game state data...", percentage=90
-            )
+            self.progress_reporter.update("Generating game state data...", percentage=90)
 
             # Ensure all 3 phases are present in output (fill missing with empty placeholders)
             phases_dict = {phase.phase_number: phase for phase in self.phases}
@@ -517,19 +437,20 @@ class LiveGameReader:  # Main game reader orchestrator
                     if "actions" in phase_dict:
                         del phase_dict["actions"]
 
+            # Calculate final state for stats reporting
+            final_state = self.game_state_manager.get_final_state(self.phases, red2_final_count)
+
             # Build output JSON (red2_final_count used for calculations but not exported)
             output_data = {
                 "meta": {
                     "ler": self.game_state_manager.calculate_ler(self.initial_ler),
                 },
                 "phases": all_phases,
-                "final_state": {
-                    name: units.to_dict()
-                    for name, units in self.game_state_manager.get_final_state(
-                        self.phases, red2_final_count
-                    ).items()
-                },
+                "final_state": {name: units.to_dict() for name, units in final_state.items()},
             }
+
+            # Update stats file with final state (for units remaining/lost calculations)
+            self.stats_reporter.update(self.phases, self.actions_by_phase, final_state)
 
             # Save JSON
             output_file = self.output_manager.export_state(output_data)
@@ -539,17 +460,13 @@ class LiveGameReader:  # Main game reader orchestrator
             # Check for save state file and merge if present
             print("\n=== Checking for Save State File ===")
             # Look for save_state.json in project root (3 levels up: game_reader -> screen_reading -> agent -> root)
-            project_root = os.path.abspath(
-                os.path.join(os.path.dirname(__file__), "..", "..", "..")
-            )
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
             save_state_path = os.path.join(project_root, "save_state.json")
             print(f"Looking for save state at: {save_state_path}")
 
             if os.path.exists(save_state_path):
                 print("Save state detected! Merging with OCR data...")
-                self.progress_reporter.update(
-                    "Merging save state with OCR data...", percentage=96
-                )
+                self.progress_reporter.update("Merging save state with OCR data...", percentage=96)
 
                 try:
                     # Import merger
@@ -561,19 +478,13 @@ class LiveGameReader:  # Main game reader orchestrator
                     output_dir = os.path.dirname(output_file)
 
                     # Merge and export
-                    success, final_filename = merger.merge(
-                        output_file, save_state_path, output_dir
-                    )
+                    success, final_filename = merger.merge(output_file, save_state_path, output_dir)
 
                     if success:
-                        print(
-                            f"SUCCESS: Enriched game state created: {os.path.basename(final_filename)}"
-                        )
+                        print(f"SUCCESS: Enriched game state created: {os.path.basename(final_filename)}")
                         print("SUCCESS: Save state file cleaned up")
                     else:
-                        print(
-                            f"WARNING: Merge failed, using simple export: {os.path.basename(final_filename)}"
-                        )
+                        print(f"WARNING: Merge failed, using simple export: {os.path.basename(final_filename)}")
 
                 except Exception as e:
                     print(f"ERROR: Error during merge: {e}")
@@ -581,16 +492,12 @@ class LiveGameReader:  # Main game reader orchestrator
                     logging.error(f"Save state merge failed: {e}", exc_info=True)
             else:
                 print("No save state detected - using simple export")
-                self.progress_reporter.update(
-                    "Finalising game state export...", percentage=96
-                )
+                self.progress_reporter.update("Finalising game state export...", percentage=96)
 
                 # Rename to simple_game_state.json to indicate OCR-only mode
                 try:
                     output_dir = os.path.dirname(output_file)
-                    simple_output_file = os.path.join(
-                        output_dir, "simple_game_state.json"
-                    )
+                    simple_output_file = os.path.join(output_dir, "simple_game_state.json")
 
                     # Rename the file
                     os.rename(output_file, simple_output_file)
@@ -606,29 +513,17 @@ class LiveGameReader:  # Main game reader orchestrator
             stats["total_base_rois"] = len(self.base_unit_rois)
             stats["total_adjustment_rois"] = len(self.adjustment_rois)
             stats["session_performance"] = {
-                "avg_phase_duration": (
-                    round(stats["duration_seconds"] / len(self.phases), 2)
-                    if self.phases
-                    else 0
-                ),
+                "avg_phase_duration": (round(stats["duration_seconds"] / len(self.phases), 2) if self.phases else 0),
                 "total_ocr_operations": stats["total_base_rois"] * len(self.phases)
                 + stats["total_adjustment_rois"] * len(self.phases),
-                "captures_per_phase": (
-                    round(stats["captures_saved"] / len(self.phases), 1)
-                    if self.phases
-                    else 0
-                ),
+                "captures_per_phase": (round(stats["captures_saved"] / len(self.phases), 1) if self.phases else 0),
             }
 
             logging.info(f"Session performance summary:")
             logging.info(f"  Total duration: {stats['duration_seconds']:.2f}s")
             logging.info(f"  Phases processed: {stats['phases_processed']}")
-            logging.info(
-                f"  Average phase duration: {stats['session_performance']['avg_phase_duration']:.2f}s"
-            )
-            logging.info(
-                f"  Total OCR operations: {stats['session_performance']['total_ocr_operations']}"
-            )
+            logging.info(f"  Average phase duration: {stats['session_performance']['avg_phase_duration']:.2f}s")
+            logging.info(f"  Total OCR operations: {stats['session_performance']['total_ocr_operations']}")
             logging.info(f"  Images captured: {stats['captures_saved']}")
             logging.info(f"Session complete: {json.dumps(stats, indent=2)}")
 
@@ -640,9 +535,7 @@ class LiveGameReader:  # Main game reader orchestrator
             print("=" * 60)
 
             # Mark progress as complete
-            self.progress_reporter.complete(
-                "Screen reading complete! Game state generated."
-            )
+            self.progress_reporter.complete("Screen reading complete! Game state generated.")
 
             return True
 
