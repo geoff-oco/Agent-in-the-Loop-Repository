@@ -1,8 +1,7 @@
 import json
 from pathlib import Path
 from typing import Any, Dict, Union, Optional, List
-from agent.decision_logic.run_agent.graph.state import ChatState
-
+from graph.state import ChatState
 
 # all of our reading/parsing logic in one place
 class Readers:
