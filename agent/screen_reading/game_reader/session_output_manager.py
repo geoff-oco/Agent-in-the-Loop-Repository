@@ -21,7 +21,6 @@ class SessionOutputManager:  # Manages all output for a game session in a single
         self.logs_dir: Optional[Path] = None
         self.log_file: Optional[Path] = None
         self.log_handler: Optional[logging.FileHandler] = None
-        self.stats_file: Optional[Path] = None  # Stats file path for current session
 
         # Session metadata
         self.session_name: Optional[str] = None
@@ -63,9 +62,6 @@ class SessionOutputManager:  # Manages all output for a game session in a single
 
         self.logs_dir = self.session_dir / "logs"
         self.logs_dir.mkdir(exist_ok=True)
-
-        # Initialise stats file path (in session root folder)
-        self.stats_file = self.session_dir / "stats.json"
 
         # Setup logging
         self._setup_logging()
@@ -196,12 +192,6 @@ class SessionOutputManager:  # Manages all output for a game session in a single
             raise ValueError("Session not initialised")
 
         return self.ocr_captures_dir / f"phase_{phase_num}"
-
-    def get_stats_file_path(self) -> Path:  # Get the stats file path for current session
-        if not self.stats_file:
-            raise ValueError("Session not initialised")
-
-        return self.stats_file
 
 
 # Singleton instance
