@@ -28,7 +28,13 @@ def discuss_strategy(json_filename: str, user_question: str) -> str:
     advice_dir.mkdir(parents=True, exist_ok=True)
     #And look for a text file with the same name as our game state
     advice_path = advice_dir / (Path(json_filename).stem + ".txt")
-    advice_text = advice_path.read_text(encoding="utf-8") if advice_path.exists() else ""
+    if not advice_path.is_file():
+        return "No advice file found." #first line check if strategy exists and aexit
+
+    if advice_path.exists():
+        advice_text = advice_path.read_text(encoding="utf-8")
+    else:
+        return "No advice file found." #Hard check to ensure it exits gracefully if no strategy exists
 
     # Important to check if simple or not so we grab the right instructions for interpreting game state
     is_simple = Path(json_filename).name.lower().startswith("simple")
