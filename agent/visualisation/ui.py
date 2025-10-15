@@ -26,10 +26,15 @@ current_process = None
 current_subprocess = None
 current_agent_subprocess = None
 
+# Font and theme references for popup windows
+font_arial_global = None
+font_arialBold_global = None
+global_theme_ref = None
+
 
 def ui(tar_hwnd=None, overlay=None):
     # Store overlay reference for callbacks
-    global overlay_instance
+    global overlay_instance, font_arial_global, font_arialBold_global, global_theme_ref
     overlay_instance = overlay
 
     # Dont start drawing screen while window is minimised
@@ -48,6 +53,9 @@ def ui(tar_hwnd=None, overlay=None):
         try:
             font_arial = dpg.add_font("C:/Windows/Fonts/arial.ttf", 7 * FONT_SCALE)
             font_arialBold = dpg.add_font("C:/Windows/Fonts/arialbd.ttf", 7 * FONT_SCALE)
+            # Store fonts globally for popup access
+            font_arial_global = font_arial
+            font_arialBold_global = font_arialBold
         except SystemError:
             print("Could not find font... switching to default")
             font_is_loaded = False
@@ -136,6 +144,9 @@ def ui(tar_hwnd=None, overlay=None):
             dpg.add_theme_style(dpg.mvStyleVar_FramePadding, 10, 6, category=dpg.mvThemeCat_Core)
             dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 8, 5, category=dpg.mvThemeCat_Core)
             dpg.add_theme_style(dpg.mvStyleVar_ScrollbarSize, 16, category=dpg.mvThemeCat_Core)
+
+    # Store theme globally for popup access
+    global_theme_ref = global_theme
 
     with dpg.theme() as mini_theme:
         with dpg.theme_component(dpg.mvAll):
@@ -617,6 +628,10 @@ def _show_save_state_popup():
             "in the project root directory for enriched game state export.\n\n"
             "Click 'Retry' after saving, or 'Skip' to proceed without."
         )
+        # Apply font to text if available
+        if font_arial_global:
+            dpg.bind_item_font(dpg.last_item(), font_arial_global)
+
         dpg.add_separator()
 
         with dpg.group(horizontal=True):
@@ -630,6 +645,12 @@ def _show_save_state_popup():
                 width=200,
                 callback=_on_skip_button_clicked,
             )
+
+    # Apply global theme and font to popup window
+    if global_theme_ref:
+        dpg.bind_item_theme("save_state_popup", global_theme_ref)
+    if font_arial_global:
+        dpg.bind_item_font("save_state_popup", font_arial_global)
 
 
 def _on_retry_button_clicked():
@@ -687,24 +708,31 @@ def _show_phase_selection_popup():
             "Please select the next phase with NO action cards:\n"
             "(This helps determine which phases need OCR processing)\n"
         )
+        # Apply font to descriptive text
+        if font_arial_global:
+            dpg.bind_item_font(dpg.last_item(), font_arial_global)
+
         dpg.add_separator()
 
         dpg.add_text("\nWhat is the next phase with NO action cards?", color=(255, 200, 100))
+        # Apply font to highlighted question text
+        if font_arial_global:
+            dpg.bind_item_font(dpg.last_item(), font_arial_global)
 
         with dpg.group(horizontal=True):
             dpg.add_button(
                 label="Phase 1 (No Actions)",
-                width=130,
+                width=160,
                 callback=lambda: _on_phase_selected(1),
             )
             dpg.add_button(
                 label="Phase 2 (No Actions)",
-                width=130,
+                width=160,
                 callback=lambda: _on_phase_selected(2),
             )
             dpg.add_button(
                 label="Phase 3 (No Actions)",
-                width=130,
+                width=160,
                 callback=lambda: _on_phase_selected(3),
             )
 
@@ -715,6 +743,12 @@ def _show_phase_selection_popup():
             width=250,
             callback=lambda: _on_phase_selected(0),
         )
+
+    # Apply global theme and font to popup window (includes title bar and buttons)
+    if global_theme_ref:
+        dpg.bind_item_theme("phase_selection_popup", global_theme_ref)
+    if font_arial_global:
+        dpg.bind_item_font("phase_selection_popup", font_arial_global)
 
 
 def _on_phase_selected(phase_num: int):
