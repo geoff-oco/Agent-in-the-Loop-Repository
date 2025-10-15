@@ -9,6 +9,7 @@ import win32process
 import sys
 import os
 import json
+import stats
 from typing import Optional
 from win_termination import (
     terminate_process_tree_aggressive,
@@ -136,8 +137,143 @@ def ui(tar_hwnd=None, overlay=None):
             dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 8, 5, category=dpg.mvThemeCat_Core)
             dpg.add_theme_style(dpg.mvStyleVar_ScrollbarSize, 16, category=dpg.mvThemeCat_Core)
 
+    with dpg.theme() as mini_theme:
+        with dpg.theme_component(dpg.mvAll):
+            dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 4, 4)
+            dpg.add_theme_style(dpg.mvStyleVar_FramePadding, 0, 0, category=dpg.mvThemeCat_Core)
+
     dpg.bind_item_theme("buttons_container", global_theme)
     dpg.bind_item_theme("chat_win", global_theme)
+
+    # Stats window
+    with dpg.window(
+        tag="stats_window",
+        no_background=False,
+        no_move=False,
+        no_resize=False,
+        no_title_bar=True,
+        width=(window_width / 7),
+        height=635,
+        pos=((window_width * 2 / 3), (window_height / 4)),
+    ):
+        if font_is_loaded:
+            dpg.bind_item_font(dpg.last_item(), font_arialBold)
+
+        dpg.add_text("Stats")
+        dpg.add_text("Total Phases: ", indent=10, tag="Total_phases")
+        if font_is_loaded:
+            dpg.bind_item_font(dpg.last_item(), font_arial)
+        dpg.bind_item_theme(dpg.last_item(), mini_theme)
+        dpg.add_text("Total Actions: ", indent=10, tag="Total_actions")
+        if font_is_loaded:
+            dpg.bind_item_font(dpg.last_item(), font_arial)
+        dpg.bind_item_theme(dpg.last_item(), mini_theme)
+
+        dpg.add_separator(label="Phase 1")
+        with dpg.child_window(height=155):
+            if font_is_loaded:
+                dpg.bind_item_font(dpg.last_item(), font_arial)
+            with dpg.table(header_row=True, row_background=True, borders_innerV=True):
+                dpg.add_table_column(width_fixed=True, width=100)
+                dpg.add_table_column(label="Blue")
+                dpg.add_table_column(label="Red")
+                dpg.add_table_column(label="Difference")
+
+                with dpg.table_row():
+                    dpg.add_text("Units Remaining")
+                    dpg.add_text("", tag="P1_Blue_units")
+                    dpg.add_text("", tag="P1_Red_units")
+                    dpg.add_text("", tag="P1_Diff_units")
+
+                with dpg.table_row():
+                    dpg.add_text("Units Lost")
+                    dpg.add_text("", tag="P1_Blue_lost")
+                    dpg.add_text("", tag="P1_Red_lost")
+                    dpg.add_text("", tag="P1_Diff_lost")
+
+                with dpg.table_row():
+                    dpg.add_text("Bases Controlled")
+                    dpg.add_text("", tag="P1_Blue_bases")
+                    dpg.add_text("", tag="P1_Red_bases")
+                    dpg.add_text("", tag="P1_Diff_bases")
+
+                with dpg.table_row():
+                    dpg.add_text("Actions Taken")
+                    dpg.add_text("", tag="P1_Blue_actions")
+                    dpg.add_text("")
+                    dpg.add_text("")
+
+        dpg.add_separator(label="Phase 2")
+        with dpg.child_window(height=155):
+            if font_is_loaded:
+                dpg.bind_item_font(dpg.last_item(), font_arial)
+            with dpg.table(header_row=True, row_background=True, borders_innerV=True):
+                dpg.add_table_column(width_fixed=True, width=100)
+                dpg.add_table_column(label="Blue")
+                dpg.add_table_column(label="Red")
+                dpg.add_table_column(label="Difference")
+
+                with dpg.table_row():
+                    dpg.add_text("Units Remaining")
+                    dpg.add_text("", tag="P2_Blue_units")
+                    dpg.add_text("", tag="P2_Red_units")
+                    dpg.add_text("", tag="P2_Diff_units")
+
+                with dpg.table_row():
+                    dpg.add_text("Units Lost")
+                    dpg.add_text("", tag="P2_Blue_lost")
+                    dpg.add_text("", tag="P2_Red_lost")
+                    dpg.add_text("", tag="P2_Diff_lost")
+
+                with dpg.table_row():
+                    dpg.add_text("Bases Controlled")
+                    dpg.add_text("", tag="P2_Blue_bases")
+                    dpg.add_text("", tag="P2_Red_bases")
+                    dpg.add_text("", tag="P2_Diff_bases")
+
+                with dpg.table_row():
+                    dpg.add_text("Actions Taken")
+                    dpg.add_text("", tag="P2_Blue_actions")
+                    dpg.add_text("")
+                    dpg.add_text("")
+
+        dpg.add_separator(label="Phase 3")
+        with dpg.child_window(height=155):
+            if font_is_loaded:
+                dpg.bind_item_font(dpg.last_item(), font_arial)
+            with dpg.table(header_row=True, row_background=True, borders_innerV=True):
+                dpg.add_table_column(width_fixed=True, width=100)
+                dpg.add_table_column(label="Blue")
+                dpg.add_table_column(label="Red")
+                dpg.add_table_column(label="Difference")
+
+                with dpg.table_row():
+                    dpg.add_text("Units Remaining")
+                    dpg.add_text("", tag="P3_Blue_units")
+                    dpg.add_text("", tag="P3_Red_units")
+                    dpg.add_text("", tag="P3_Diff_units")
+
+                with dpg.table_row():
+                    dpg.add_text("Units Lost")
+                    dpg.add_text("", tag="P3_Blue_lost")
+                    dpg.add_text("", tag="P3_Red_lost")
+                    dpg.add_text("", tag="P3_Diff_lost")
+
+                with dpg.table_row():
+                    dpg.add_text("Bases Controlled")
+                    dpg.add_text("", tag="P3_Blue_bases")
+                    dpg.add_text("", tag="P3_Red_bases")
+                    dpg.add_text("", tag="P3_Diff_bases")
+
+                with dpg.table_row():
+                    dpg.add_text("Actions Taken")
+                    dpg.add_text("", tag="P3_Blue_actions")
+                    dpg.add_text("")
+                    dpg.add_text("")
+
+        dpg.child_window()
+
+    dpg.bind_item_theme("stats_window", global_theme)
 
     # Start background thread for dynamic resizing
     resize_thread = threading.Thread(target=_update_chat_window_sizes, daemon=True)
@@ -256,9 +392,11 @@ def _hide_callback(sender, app_data, user_data):
         hidden = True
         dpg.set_item_label(sender, "Show")
         dpg.hide_item("chat_win")
+        dpg.hide_item("stats_window")
     else:
         hidden = False
         dpg.show_item("chat_win")
+        dpg.show_item("stats_window")
         dpg.set_item_label(sender, "Hide")
 
 
@@ -380,12 +518,12 @@ def _process_chat_message(user_question):
 
         current_log = dpg.get_value("chatLog")
         updated = current_log.replace("Agent: Thinking...", f"Agent: {answer}")
-        dpg.set_value("chatLog", updated)
+        _safe_dpg_call(dpg.set_value, "chatLog", updated)
 
     except Exception as e:
         current_log = dpg.get_value("chatLog")
         updated = current_log.replace("Agent: Thinking...", f"Agent: Error - {str(e)}")
-        dpg.set_value("chatLog", updated)
+        _safe_dpg_call(dpg.set_value, "chatLog", updated)
 
 
 # MARK: Callbacks end
@@ -599,7 +737,7 @@ def _launch_subprocess_with_phase_selection(phase_selection: Optional[int]):
     warning_msg += "Screen reading in progress...\n"
     warning_msg += "To stop: Use 'Cancel' or 'Exit System' buttons\n"
     warning_msg += "\nStarting screen reading process..."
-    dpg.set_value("outputText", warning_msg)
+    _safe_dpg_call(dpg.set_value, "outputText", warning_msg)
 
     # Path to progress file (relative to screen_reading directory)
     progress_file = os.path.join("agent", "screen_reading", "output", "progress.json")
@@ -729,25 +867,29 @@ def _run_agent_strategy():
 
     # Generate strategy using the agent bridge
     try:
-        dpg.set_value("outputText", "STRATEGY GENERATION: Initialising agent...")
+        _safe_dpg_call(dpg.set_value, "outputText", "STRATEGY GENERATION: Initialising agent...")
 
         # Create agent bridge
         bridge = AgentBridge()
 
         # Update progress
-        dpg.set_value("outputText", "STRATEGY GENERATION: Bridging game state to agent...")
+        _safe_dpg_call(dpg.set_value, "outputText", "STRATEGY GENERATION: Bridging game state to agent...")
 
         # Generate strategy (auto-detects enriched vs simple based on what LIVE_GAME_READER created)
         success, result = bridge.generate_strategy()
 
         if success:
             # Strategy generated successfully - display it
-            dpg.set_value("outputText", f"STRATEGY GENERATED:\n\n{result}")
-            dpg.set_value("chatLog", "Strategy ready! Ask questions about it.")
+            _safe_dpg_call(dpg.set_value, "outputText", f"STRATEGY GENERATED:\n\n{result}")
+            _safe_dpg_call(dpg.set_value, "chatLog", "Strategy ready! Ask questions about it.")
             print("Strategy generation completed successfully")
+
+            # Update stats panel with latest game statistics
+            _display_stats()
         else:
             # Error occurred
-            dpg.set_value(
+            _safe_dpg_call(
+                dpg.set_value,
                 "outputText",
                 f"STRATEGY GENERATION FAILED:\n\n{result or 'Unknown error occurred'}",
             )
@@ -755,13 +897,100 @@ def _run_agent_strategy():
 
     except Exception as e:
         error_msg = f"Error in strategy generation: {str(e)}"
-        dpg.set_value("outputText", f"STRATEGY GENERATION ERROR:\n\n{error_msg}")
+        _safe_dpg_call(dpg.set_value, "outputText", f"STRATEGY GENERATION ERROR:\n\n{error_msg}")
         print(error_msg)
 
     # Reset UI state when done
     running = False
     current_agent_subprocess = None
     _change_ui_state(False)
+
+
+def _display_stats():
+    """Update stats panel with latest game statistics.
+
+    Called from worker thread after strategy generation completes.
+    Uses direct dpg.set_value() calls matching existing _run_agent_strategy() pattern.
+    """
+    try:
+        the_stats = stats.stats_processing()
+
+        if not the_stats:
+            print("No stats data returned from stats_processing()")
+            return
+
+        total_phases = the_stats[0]
+        total_actions = the_stats[1]
+
+        # Update summary stats
+        _safe_dpg_call(dpg.set_value, "Total_phases", f"Total Phases: {total_phases}")
+        _safe_dpg_call(dpg.set_value, "Total_actions", f"Total Actions: {total_actions}")
+
+        # Update Phase 1 if exists
+        if total_phases >= 1 and len(the_stats) > 2:
+            phase_stats = the_stats[2]
+            _safe_dpg_call(dpg.set_value, "P1_Blue_units", phase_stats[0][0])
+            _safe_dpg_call(dpg.set_value, "P1_Red_units", phase_stats[1][0])
+            _safe_dpg_call(dpg.set_value, "P1_Diff_units", phase_stats[2][0])
+            _safe_dpg_call(dpg.set_value, "P1_Blue_lost", phase_stats[0][1])
+            _safe_dpg_call(dpg.set_value, "P1_Red_lost", phase_stats[1][1])
+            _safe_dpg_call(dpg.set_value, "P1_Diff_lost", phase_stats[2][1])
+            _safe_dpg_call(dpg.set_value, "P1_Blue_actions", phase_stats[0][2])
+            _safe_dpg_call(dpg.set_value, "P1_Blue_bases", phase_stats[0][3])
+            _safe_dpg_call(dpg.set_value, "P1_Red_bases", phase_stats[1][3])
+            _safe_dpg_call(dpg.set_value, "P1_Diff_bases", phase_stats[2][3])
+
+        # Update Phase 2 if exists
+        if total_phases >= 2 and len(the_stats) > 3:
+            phase_stats = the_stats[3]
+            _safe_dpg_call(dpg.set_value, "P2_Blue_units", phase_stats[0][0])
+            _safe_dpg_call(dpg.set_value, "P2_Red_units", phase_stats[1][0])
+            _safe_dpg_call(dpg.set_value, "P2_Diff_units", phase_stats[2][0])
+            _safe_dpg_call(dpg.set_value, "P2_Blue_lost", phase_stats[0][1])
+            _safe_dpg_call(dpg.set_value, "P2_Red_lost", phase_stats[1][1])
+            _safe_dpg_call(dpg.set_value, "P2_Diff_lost", phase_stats[2][1])
+            _safe_dpg_call(dpg.set_value, "P2_Blue_actions", phase_stats[0][2])
+            _safe_dpg_call(dpg.set_value, "P2_Blue_bases", phase_stats[0][3])
+            _safe_dpg_call(dpg.set_value, "P2_Red_bases", phase_stats[1][3])
+            _safe_dpg_call(dpg.set_value, "P2_Diff_bases", phase_stats[2][3])
+
+        # Update Phase 3 if exists
+        if total_phases >= 3 and len(the_stats) > 4:
+            phase_stats = the_stats[4]
+            _safe_dpg_call(dpg.set_value, "P3_Blue_units", phase_stats[0][0])
+            _safe_dpg_call(dpg.set_value, "P3_Red_units", phase_stats[1][0])
+            _safe_dpg_call(dpg.set_value, "P3_Diff_units", phase_stats[2][0])
+            _safe_dpg_call(dpg.set_value, "P3_Blue_lost", phase_stats[0][1])
+            _safe_dpg_call(dpg.set_value, "P3_Red_lost", phase_stats[1][1])
+            _safe_dpg_call(dpg.set_value, "P3_Diff_lost", phase_stats[2][1])
+            _safe_dpg_call(dpg.set_value, "P3_Blue_actions", phase_stats[0][2])
+            _safe_dpg_call(dpg.set_value, "P3_Blue_bases", phase_stats[0][3])
+            _safe_dpg_call(dpg.set_value, "P3_Red_bases", phase_stats[1][3])
+            _safe_dpg_call(dpg.set_value, "P3_Diff_bases", phase_stats[2][3])
+
+        print("Stats panel updated successfully")
+
+    except Exception as e:
+        print(f"Error updating stats panel: {e}")
+        import traceback
+
+        traceback.print_exc()
+
+
+def _safe_dpg_call(func, *args, **kwargs):
+    """Thread-safe wrapper for ANY DPG function called from worker threads.
+
+    Uses dpg.split_frame() to synchronise with DPG's render loop.
+    Prevents UI corruption when updating from background threads.
+    """
+    try:
+        if not dpg.is_dearpygui_running():
+            return
+        dpg.split_frame()  # Sync with DPG render thread
+        return func(*args, **kwargs)
+    except Exception as e:
+        print(f"Error in thread-safe DPG call: {e}")
+        return None
 
 
 def _change_ui_state(running):
