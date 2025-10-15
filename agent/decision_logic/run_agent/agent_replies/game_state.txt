@@ -1,0 +1,28 @@
+Summary
+Focus on a concentrated, heavy push targeting Red 3 to secure a quick base capture in Phase 1. Transition to a coordinated, grouped attack on Red 1 to maximize LER in Phase 2. Maintain map control with a unified, single-axis advance towards Red 2 in Phase 3 for optimal endgame positioning.
+
+Current LER
+1.19 / 1.0 | Favour: Neutral
+
+Phase 1
+Actions
+lock blue->red1 6/7/8
+lock blue->red3 8/4/3
+delete blue->red2 1/0/1 [delete] (#2)
+Inserts
+insert blue->red2 0/0/1
+
+Phase 2
+Actions
+—
+Inserts
+insert blue->red3 1/0/0
+
+Phase 3
+Actions
+—
+Inserts
+—
+
+Rationale
+The concentrated push on Red 3 in Phase 1 secures an early advantage and reduces Red's defensive options. Transitioning to a grouped attack on Red 1 in Phase 2 maximizes LER by consolidating forces and minimizing overextension. Maintaining a single-axis advance towards Red 2 in Phase 3 ensures map control and a cohesive endgame strategy, though it risks overcommitting if Red reallocates defenses.
