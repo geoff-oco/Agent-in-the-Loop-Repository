@@ -3,7 +3,7 @@
     "blue": {
       "units_remaining": 43,
       "units_lost": 2,
-      "actions_taken": 3,
+      "actions_taken": null,
       "bases_controlled": 3
     },
     "red": {
@@ -15,6 +15,6 @@
   },
   "summary": {
     "total_phases": 1,
-    "total_actions": 3
+    "total_actions": null
   }
 }

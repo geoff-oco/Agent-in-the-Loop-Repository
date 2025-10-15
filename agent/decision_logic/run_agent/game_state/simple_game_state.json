@@ -1,16 +1,15 @@
 {
   "meta": {
-    "timestamp": "2025-10-14T19:02:02.580508",
     "ler": {
       "blue": 1.19,
       "red": 1.0,
-      "favour": "Neutral"
+      "favour": "Blue"
     }
   },
   "phases": [
     {
       "phase": 1,
-      "start": {
+      "before": {
         "blue": {
           "blue": {
             "L": 15,
@@ -60,35 +59,6 @@
           }
         }
       },
-      "actions": [
-        {
-          "id": 1,
-          "from": "Blue",
-          "to": "Red1",
-          "L": 6,
-          "H": 7,
-          "R": 8,
-          "locked": false
-        },
-        {
-          "id": 2,
-          "from": "Blue",
-          "to": "Red2",
-          "L": 1,
-          "H": 0,
-          "R": 1,
-          "locked": false
-        },
-        {
-          "id": 3,
-          "from": "Blue",
-          "to": "Red3",
-          "L": 8,
-          "H": 4,
-          "R": 3,
-          "locked": false
-        }
-      ],
       "after": {
         "blue": {
           "blue": {
@@ -116,9 +86,9 @@
         },
         "red2": {
           "blue": {
-            "L": 1,
+            "L": 6,
             "H": 0,
-            "R": 8
+            "R": 1
           },
           "red": {
             "L": 0,
@@ -142,7 +112,7 @@
     },
     {
       "phase": 2,
-      "start": {
+      "before": {
         "blue": {
           "blue": {
             "L": 0,
@@ -192,13 +162,11 @@
           }
         }
       },
-      "actions": [],
       "after": {}
     },
     {
       "phase": 3,
       "start": {},
-      "actions": [],
       "after": {}
     }
   ],

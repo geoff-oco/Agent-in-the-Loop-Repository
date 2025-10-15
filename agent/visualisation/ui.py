@@ -27,9 +27,7 @@ current_agent_subprocess = None
 
 
 def ui(tar_hwnd=None, overlay=None):
-    """Function that describes the UI layout and functionality to dearPyGui"""
-
-    # Store overlay reference globally for callbacks
+    # Store overlay reference for callbacks
     global overlay_instance
     overlay_instance = overlay
 
@@ -51,53 +49,83 @@ def ui(tar_hwnd=None, overlay=None):
             font_arialBold = dpg.add_font("C:/Windows/Fonts/arialbd.ttf", 7 * FONT_SCALE)
         except SystemError:
             print("Could not find font... switching to default")
-            font_is_loaded = False 
-            
-
+            font_is_loaded = False
 
     # Main container window for buttons (resizable)
-    with dpg.window(tag="buttons_container", 
-                    no_background=False, 
-                    no_move=False, 
-                    no_resize=False, 
-                    no_title_bar=True,
-                    width=220, height=280,
-                    pos=(40,(window_height/3))
-                    ):
-        
-        if font_is_loaded: dpg.bind_item_font(dpg.last_item(), font_arialBold)
+    with dpg.window(
+        tag="buttons_container",
+        no_background=False,
+        no_move=False,
+        no_resize=False,
+        no_title_bar=True,
+        width=220,
+        height=280,
+        pos=(40, (window_height / 3)),
+    ):
+
+        if font_is_loaded:
+            dpg.bind_item_font(dpg.last_item(), font_arialBold)
         dpg.add_text("System Controls", color=(200, 200, 200))
 
         # Child window inside for actual button content (makes it resizable)
         with dpg.child_window(tag="buttons_win", width=-1, auto_resize_y=True):
             with dpg.group(tag="agent_button"):
-                dpg.add_button(label='Generate Strategy', width=-1, callback=_generation_callback)
-            with dpg.group(tag="cancel_button",enabled=False):
-                dpg.add_button(label="Cancel", width=-1,callback=_stopButton_callback)
+                dpg.add_button(label="Generate Strategy", width=-1, callback=_generation_callback)
+            with dpg.group(tag="cancel_button", enabled=False):
+                dpg.add_button(label="Cancel", width=-1, callback=_stopButton_callback)
             dpg.add_spacer(height=5)
             dpg.add_separator()
             dpg.add_spacer(height=5)
             dpg.add_button(label="Launch ROI Studio", width=-1, callback=_launch_roi_studio_callback)
-            dpg.add_button(label="Hide", tag="hide_button", width=-1,callback=_hide_callback)
+            dpg.add_button(label="Hide", tag="hide_button", width=-1, callback=_hide_callback)
             dpg.add_button(label="Exit System", width=-1, callback=_exit_callback)
-        dpg.add_loading_indicator(tag="loading_ind",show=False,width=50,indent=75)
+        dpg.add_loading_indicator(tag="loading_ind", show=False, width=50, indent=75)
 
-    with dpg.window(tag="chat_win", 
-                    no_background=False, 
-                    no_move=False, 
-                    no_resize=False, 
-                    no_title_bar=True,
-                    width=500, height= window_height / 3 - 10,
-                    pos=((window_width/3), (window_height - 10 - window_height/3))
-                    ):
-        
-        if font_is_loaded: dpg.bind_item_font(dpg.last_item(), font_arialBold)
-        dpg.add_text("Chatbox", color=(200, 200, 200))
-        dpg.add_separator()
+    with dpg.window(
+        tag="chat_win",
+        no_background=False,
+        no_move=False,
+        no_resize=False,
+        no_title_bar=True,
+        width=500,
+        height=window_height / 2 - 20,
+        pos=((window_width / 3), (window_height - 20 - window_height / 2)),
+    ):
+
+        if font_is_loaded:
+            dpg.bind_item_font(dpg.last_item(), font_arialBold)
+
+        # System Output section title
+        dpg.add_separator(label="System Output")
         dpg.add_spacer(height=5)
-        with dpg.child_window(tag='outputWindow'):
-            dpg.add_text('',tag="outputText", wrap= 475)
-            if font_is_loaded: dpg.bind_item_font(dpg.last_item(), font_arial)
+
+        # Calculate initial child window sizes (50/50 split)
+        parent_initial_height = window_height / 2 - 20
+        available_initial_height = parent_initial_height - 150  # Reserve for UI elements
+        output_initial_height = int(available_initial_height * 0.50)
+        chat_initial_height = int(available_initial_height * 0.50)
+        initial_wrap_width = 460
+
+        # Strategy output section
+        with dpg.child_window(tag="outputWindow", width=-1, height=output_initial_height, border=True):
+            dpg.add_text("", tag="outputText", wrap=initial_wrap_width)
+            if font_is_loaded:
+                dpg.bind_item_font(dpg.last_item(), font_arial)
+
+        # Chat conversation section
+        dpg.add_spacer(height=5)
+        dpg.add_separator(label="Chatbox")
+        dpg.add_spacer(height=5)
+        with dpg.child_window(tag="chatWindow", width=-1, height=chat_initial_height, border=True):
+            dpg.add_text("", tag="chatLog", wrap=initial_wrap_width)
+            if font_is_loaded:
+                dpg.bind_item_font(dpg.last_item(), font_arial)
+
+        # User input area
+        dpg.add_spacer(height=5)
+        with dpg.group(horizontal=True):
+            dpg.add_input_text(tag="chatInput", width=360, hint="Type here to discuss strategy with agent...")
+            dpg.add_button(label="Send", width=80, callback=_send_message)
 
     with dpg.theme() as global_theme:
         with dpg.theme_component(dpg.mvAll):
@@ -108,9 +136,12 @@ def ui(tar_hwnd=None, overlay=None):
             dpg.add_theme_style(dpg.mvStyleVar_ItemSpacing, 8, 5, category=dpg.mvThemeCat_Core)
             dpg.add_theme_style(dpg.mvStyleVar_ScrollbarSize, 16, category=dpg.mvThemeCat_Core)
 
-    dpg.bind_item_theme("buttons_container",global_theme)
-    dpg.bind_item_theme("chat_win",global_theme)
+    dpg.bind_item_theme("buttons_container", global_theme)
+    dpg.bind_item_theme("chat_win", global_theme)
 
+    # Start background thread for dynamic resizing
+    resize_thread = threading.Thread(target=_update_chat_window_sizes, daemon=True)
+    resize_thread.start()
 
     # Style editor for real-time experimentation (positioned top-right) - COMMENTED OUT
     # with dpg.window(tag="style_editor_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
@@ -132,7 +163,8 @@ def ui(tar_hwnd=None, overlay=None):
 
 # Theme system implementation complete - using targeted themes for specific components
 
-#MARK: Callbacks
+
+# MARK: Callbacks
 def _generation_callback(sender, app_data, user_data):
     """Handles button press response of \"Generate Strategy\"
 
@@ -180,9 +212,7 @@ def _stopButton_callback(sender, app_data, user_data):
     if current_agent_subprocess:
         try:
             if current_agent_subprocess.poll() is None:  # Still running
-                print(
-                    f"Terminating agent subprocess PID: {current_agent_subprocess.pid}"
-                )
+                print(f"Terminating agent subprocess PID: {current_agent_subprocess.pid}")
                 terminate_process_tree_aggressive(current_agent_subprocess.pid)
         except Exception as e:
             print(f"Error terminating agent subprocess: {e}")
@@ -190,9 +220,7 @@ def _stopButton_callback(sender, app_data, user_data):
 
     # Clean up progress file
     try:
-        progress_file = os.path.join(
-            "agent", "screen_reading", "output", "progress.json"
-        )
+        progress_file = os.path.join("agent", "screen_reading", "output", "progress.json")
         if os.path.exists(progress_file):
             os.remove(progress_file)
             print("Progress file removed")
@@ -213,9 +241,7 @@ def _launch_roi_studio_callback(sender, app_data, user_data):
         print("Launching ROI Studio...")
         # Get the project root directory
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        roi_studio_path = os.path.join(
-            project_root, "screen_reading", "LIVE_ROI_STUDIO.py"
-        )
+        roi_studio_path = os.path.join(project_root, "screen_reading", "LIVE_ROI_STUDIO.py")
 
         # Launch ROI Studio as a separate process
         subprocess.Popen([sys.executable, roi_studio_path], cwd=project_root)
@@ -223,16 +249,18 @@ def _launch_roi_studio_callback(sender, app_data, user_data):
     except Exception as e:
         print(f"Failed to launch ROI Studio: {e}")
 
+
 def _hide_callback(sender, app_data, user_data):
-    global hidden;
+    global hidden
     if hidden == False:
         hidden = True
-        dpg.set_item_label(sender,"Show")
+        dpg.set_item_label(sender, "Show")
         dpg.hide_item("chat_win")
     else:
         hidden = False
         dpg.show_item("chat_win")
-        dpg.set_item_label(sender,"Hide")
+        dpg.set_item_label(sender, "Hide")
+
 
 def _exit_callback(sender, app_data, user_data):
     """Exit System button - shuts down everything and exits"""
@@ -264,9 +292,7 @@ def _exit_callback(sender, app_data, user_data):
     if current_agent_subprocess:
         try:
             if current_agent_subprocess.poll() is None:
-                print(
-                    f"Terminating agent subprocess PID: {current_agent_subprocess.pid}"
-                )
+                print(f"Terminating agent subprocess PID: {current_agent_subprocess.pid}")
                 terminate_process_tree_aggressive(current_agent_subprocess.pid)
         except:
             pass
@@ -301,7 +327,112 @@ def _exit_callback(sender, app_data, user_data):
     print("Exiting...")
     os._exit(0)
 
-#MARK: Callbacks end
+
+# MARK: Chat Callbacks
+
+
+def _send_message():
+    user_msg = dpg.get_value("chatInput").strip()
+    if not user_msg:
+        return
+
+    dpg.set_value("chatInput", "")
+
+    current_log = dpg.get_value("chatLog")
+    dpg.set_value("chatLog", f"{current_log}\n\nYou: {user_msg}\n\nAgent: Thinking...")
+
+    # Process in background to avoid blocking UI
+    threading.Thread(target=_process_chat_message, args=(user_msg,)).start()
+
+
+def _process_chat_message(user_question):
+    try:
+        from pathlib import Path
+
+        project_root = Path(__file__).parent.parent.parent
+        agent_dir = project_root / "agent" / "decision_logic" / "run_agent"
+        game_state_dir = agent_dir / "game_state"
+
+        json_files = list(game_state_dir.glob("*.json"))
+
+        if not json_files:
+            raise FileNotFoundError("No game state JSON found. Generate a strategy first.")
+
+        latest_json = max(json_files, key=lambda p: p.stat().st_mtime)
+        json_filename = latest_json.name
+
+        # Use subprocess to avoid atexit registration issues in daemon thread
+        result = subprocess.run(
+            [sys.executable, "chat_discuss_cli.py", json_filename, user_question],
+            cwd=str(agent_dir),
+            capture_output=True,
+            text=True,
+            timeout=120,
+        )
+
+        if result.returncode != 0:
+            raise Exception(f"Chat subprocess failed: {result.stderr or 'Unknown error'}")
+
+        answer = result.stdout.strip()
+
+        if not answer:
+            raise Exception("No response from chat system")
+
+        current_log = dpg.get_value("chatLog")
+        updated = current_log.replace("Agent: Thinking...", f"Agent: {answer}")
+        dpg.set_value("chatLog", updated)
+
+    except Exception as e:
+        current_log = dpg.get_value("chatLog")
+        updated = current_log.replace("Agent: Thinking...", f"Agent: Error - {str(e)}")
+        dpg.set_value("chatLog", updated)
+
+
+# MARK: Callbacks end
+
+
+def _update_chat_window_sizes():
+    # Background thread for dynamic window resizing
+    while True:
+        try:
+            if not dpg.does_item_exist("chat_win"):
+                time.sleep(0.1)
+                continue
+
+            parent_width = dpg.get_item_width("chat_win")
+            parent_height = dpg.get_item_height("chat_win")
+
+            # Reserve space for UI elements (150px)
+            available_height = parent_height - 150
+            if available_height < 150:
+                available_height = 150
+
+            # Split 50/50 for equal sizing
+            output_height = int(available_height * 0.50)
+            chat_height = int(available_height * 0.50)
+
+            # Calculate wrap width (parent - scrollbar/padding)
+            wrap_width = int(parent_width - 40)
+            if wrap_width < 200:
+                wrap_width = 200
+
+            # Calculate input width (Send button stays fixed at 80px)
+            input_width = int(parent_width - 130)
+            if input_width < 200:
+                input_width = 200
+
+            dpg.configure_item("outputWindow", height=output_height)
+            dpg.configure_item("chatWindow", height=chat_height)
+            dpg.configure_item("outputText", wrap=wrap_width)
+            dpg.configure_item("chatLog", wrap=wrap_width)
+            dpg.configure_item("chatInput", width=input_width)
+
+        except Exception:
+            pass  # Items may not exist during initialisation
+
+        time.sleep(0.1)  # Poll every 100ms
+
+
 def _start_save_state_check():
     """Check for save_state.json and show popup if not found"""
     # Get project root path
@@ -313,9 +444,7 @@ def _start_save_state_check():
     if os.path.exists(save_state_path):
         print("save_state.json found - no popup needed")
         # Launch subprocess in worker thread so main thread stays responsive
-        thread = threading.Thread(
-            target=_launch_subprocess_with_phase_selection, args=(None,), daemon=True
-        )
+        thread = threading.Thread(target=_launch_subprocess_with_phase_selection, args=(None,), daemon=True)
         thread.start()
     else:
         # save_state.json not found - show popup (on main thread - safe)
@@ -379,16 +508,12 @@ def _on_retry_button_clicked():
         dpg.set_value("outputText", "Save state found! Starting screen reading...")
         dpg.delete_item("save_state_popup")
         # Launch subprocess in worker thread so main thread stays responsive
-        thread = threading.Thread(
-            target=_launch_subprocess_with_phase_selection, args=(None,), daemon=True
-        )
+        thread = threading.Thread(target=_launch_subprocess_with_phase_selection, args=(None,), daemon=True)
         thread.start()
     else:
         # Still not found - update message, keep popup open
         print("save_state.json still not found - popup remains open...")
-        dpg.set_value(
-            "outputText", "Save state not found. Please save file and click Retry..."
-        )
+        dpg.set_value("outputText", "Save state not found. Please save file and click Retry...")
 
 
 def _on_skip_button_clicked():
@@ -424,9 +549,7 @@ def _show_phase_selection_popup():
         )
         dpg.add_separator()
 
-        dpg.add_text(
-            "\nWhat is the next phase with NO action cards?", color=(255, 200, 100)
-        )
+        dpg.add_text("\nWhat is the next phase with NO action cards?", color=(255, 200, 100))
 
         with dpg.group(horizontal=True):
             dpg.add_button(
@@ -459,9 +582,7 @@ def _on_phase_selected(phase_num: int):
     print(f"User selected: Phase {phase_num} has no actions")
     dpg.delete_item("phase_selection_popup")
     # Launch subprocess in worker thread so main thread stays responsive
-    thread = threading.Thread(
-        target=_launch_subprocess_with_phase_selection, args=(phase_num,), daemon=True
-    )
+    thread = threading.Thread(target=_launch_subprocess_with_phase_selection, args=(phase_num,), daemon=True)
     thread.start()
 
 
@@ -531,9 +652,7 @@ def _launch_subprocess_with_phase_selection(phase_selection: Optional[int]):
                             or "screenshots captured" in current_status.lower()
                         ):
                             display_text = "=== CAPTURES COMPLETE ===\n"
-                            display_text += (
-                                "Processing OCR - You can move your mouse now\n\n"
-                            )
+                            display_text += "Processing OCR - You can move your mouse now\n\n"
                         else:
                             display_text = "=== DO NOT MOVE MOUSE ===\n"
                             display_text += "Use Cancel or Exit System if needed\n\n"
@@ -616,9 +735,7 @@ def _run_agent_strategy():
         bridge = AgentBridge()
 
         # Update progress
-        dpg.set_value(
-            "outputText", "STRATEGY GENERATION: Bridging game state to agent..."
-        )
+        dpg.set_value("outputText", "STRATEGY GENERATION: Bridging game state to agent...")
 
         # Generate strategy (auto-detects enriched vs simple based on what LIVE_GAME_READER created)
         success, result = bridge.generate_strategy()
@@ -626,6 +743,7 @@ def _run_agent_strategy():
         if success:
             # Strategy generated successfully - display it
             dpg.set_value("outputText", f"STRATEGY GENERATED:\n\n{result}")
+            dpg.set_value("chatLog", "Strategy ready! Ask questions about it.")
             print("Strategy generation completed successfully")
         else:
             # Error occurred
@@ -699,9 +817,7 @@ def _run_agent(phase_selection: Optional[int] = None):
         stderr_data = ""
 
         try:
-            stdout_data, stderr_data = current_subprocess.communicate(
-                timeout=300
-            )  # 5 minute timeout
+            stdout_data, stderr_data = current_subprocess.communicate(timeout=300)  # 5 minute timeout
             result_returncode = current_subprocess.returncode
         except subprocess.TimeoutExpired:
             if running:  # Only kill if not already cancelled
