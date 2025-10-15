@@ -76,9 +76,10 @@ class AgentBridge:
             print(f"Error finding latest session: {e}")
             return None, None
 
-    def generate_strategy(self) -> Tuple[bool, Optional[str]]:
+    def generate_strategy(self, process_holder: Optional[list] = None) -> Tuple[bool, Optional[str]]:
         # Complete flow: find session, copy file, call agent, return strategy
         # Auto-detects enriched (game_state.json) vs simple (simple_game_state.json)
+        # process_holder: Optional list to store subprocess reference (for cancellation support)
         try:
             print("Starting agent strategy generation...")
 
@@ -107,7 +108,7 @@ class AgentBridge:
             shutil.copy2(latest_file, bridge_path)
             print(f"Bridged {filename} to agent")
 
-            #Copy stats file if present
+            # Copy stats file if present
             stats_source = latest_file.parent.parent / "stats.json"
             if stats_source.exists():
                 stats_dest = self.agent_game_state_dir / "stats.json"
@@ -116,27 +117,54 @@ class AgentBridge:
             else:
                 print("No stats file found in session (skipping)")
 
-            # Step 3: Run agent subprocess
+            # Step 3: Run agent subprocess (using Popen for cancellation support)
             if not self.agent_dir.exists():
                 return False, f"Agent directory not found: {self.agent_dir}"
 
-            result = subprocess.run(
+            process = subprocess.Popen(
                 [sys.executable, "run_agent.py", filename],
                 cwd=str(self.agent_dir),
-                capture_output=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
                 text=True,
-                timeout=300,
             )
 
-            if result.returncode != 0:
-                print(f"Agent failed with return code: {result.returncode}")
-                print(f"STDOUT: {result.stdout}")
-                print(f"STDERR: {result.stderr}")
-                return False, f"Agent execution failed: {result.stderr}"
+            # Store process reference for external cancellation
+            if process_holder is not None:
+                process_holder[0] = process
+
+            # Poll process with timeout (300 seconds total)
+            import time
+
+            timeout = 300
+            start_time = time.time()
+
+            while process.poll() is None:
+                if time.time() - start_time > timeout:
+                    process.kill()
+                    process.wait()
+                    return False, "Agent execution timed out after 300 seconds"
+                time.sleep(0.1)  # Check every 100ms
+
+            # Process completed (either normally or was terminated)
+            stdout_data, stderr_data = process.communicate()
+            returncode = process.returncode
+
+            # Check if process was terminated externally (e.g., by cancel button)
+            if returncode != 0:
+                # Could be legitimate error or external termination
+                if returncode < 0:  # Negative return codes indicate signals (termination)
+                    print(f"Agent process was terminated externally (return code: {returncode})")
+                    return False, "Agent execution was cancelled"
+
+                print(f"Agent failed with return code: {returncode}")
+                print(f"STDOUT: {stdout_data}")
+                print(f"STDERR: {stderr_data}")
+                return False, f"Agent execution failed: {stderr_data}"
 
             # Step 4: Parse output path from agent's stdout
             result_path = None
-            for line in result.stdout.split("\n"):
+            for line in stdout_data.split("\n"):
                 if line.startswith("Output saved to:"):
                     result_path = line.replace("Output saved to:", "").strip()
                     break

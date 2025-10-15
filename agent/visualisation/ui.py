@@ -90,7 +90,7 @@ def ui(tar_hwnd=None, overlay=None):
         no_title_bar=True,
         width=500,
         height=window_height / 2 - 20,
-        pos=((window_width / 3), (window_height - 20 - window_height / 2)),
+        pos=((window_width / 4), (window_height - 20 - window_height / 2)),
     ):
 
         if font_is_loaded:
@@ -335,16 +335,18 @@ def _stopButton_callback(sender, app_data, user_data):
     # Update chatbox
     dpg.set_value("outputText", "Cancelling operation...")
 
-    # Only terminate subprocesses if they exist and are running
+    # Terminate all active subprocesses
+    # 1. Screen reading subprocess (LIVE_GAME_READER)
     if current_subprocess:
         try:
             if current_subprocess.poll() is None:  # Still running
-                print(f"Terminating subprocess PID: {current_subprocess.pid}")
+                print(f"Terminating screen reading subprocess PID: {current_subprocess.pid}")
                 terminate_process_tree_aggressive(current_subprocess.pid)
         except Exception as e:
-            print(f"Error terminating subprocess: {e}")
+            print(f"Error terminating screen reading subprocess: {e}")
         current_subprocess = None
 
+    # 2. Agent strategy generation subprocess
     if current_agent_subprocess:
         try:
             if current_agent_subprocess.poll() is None:  # Still running
@@ -499,7 +501,7 @@ def _process_chat_message(user_question):
         latest_json = max(json_files, key=lambda p: p.stat().st_mtime)
         json_filename = latest_json.name
 
-        # Use subprocess to avoid atexit registration issues in daemon thread
+        # Use blocking subprocess.run() - chat is independent and not cancellable
         result = subprocess.run(
             [sys.executable, "chat_discuss_cli.py", json_filename, user_question],
             cwd=str(agent_dir),
@@ -875,29 +877,46 @@ def _run_agent_strategy():
         # Update progress
         _safe_dpg_call(dpg.set_value, "outputText", "STRATEGY GENERATION: Bridging game state to agent...")
 
+        # Create process holder list to track subprocess (passed by reference)
+        process_holder = [None]
+
         # Generate strategy (auto-detects enriched vs simple based on what LIVE_GAME_READER created)
-        success, result = bridge.generate_strategy()
+        # Pass process_holder so AgentBridge can store subprocess reference
+        success, result = bridge.generate_strategy(process_holder=process_holder)
+
+        # Store subprocess in global for cancel button access
+        if process_holder[0] is not None:
+            current_agent_subprocess = process_holder[0]
+
+        # Check if operation was cancelled during execution
+        if not running:
+            print("Agent strategy generation was cancelled")
+            _safe_dpg_call(dpg.set_value, "outputText", "Operation cancelled\n\nReady for new operation...")
+            return
 
         if success:
-            # Strategy generated successfully - display it
-            _safe_dpg_call(dpg.set_value, "outputText", f"STRATEGY GENERATED:\n\n{result}")
-            _safe_dpg_call(dpg.set_value, "chatLog", "Strategy ready! Ask questions about it.")
-            print("Strategy generation completed successfully")
+            # Strategy generated successfully - display it only if still running
+            if running:
+                _safe_dpg_call(dpg.set_value, "outputText", f"STRATEGY GENERATED:\n\n{result}")
+                _safe_dpg_call(dpg.set_value, "chatLog", "Strategy ready! Ask questions about it.")
+                print("Strategy generation completed successfully")
 
-            # Update stats panel with latest game statistics
-            _display_stats()
+                # Update stats panel with latest game statistics
+                _display_stats()
         else:
-            # Error occurred
-            _safe_dpg_call(
-                dpg.set_value,
-                "outputText",
-                f"STRATEGY GENERATION FAILED:\n\n{result or 'Unknown error occurred'}",
-            )
-            print(f"Strategy generation failed: {result}")
+            # Error occurred - display only if still running
+            if running:
+                _safe_dpg_call(
+                    dpg.set_value,
+                    "outputText",
+                    f"STRATEGY GENERATION FAILED:\n\n{result or 'Unknown error occurred'}",
+                )
+                print(f"Strategy generation failed: {result}")
 
     except Exception as e:
         error_msg = f"Error in strategy generation: {str(e)}"
-        _safe_dpg_call(dpg.set_value, "outputText", f"STRATEGY GENERATION ERROR:\n\n{error_msg}")
+        if running:  # Only display error if not cancelled
+            _safe_dpg_call(dpg.set_value, "outputText", f"STRATEGY GENERATION ERROR:\n\n{error_msg}")
         print(error_msg)
 
     # Reset UI state when done
