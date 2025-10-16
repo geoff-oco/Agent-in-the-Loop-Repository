@@ -10,6 +10,8 @@ import sys
 import os
 import json
 import shutil
+import numpy as np
+from PIL import Image
 import stats
 from typing import Optional
 from win_termination import (
@@ -97,11 +99,28 @@ overlay_instance = None
 current_process = None
 current_subprocess = None
 current_agent_subprocess = None
+current_roi_studio_subprocess = None
 
 # Font and theme references for popup windows
-font_arial_global = None
-font_arialBold_global = None
+font_segoeui_global = None
+font_segoeuiBold_global = None
+font_segoeuiBold_medium_global = None  # Medium bold font for section titles
+font_segoeuiBold_large_global = None  # Larger bold font for Stats title
 global_theme_ref = None
+
+# Window dimensions for relative sizing (set in ui() function)
+window_width = None
+window_height = None
+
+# Battle logo texture
+battle_logo_texture = None
+battle_logo_width = 0
+battle_logo_height = 0
+
+# Agent logo texture
+agent_logo_texture = None
+agent_logo_width = 0
+agent_logo_height = 0
 
 
 def ui(tar_hwnd=None, overlay=None):
@@ -109,7 +128,7 @@ def ui(tar_hwnd=None, overlay=None):
     _cleanup_temp_files()
 
     # Store overlay reference for callbacks
-    global overlay_instance, font_arial_global, font_arialBold_global, global_theme_ref
+    global overlay_instance, font_segoeui_global, font_segoeuiBold_global, font_segoeuiBold_medium_global, font_segoeuiBold_large_global, global_theme_ref, window_width, window_height, battle_logo_texture, battle_logo_width, battle_logo_height, agent_logo_texture, agent_logo_width, agent_logo_height
     overlay_instance = overlay
 
     # Dont start drawing screen while window is minimised
@@ -126,14 +145,119 @@ def ui(tar_hwnd=None, overlay=None):
     font_is_loaded = True
     with dpg.font_registry():
         try:
-            font_arial = dpg.add_font("C:/Windows/Fonts/arial.ttf", 7 * FONT_SCALE)
-            font_arialBold = dpg.add_font("C:/Windows/Fonts/arialbd.ttf", 7 * FONT_SCALE)
+            # Load Segoe UI fonts with extended glyph ranges for Unicode support
+            # This fixes '?' characters from LLM output (smart quotes, em dashes, etc.)
+
+            # Regular font for body text (System Output, Chatbox)
+            font_segoeui = dpg.add_font("C:/Windows/Fonts/segoeui.ttf", 7 * FONT_SCALE)
+            # Add default ASCII range (0x0020-0x00FF)
+            dpg.add_font_range_hint(dpg.mvFontRangeHint_Default, parent=font_segoeui)
+            # Add General Punctuation block (U+2000-U+206F) for smart quotes, dashes
+            dpg.add_font_range(0x2000, 0x206F, parent=font_segoeui)
+            # Add Latin Extended-A (U+0100-U+017F) for accented characters
+            dpg.add_font_range(0x0100, 0x017F, parent=font_segoeui)
+
+            # Bold font for headers and emphasis
+            font_segoeuiBold = dpg.add_font("C:/Windows/Fonts/segoeuib.ttf", 7 * FONT_SCALE)
+            dpg.add_font_range_hint(dpg.mvFontRangeHint_Default, parent=font_segoeuiBold)
+            dpg.add_font_range(0x2000, 0x206F, parent=font_segoeuiBold)
+            dpg.add_font_range(0x0100, 0x017F, parent=font_segoeuiBold)
+
+            # Medium bold font for section titles
+            font_segoeuiBold_medium = dpg.add_font("C:/Windows/Fonts/segoeuib.ttf", 9 * FONT_SCALE)
+            dpg.add_font_range_hint(dpg.mvFontRangeHint_Default, parent=font_segoeuiBold_medium)
+            dpg.add_font_range(0x2000, 0x206F, parent=font_segoeuiBold_medium)
+            dpg.add_font_range(0x0100, 0x017F, parent=font_segoeuiBold_medium)
+
+            # Large bold font for Stats title
+            font_segoeuiBold_large = dpg.add_font("C:/Windows/Fonts/segoeuib.ttf", 10 * FONT_SCALE)
+            dpg.add_font_range_hint(dpg.mvFontRangeHint_Default, parent=font_segoeuiBold_large)
+            dpg.add_font_range(0x2000, 0x206F, parent=font_segoeuiBold_large)
+            dpg.add_font_range(0x0100, 0x017F, parent=font_segoeuiBold_large)
+
             # Store fonts globally for popup access
-            font_arial_global = font_arial
-            font_arialBold_global = font_arialBold
+            font_segoeui_global = font_segoeui
+            font_segoeuiBold_global = font_segoeuiBold
+            font_segoeuiBold_medium_global = font_segoeuiBold_medium
+            font_segoeuiBold_large_global = font_segoeuiBold_large
         except SystemError:
-            print("Could not find font... switching to default")
+            print("Could not find Segoe UI font... switching to default")
             font_is_loaded = False
+
+    # Load and register battle_logo texture
+    try:
+        # Get path to battle_logo.png in images directory
+        images_dir = os.path.join(os.path.dirname(__file__), "images")
+        battle_logo_path = os.path.join(images_dir, "battle_logo.png")
+
+        # Load image with PIL
+        logo_image = Image.open(battle_logo_path)
+
+        # Resize to fit stats panel width
+        target_width = int((window_width / 7) * 0.22) 
+        aspect_ratio = logo_image.height / logo_image.width
+        target_height = int(target_width * aspect_ratio)
+
+        # Resize image
+        logo_image = logo_image.resize((target_width, target_height), Image.LANCZOS)
+
+        # Convert to RGBA for proper transparency handling
+        if logo_image.mode != "RGBA":
+            logo_image = logo_image.convert("RGBA")
+
+        # Convert to numpy array and normalize to 0-1 range
+        # DPG expects RGBA format: [r, g, b, a, r, g, b, a, ...]
+        logo_array = np.frombuffer(logo_image.tobytes(), dtype=np.uint8).astype(np.float32) / 255.0
+
+        # Register texture with DPG
+        with dpg.texture_registry():
+            battle_logo_texture = dpg.add_static_texture(
+                width=target_width, height=target_height, default_value=logo_array.flatten().tolist()
+            )
+
+        battle_logo_width = target_width
+        battle_logo_height = target_height
+        print(f"Battle logo loaded: {target_width}x{target_height}")
+    except Exception as e:
+        print(f"Failed to load battle_logo.png: {e}")
+        battle_logo_texture = None
+
+    # Load and register agent_logo texture
+    try:
+        # Get path to agent_logo.png in images directory
+        images_dir = os.path.join(os.path.dirname(__file__), "images")
+        agent_logo_path = os.path.join(images_dir, "agent_logo.png")
+
+        # Load image with PIL
+        agent_image = Image.open(agent_logo_path)
+
+        # Resize to fit System Controls width 
+        target_width = int((window_width * 0.15) * 0.25)
+        aspect_ratio = agent_image.height / agent_image.width
+        target_height = int(target_width * aspect_ratio)
+
+        # Resize image
+        agent_image = agent_image.resize((target_width, target_height), Image.LANCZOS)
+
+        # Convert to RGBA for proper transparency handling
+        if agent_image.mode != "RGBA":
+            agent_image = agent_image.convert("RGBA")
+
+        # Convert to numpy array and normalize to 0-1 range
+        agent_array = np.frombuffer(agent_image.tobytes(), dtype=np.uint8).astype(np.float32) / 255.0
+
+        # Register texture with DPG
+        with dpg.texture_registry():
+            agent_logo_texture = dpg.add_static_texture(
+                width=target_width, height=target_height, default_value=agent_array.flatten().tolist()
+            )
+
+        agent_logo_width = target_width
+        agent_logo_height = target_height
+        print(f"Agent logo loaded: {target_width}x{target_height}")
+    except Exception as e:
+        print(f"Failed to load agent_logo.png: {e}")
+        agent_logo_texture = None
 
     # Main container window for buttons (resizable)
     with dpg.window(
@@ -142,14 +266,21 @@ def ui(tar_hwnd=None, overlay=None):
         no_move=False,
         no_resize=False,
         no_title_bar=True,
-        width=220,
-        height=280,
+        width=int(window_width * 0.15), 
+        height=int(window_height * 0.26),
         pos=(40, (window_height / 3)),
     ):
 
         if font_is_loaded:
-            dpg.bind_item_font(dpg.last_item(), font_arialBold)
-        dpg.add_text("System Controls", color=(200, 200, 200))
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold)
+
+        # System Controls title - centered and bold
+        controls_width = int(window_width * 0.15)
+        estimated_controls_width = 130  # "System Controls" with medium bold font
+        controls_indent = max(0, (controls_width - estimated_controls_width) // 2)
+        dpg.add_text("System Controls", color=(64, 224, 208), indent=controls_indent)
+        if font_is_loaded and font_segoeuiBold_medium_global:
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold_medium_global)
 
         # Child window inside for actual button content (makes it resizable)
         with dpg.child_window(tag="buttons_win", width=-1, auto_resize_y=True):
@@ -160,10 +291,46 @@ def ui(tar_hwnd=None, overlay=None):
             dpg.add_spacer(height=5)
             dpg.add_separator()
             dpg.add_spacer(height=5)
-            dpg.add_button(label="Launch ROI Studio", width=-1, callback=_launch_roi_studio_callback)
+            with dpg.group(tag="roi_studio_button"):
+                dpg.add_button(label="Launch ROI Studio", width=-1, callback=_launch_roi_studio_callback)
             dpg.add_button(label="Hide", tag="hide_button", width=-1, callback=_hide_callback)
             dpg.add_button(label="Exit System", width=-1, callback=_exit_callback)
-        dpg.add_loading_indicator(tag="loading_ind", show=False, width=50, indent=75)
+
+        # Add agent logo and loading indicator at bottom of panel in horizontal group
+        dpg.add_spacer(height=5)
+        if agent_logo_texture:
+            # Calculate dimensions
+            spacing_between = 8 
+            loading_size = 40  # Fixed size for loading indicator
+            total_group_width = agent_logo_width + spacing_between + loading_size
+
+            # Calculate indent to center the group contents
+            group_indent = max(0, (controls_width - total_group_width) // 2)
+
+            # Create horizontal group
+            with dpg.group(horizontal=True):
+                # Add spacer INSIDE group to push content to center
+                dpg.add_spacer(width=group_indent)
+
+                # Agent logo
+                dpg.add_image(agent_logo_texture)
+
+                # Spacing between elements
+                dpg.add_spacer(width=spacing_between)
+
+                # Loading indicator wrapped in vertical group for centering
+                # Calculate vertical offset to center loading indicator with logo
+                vertical_offset = max(0, (agent_logo_height - loading_size) // 2)
+                with dpg.group():
+                    # Add vertical spacer to push loading indicator down to match logo center
+                    if vertical_offset > 0:
+                        dpg.add_spacer(height=vertical_offset)
+                    # Loading indicator (larger than logo for better visibility)
+                    dpg.add_loading_indicator(tag="loading_ind", show=False, width=loading_size)
+        else:
+            # Fallback if logo doesn't load - center loading indicator with default size
+            loading_indent = max(0, (controls_width - 40) // 2)
+            dpg.add_loading_indicator(tag="loading_ind", show=False, width=40, indent=loading_indent)
 
     with dpg.window(
         tag="chat_win",
@@ -171,45 +338,55 @@ def ui(tar_hwnd=None, overlay=None):
         no_move=False,
         no_resize=False,
         no_title_bar=True,
-        width=500,
-        height=window_height / 2 - 20,
-        pos=((window_width / 4), (window_height - 20 - window_height / 2)),
+        width=int(window_width * 0.21),
+        height=int(window_height * 0.65) - 20, 
+        pos=((window_width / 4), (window_height - 20 - int(window_height * 0.65))),
     ):
 
         if font_is_loaded:
-            dpg.bind_item_font(dpg.last_item(), font_arialBold)
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold)
 
-        # System Output section title
-        dpg.add_separator(label="System Output")
-        dpg.add_spacer(height=5)
+        # System Output section title - centered and bold
+        chat_width = int(window_width * 0.21)
+        estimated_output_width = 120  # "System Output" with medium bold font
+        output_indent = max(0, (chat_width - estimated_output_width) // 2)
+        dpg.add_text("System Output", color=(64, 224, 208), indent=output_indent)
+        if font_is_loaded and font_segoeuiBold_medium_global:
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold_medium_global)
 
-        # Calculate initial child window sizes (50/50 split)
-        parent_initial_height = window_height / 2 - 20
-        available_initial_height = parent_initial_height - 150  # Reserve for UI elements
+        # Calculate initial child window sizes (50/50 split) 
+        parent_initial_height = int(window_height * 0.65) - 20
+        available_initial_height = parent_initial_height - int(window_height * 0.14) 
         output_initial_height = int(available_initial_height * 0.50)
         chat_initial_height = int(available_initial_height * 0.50)
-        initial_wrap_width = 460
+        initial_wrap_width = int(window_width * 0.18) 
 
         # Strategy output section
         with dpg.child_window(tag="outputWindow", width=-1, height=output_initial_height, border=True):
             dpg.add_text("", tag="outputText", wrap=initial_wrap_width)
             if font_is_loaded:
-                dpg.bind_item_font(dpg.last_item(), font_arial)
+                dpg.bind_item_font(dpg.last_item(), font_segoeui)
 
         # Chat conversation section
         dpg.add_spacer(height=5)
-        dpg.add_separator(label="Chatbox")
-        dpg.add_spacer(height=5)
+        # Chatbox title - centered and bold
+        estimated_chatbox_width = 70  # "Chatbox" with medium bold font
+        chatbox_indent = max(0, (chat_width - estimated_chatbox_width) // 2)
+        dpg.add_text("Chatbox", color=(64, 224, 208), indent=chatbox_indent)
+        if font_is_loaded and font_segoeuiBold_medium_global:
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold_medium_global)
         with dpg.child_window(tag="chatWindow", width=-1, height=chat_initial_height, border=True):
             dpg.add_text("", tag="chatLog", wrap=initial_wrap_width)
             if font_is_loaded:
-                dpg.bind_item_font(dpg.last_item(), font_arial)
+                dpg.bind_item_font(dpg.last_item(), font_segoeui)
 
         # User input area
         dpg.add_spacer(height=5)
         with dpg.group(horizontal=True):
-            dpg.add_input_text(tag="chatInput", width=360, hint="Type here to discuss strategy with agent...")
-            dpg.add_button(label="Send", width=80, callback=_send_message)
+            dpg.add_input_text(
+                tag="chatInput", width=int(window_width * 0.14), hint="Type here to discuss strategy with agent..."
+            )  
+            dpg.add_button(label="Send", width=int(window_width * 0.056), callback=_send_message) 
 
     with dpg.theme() as global_theme:
         with dpg.theme_component(dpg.mvAll):
@@ -231,39 +408,69 @@ def ui(tar_hwnd=None, overlay=None):
     dpg.bind_item_theme("buttons_container", global_theme)
     dpg.bind_item_theme("chat_win", global_theme)
 
-    # Stats window
+    # Stats window 
+    stats_window_height = int(window_height * 0.60) 
+    stats_y_pos = int(window_height * 0.25) 
     with dpg.window(
         tag="stats_window",
         no_background=False,
         no_move=False,
         no_resize=False,
         no_title_bar=True,
-        width=(window_width / 7),
-        height=635,
-        pos=((window_width * 2 / 3), (window_height / 4)),
+        width=int(window_width / 7),  
+        height=stats_window_height,
+        pos=((window_width * 2 / 3), stats_y_pos),
     ):
         if font_is_loaded:
-            dpg.bind_item_font(dpg.last_item(), font_arialBold)
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold)
 
-        dpg.add_text("Stats")
-        dpg.add_text("Total Phases: ", indent=10, tag="Total_phases")
+        # Stats title - centered, larger, and bold
+        stats_title_width = int(window_width / 7)
+        estimated_text_width = 60  
+        title_indent = max(0, (stats_title_width - estimated_text_width) // 2)
+        dpg.add_text("Stats", color=(64, 224, 208), indent=title_indent)
+        if font_is_loaded and font_segoeuiBold_large_global:
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold_large_global)
+        dpg.add_separator()
+
+        # Total Phases - centered and bold
+        estimated_phases_width = 85  
+        phases_indent = max(0, (stats_title_width - estimated_phases_width) // 2)
+        dpg.add_text("Total Phases: ", indent=phases_indent, tag="Total_phases")
         if font_is_loaded:
-            dpg.bind_item_font(dpg.last_item(), font_arial)
-        dpg.bind_item_theme(dpg.last_item(), mini_theme)
-        dpg.add_text("Total Actions: ", indent=10, tag="Total_actions")
-        if font_is_loaded:
-            dpg.bind_item_font(dpg.last_item(), font_arial)
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold)  
         dpg.bind_item_theme(dpg.last_item(), mini_theme)
 
-        dpg.add_separator(label="Phase 1")
-        with dpg.child_window(height=155):
+        # Total Actions - centered and bold
+        estimated_actions_width = 95  
+        actions_indent = max(0, (stats_title_width - estimated_actions_width) // 2)
+        dpg.add_text("Total Actions: ", indent=actions_indent, tag="Total_actions")
+        if font_is_loaded:
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold)  # Bold instead of regular
+        dpg.bind_item_theme(dpg.last_item(), mini_theme)
+        dpg.add_separator()  
+
+        # Phase 1 title - centered and bold
+        estimated_phase_width = 65  
+        phase_indent = max(0, (stats_title_width - estimated_phase_width) // 2)
+        dpg.add_text("Phase 1", color=(64, 224, 208), indent=phase_indent)
+        if font_is_loaded and font_segoeuiBold_medium_global:
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold_medium_global)
+        with dpg.child_window(height=int(window_height * 0.12)): 
             if font_is_loaded:
-                dpg.bind_item_font(dpg.last_item(), font_arial)
-            with dpg.table(header_row=True, row_background=True, borders_innerV=True):
+                dpg.bind_item_font(dpg.last_item(), font_segoeui)
+            with dpg.table(header_row=False, row_background=True, borders_innerV=True):
                 dpg.add_table_column(width_fixed=True, width=100)
-                dpg.add_table_column(label="Blue")
-                dpg.add_table_column(label="Red")
-                dpg.add_table_column(label="Difference")
+                dpg.add_table_column()
+                dpg.add_table_column()
+                dpg.add_table_column()
+
+                # Custom colored header row
+                with dpg.table_row():
+                    dpg.add_text("")
+                    dpg.add_text("Blue", color=(100, 149, 237))
+                    dpg.add_text("Red", color=(220, 80, 80))
+                    dpg.add_text("Difference", color=(200, 200, 200))
 
                 with dpg.table_row():
                     dpg.add_text("Units Remaining")
@@ -289,15 +496,25 @@ def ui(tar_hwnd=None, overlay=None):
                     dpg.add_text("")
                     dpg.add_text("")
 
-        dpg.add_separator(label="Phase 2")
-        with dpg.child_window(height=155):
+        # Phase 2 title - centered and bold
+        dpg.add_text("Phase 2", color=(64, 224, 208), indent=phase_indent)
+        if font_is_loaded and font_segoeuiBold_medium_global:
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold_medium_global)
+        with dpg.child_window(height=int(window_height * 0.12)): 
             if font_is_loaded:
-                dpg.bind_item_font(dpg.last_item(), font_arial)
-            with dpg.table(header_row=True, row_background=True, borders_innerV=True):
+                dpg.bind_item_font(dpg.last_item(), font_segoeui)
+            with dpg.table(header_row=False, row_background=True, borders_innerV=True):
                 dpg.add_table_column(width_fixed=True, width=100)
-                dpg.add_table_column(label="Blue")
-                dpg.add_table_column(label="Red")
-                dpg.add_table_column(label="Difference")
+                dpg.add_table_column()
+                dpg.add_table_column()
+                dpg.add_table_column()
+
+                # Custom colored header row
+                with dpg.table_row():
+                    dpg.add_text("")
+                    dpg.add_text("Blue", color=(100, 149, 237))
+                    dpg.add_text("Red", color=(220, 80, 80))
+                    dpg.add_text("Difference", color=(200, 200, 200))
 
                 with dpg.table_row():
                     dpg.add_text("Units Remaining")
@@ -323,15 +540,25 @@ def ui(tar_hwnd=None, overlay=None):
                     dpg.add_text("")
                     dpg.add_text("")
 
-        dpg.add_separator(label="Phase 3")
-        with dpg.child_window(height=155):
+        # Phase 3 title - centered and bold
+        dpg.add_text("Phase 3", color=(64, 224, 208), indent=phase_indent)
+        if font_is_loaded and font_segoeuiBold_medium_global:
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold_medium_global)
+        with dpg.child_window(height=int(window_height * 0.12)):  
             if font_is_loaded:
-                dpg.bind_item_font(dpg.last_item(), font_arial)
-            with dpg.table(header_row=True, row_background=True, borders_innerV=True):
+                dpg.bind_item_font(dpg.last_item(), font_segoeui)
+            with dpg.table(header_row=False, row_background=True, borders_innerV=True):
                 dpg.add_table_column(width_fixed=True, width=100)
-                dpg.add_table_column(label="Blue")
-                dpg.add_table_column(label="Red")
-                dpg.add_table_column(label="Difference")
+                dpg.add_table_column()
+                dpg.add_table_column()
+                dpg.add_table_column()
+
+                # Custom colored header row
+                with dpg.table_row():
+                    dpg.add_text("")
+                    dpg.add_text("Blue", color=(100, 149, 237))
+                    dpg.add_text("Red", color=(220, 80, 80))
+                    dpg.add_text("Difference", color=(200, 200, 200))
 
                 with dpg.table_row():
                     dpg.add_text("Units Remaining")
@@ -357,7 +584,12 @@ def ui(tar_hwnd=None, overlay=None):
                     dpg.add_text("")
                     dpg.add_text("")
 
-        dpg.child_window()
+        # Add battle logo at bottom of stats panel if loaded
+        if battle_logo_texture:
+            dpg.add_spacer(height=10)
+            # Center the logo horizontally
+            logo_indent = max(0, (stats_title_width - battle_logo_width) // 2)
+            dpg.add_image(battle_logo_texture, indent=logo_indent)
 
     dpg.bind_item_theme("stats_window", global_theme)
 
@@ -464,7 +696,20 @@ def _stopButton_callback(sender, app_data, user_data):
 def _launch_roi_studio_callback(sender, app_data, user_data):
     """Launches the ROI Studio application
 
-    Called on \"Launch ROI Studio\" button press"""
+    Called on "Launch ROI Studio" button press
+    Checks if already running and disables button while active"""
+    global current_roi_studio_subprocess
+
+    # Check if ROI Studio is already running
+    if current_roi_studio_subprocess is not None:
+        if current_roi_studio_subprocess.poll() is None:
+            # Still running - do nothing
+            print("ROI Studio is already running")
+            return
+        else:
+            # Process finished - clean up reference
+            current_roi_studio_subprocess = None
+
     try:
         print("Launching ROI Studio...")
         # Get the project root directory
@@ -472,10 +717,47 @@ def _launch_roi_studio_callback(sender, app_data, user_data):
         roi_studio_path = os.path.join(project_root, "screen_reading", "LIVE_ROI_STUDIO.py")
 
         # Launch ROI Studio as a separate process
-        subprocess.Popen([sys.executable, roi_studio_path], cwd=project_root)
-        print(f"ROI Studio launched from: {roi_studio_path}")
+        current_roi_studio_subprocess = subprocess.Popen([sys.executable, roi_studio_path], cwd=project_root)
+        print(f"ROI Studio launched from: {roi_studio_path} (PID: {current_roi_studio_subprocess.pid})")
+
+        # Disable the button while ROI Studio is running 
+        dpg.disable_item("roi_studio_button")
+
+        # Start monitoring thread to re-enable button when process exits
+        threading.Thread(target=_monitor_roi_studio, daemon=True).start()
+
     except Exception as e:
         print(f"Failed to launch ROI Studio: {e}")
+        current_roi_studio_subprocess = None
+
+
+def _monitor_roi_studio():
+    """Background thread to monitor ROI Studio process
+
+    Re-enables button when ROI Studio exits"""
+    global current_roi_studio_subprocess
+
+    if current_roi_studio_subprocess is None:
+        return
+
+    try:
+        # Wait for process to finish (blocks in background thread)
+        current_roi_studio_subprocess.wait()
+        print(f"ROI Studio exited with code: {current_roi_studio_subprocess.returncode}")
+    except Exception as e:
+        print(f"Error monitoring ROI Studio: {e}")
+    finally:
+        # Process finished - re-enable button
+        current_roi_studio_subprocess = None
+
+        # Thread-safe UI update
+        try:
+            if dpg.is_dearpygui_running() and dpg.does_item_exist("roi_studio_button"):
+                dpg.split_frame()  # Sync with DPG render thread
+                dpg.enable_item("roi_studio_button")
+                print("ROI Studio button enabled - ready to launch again")
+        except Exception as e:
+            print(f"Error enabling ROI Studio button: {e}")
 
 
 def _hide_callback(sender, app_data, user_data):
@@ -494,7 +776,7 @@ def _hide_callback(sender, app_data, user_data):
 
 def _exit_callback(sender, app_data, user_data):
     """Exit System button - shuts down everything and exits"""
-    global overlay_instance, running, current_subprocess, current_agent_subprocess
+    global overlay_instance, running, current_subprocess, current_agent_subprocess, current_roi_studio_subprocess
     print("EXIT SYSTEM BUTTON PRESSED")
 
     running = False  # Stop all loops
@@ -524,6 +806,14 @@ def _exit_callback(sender, app_data, user_data):
             if current_agent_subprocess.poll() is None:
                 print(f"Terminating agent subprocess PID: {current_agent_subprocess.pid}")
                 terminate_process_tree_aggressive(current_agent_subprocess.pid)
+        except:
+            pass
+
+    if current_roi_studio_subprocess:
+        try:
+            if current_roi_studio_subprocess.poll() is None:
+                print(f"Terminating ROI Studio subprocess PID: {current_roi_studio_subprocess.pid}")
+                terminate_process_tree_aggressive(current_roi_studio_subprocess.pid)
         except:
             pass
 
@@ -623,6 +913,7 @@ def _process_chat_message(user_question):
 
 def _update_chat_window_sizes():
     # Background thread for dynamic window resizing
+    global window_width, window_height
     while True:
         try:
             if not dpg.does_item_exist("chat_win"):
@@ -632,8 +923,9 @@ def _update_chat_window_sizes():
             parent_width = dpg.get_item_width("chat_win")
             parent_height = dpg.get_item_height("chat_win")
 
-            # Reserve space for UI elements (150px)
-            available_height = parent_height - 150
+            # Reserve space for UI elements
+            reserve_height = int(window_height * 0.14) if window_height else 150
+            available_height = parent_height - reserve_height
             if available_height < 150:
                 available_height = 150
 
@@ -646,8 +938,9 @@ def _update_chat_window_sizes():
             if wrap_width < 200:
                 wrap_width = 200
 
-            # Calculate input width (Send button stays fixed at 80px)
-            input_width = int(parent_width - 130)
+            # Calculate input width 
+            send_button_width = int(window_width * 0.056) if window_width else 80
+            input_width = int(parent_width - send_button_width - 50)  
             if input_width < 200:
                 input_width = 200
 
@@ -708,8 +1001,8 @@ def _show_save_state_popup():
             "Click 'Retry' after saving, or 'Skip' to proceed without."
         )
         # Apply font to text if available
-        if font_arial_global:
-            dpg.bind_item_font(dpg.last_item(), font_arial_global)
+        if font_segoeui_global:
+            dpg.bind_item_font(dpg.last_item(), font_segoeui_global)
 
         dpg.add_separator()
 
@@ -728,8 +1021,8 @@ def _show_save_state_popup():
     # Apply global theme and font to popup window
     if global_theme_ref:
         dpg.bind_item_theme("save_state_popup", global_theme_ref)
-    if font_arial_global:
-        dpg.bind_item_font("save_state_popup", font_arial_global)
+    if font_segoeui_global:
+        dpg.bind_item_font("save_state_popup", font_segoeui_global)
 
 
 def _on_retry_button_clicked():
@@ -788,15 +1081,15 @@ def _show_phase_selection_popup():
             "(This helps determine which phases need OCR processing)\n"
         )
         # Apply font to descriptive text
-        if font_arial_global:
-            dpg.bind_item_font(dpg.last_item(), font_arial_global)
+        if font_segoeui_global:
+            dpg.bind_item_font(dpg.last_item(), font_segoeui_global)
 
         dpg.add_separator()
 
         dpg.add_text("\nWhat is the next phase with NO action cards?", color=(255, 200, 100))
         # Apply font to highlighted question text
-        if font_arial_global:
-            dpg.bind_item_font(dpg.last_item(), font_arial_global)
+        if font_segoeui_global:
+            dpg.bind_item_font(dpg.last_item(), font_segoeui_global)
 
         with dpg.group(horizontal=True):
             dpg.add_button(
@@ -826,8 +1119,8 @@ def _show_phase_selection_popup():
     # Apply global theme and font to popup window (includes title bar and buttons)
     if global_theme_ref:
         dpg.bind_item_theme("phase_selection_popup", global_theme_ref)
-    if font_arial_global:
-        dpg.bind_item_font("phase_selection_popup", font_arial_global)
+    if font_segoeui_global:
+        dpg.bind_item_font("phase_selection_popup", font_segoeui_global)
 
 
 def _on_phase_selected(phase_num: int):
@@ -1038,6 +1331,36 @@ def _run_agent_strategy():
     _change_ui_state(False)
 
 
+def _get_difference_color(value, metric_type):
+    # Define team colours (matching column header colours)
+    BLUE_COLOUR = (100, 149, 237)
+    RED_COLOUR = (220, 80, 80)
+    WHITE_COLOUR = (255, 255, 255)
+
+    # Neutral case - zero difference
+    if value == 0:
+        return WHITE_COLOUR
+
+    # Actions - no colour coding
+    if metric_type == "actions":
+        return WHITE_COLOUR
+
+    # Units Lost - INVERSE logic (highlight winner who lost less)
+    # Positive = red lost more (blue advantage) → blue colour
+    # Negative = blue lost more (red advantage) → red colour
+    if metric_type == "units_lost":
+        return BLUE_COLOUR if value > 0 else RED_COLOUR
+
+    # Units Remaining & Bases Controlled - standard logic
+    # Positive = blue has more → blue colour
+    # Negative = red has more → red colour
+    if metric_type in ["units_remaining", "bases_controlled"]:
+        return BLUE_COLOUR if value > 0 else RED_COLOUR
+
+    # Default fallback
+    return WHITE_COLOUR
+
+
 def _display_stats():
     """Update stats panel with latest game statistics.
 
@@ -1063,42 +1386,87 @@ def _display_stats():
             phase_stats = the_stats[2]
             _safe_dpg_call(dpg.set_value, "P1_Blue_units", phase_stats[0][0])
             _safe_dpg_call(dpg.set_value, "P1_Red_units", phase_stats[1][0])
-            _safe_dpg_call(dpg.set_value, "P1_Diff_units", phase_stats[2][0])
+            # Units Remaining difference with colour coding
+            diff_units = phase_stats[2][0]
+            _safe_dpg_call(dpg.set_value, "P1_Diff_units", abs(diff_units))
+            _safe_dpg_call(
+                dpg.configure_item, "P1_Diff_units", color=_get_difference_color(diff_units, "units_remaining")
+            )
+
             _safe_dpg_call(dpg.set_value, "P1_Blue_lost", phase_stats[0][1])
             _safe_dpg_call(dpg.set_value, "P1_Red_lost", phase_stats[1][1])
-            _safe_dpg_call(dpg.set_value, "P1_Diff_lost", phase_stats[2][1])
+            # Units Lost difference with colour coding
+            diff_lost = phase_stats[2][1]
+            _safe_dpg_call(dpg.set_value, "P1_Diff_lost", abs(diff_lost))
+            _safe_dpg_call(dpg.configure_item, "P1_Diff_lost", color=_get_difference_color(diff_lost, "units_lost"))
+
             _safe_dpg_call(dpg.set_value, "P1_Blue_actions", phase_stats[0][2])
             _safe_dpg_call(dpg.set_value, "P1_Blue_bases", phase_stats[0][3])
             _safe_dpg_call(dpg.set_value, "P1_Red_bases", phase_stats[1][3])
-            _safe_dpg_call(dpg.set_value, "P1_Diff_bases", phase_stats[2][3])
+            # Bases Controlled difference with colour coding
+            diff_bases = phase_stats[2][3]
+            _safe_dpg_call(dpg.set_value, "P1_Diff_bases", abs(diff_bases))
+            _safe_dpg_call(
+                dpg.configure_item, "P1_Diff_bases", color=_get_difference_color(diff_bases, "bases_controlled")
+            )
 
         # Update Phase 2 if exists
         if total_phases >= 2 and len(the_stats) > 3:
             phase_stats = the_stats[3]
             _safe_dpg_call(dpg.set_value, "P2_Blue_units", phase_stats[0][0])
             _safe_dpg_call(dpg.set_value, "P2_Red_units", phase_stats[1][0])
-            _safe_dpg_call(dpg.set_value, "P2_Diff_units", phase_stats[2][0])
+            # Units Remaining difference with colour coding
+            diff_units = phase_stats[2][0]
+            _safe_dpg_call(dpg.set_value, "P2_Diff_units", abs(diff_units))
+            _safe_dpg_call(
+                dpg.configure_item, "P2_Diff_units", color=_get_difference_color(diff_units, "units_remaining")
+            )
+
             _safe_dpg_call(dpg.set_value, "P2_Blue_lost", phase_stats[0][1])
             _safe_dpg_call(dpg.set_value, "P2_Red_lost", phase_stats[1][1])
-            _safe_dpg_call(dpg.set_value, "P2_Diff_lost", phase_stats[2][1])
+            # Units Lost difference with colour coding
+            diff_lost = phase_stats[2][1]
+            _safe_dpg_call(dpg.set_value, "P2_Diff_lost", abs(diff_lost))
+            _safe_dpg_call(dpg.configure_item, "P2_Diff_lost", color=_get_difference_color(diff_lost, "units_lost"))
+
             _safe_dpg_call(dpg.set_value, "P2_Blue_actions", phase_stats[0][2])
             _safe_dpg_call(dpg.set_value, "P2_Blue_bases", phase_stats[0][3])
             _safe_dpg_call(dpg.set_value, "P2_Red_bases", phase_stats[1][3])
-            _safe_dpg_call(dpg.set_value, "P2_Diff_bases", phase_stats[2][3])
+            # Bases Controlled difference with colour coding
+            diff_bases = phase_stats[2][3]
+            _safe_dpg_call(dpg.set_value, "P2_Diff_bases", abs(diff_bases))
+            _safe_dpg_call(
+                dpg.configure_item, "P2_Diff_bases", color=_get_difference_color(diff_bases, "bases_controlled")
+            )
 
         # Update Phase 3 if exists
         if total_phases >= 3 and len(the_stats) > 4:
             phase_stats = the_stats[4]
             _safe_dpg_call(dpg.set_value, "P3_Blue_units", phase_stats[0][0])
             _safe_dpg_call(dpg.set_value, "P3_Red_units", phase_stats[1][0])
-            _safe_dpg_call(dpg.set_value, "P3_Diff_units", phase_stats[2][0])
+            # Units Remaining difference with colour coding
+            diff_units = phase_stats[2][0]
+            _safe_dpg_call(dpg.set_value, "P3_Diff_units", abs(diff_units))
+            _safe_dpg_call(
+                dpg.configure_item, "P3_Diff_units", color=_get_difference_color(diff_units, "units_remaining")
+            )
+
             _safe_dpg_call(dpg.set_value, "P3_Blue_lost", phase_stats[0][1])
             _safe_dpg_call(dpg.set_value, "P3_Red_lost", phase_stats[1][1])
-            _safe_dpg_call(dpg.set_value, "P3_Diff_lost", phase_stats[2][1])
+            # Units Lost difference with colour coding
+            diff_lost = phase_stats[2][1]
+            _safe_dpg_call(dpg.set_value, "P3_Diff_lost", abs(diff_lost))
+            _safe_dpg_call(dpg.configure_item, "P3_Diff_lost", color=_get_difference_color(diff_lost, "units_lost"))
+
             _safe_dpg_call(dpg.set_value, "P3_Blue_actions", phase_stats[0][2])
             _safe_dpg_call(dpg.set_value, "P3_Blue_bases", phase_stats[0][3])
             _safe_dpg_call(dpg.set_value, "P3_Red_bases", phase_stats[1][3])
-            _safe_dpg_call(dpg.set_value, "P3_Diff_bases", phase_stats[2][3])
+            # Bases Controlled difference with colour coding
+            diff_bases = phase_stats[2][3]
+            _safe_dpg_call(dpg.set_value, "P3_Diff_bases", abs(diff_bases))
+            _safe_dpg_call(
+                dpg.configure_item, "P3_Diff_bases", color=_get_difference_color(diff_bases, "bases_controlled")
+            )
 
         print("Stats panel updated successfully")
 

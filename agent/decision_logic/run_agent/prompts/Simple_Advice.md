@@ -77,7 +77,7 @@ Return exactly this schema:
 
 &nbsp; "mode": "simple",
 
-&nbsp; "meta": {"ler\_favour": "Red|Blue|Neutral", "ler": ...},
+&nbsp; "meta": {"ler\_favour": "Red|Blue|Neutral", "ler": {"blue": 1.24, "red": 1.0}},
 
 &nbsp; "summary": "Line1\\nLine2\\nLine3",
 
@@ -112,6 +112,8 @@ Return exactly this schema:
 }
 
 Populate meta.ler\_favour from the input.
+
+Copy meta.ler dict from the input (contains blue/red ratio values).
 
 No extra keys. No markdown outside JSON.
 
