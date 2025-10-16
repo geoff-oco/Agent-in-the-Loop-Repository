@@ -3,6 +3,7 @@ from typing import List, Tuple, Optional, Dict
 from PIL import Image
 import time
 import logging
+import threading
 
 from core.models import ROIMeta, OCRResult, ProcessingMethod
 from core.validators import get_text_validator
@@ -37,6 +38,7 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
         self.tesseract_engine = get_tesseract_engine()  # Add Tesseract support
         self.engine_selector = get_engine_selector()  # Add engine selection
         self.validator = get_text_validator()
+        self._ocr_lock = threading.Lock()  # Thread safety for OCR engine calls
 
     def _get_filters(  # Extract whitelist/blacklist settings from ROI metadata
         self, roi_meta: ROIMeta, accepted_chars: Optional[str]
@@ -61,21 +63,33 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
         early_exit_enabled: bool = False,
         roi_meta: Optional[object] = None,
     ) -> Tuple[str, float, float]:  # Run OCR with the specified engine
-        if engine_type == EngineType.PADDLE_GPU:
-            return engine_instance.recognise_text(
-                image, whitelist, blacklist, prefer_gpu=True, early_exit_enabled=early_exit_enabled, roi_meta=roi_meta
-            )
-        elif engine_type == EngineType.PADDLE_CPU:
-            return engine_instance.recognise_text(
-                image, whitelist, blacklist, prefer_gpu=False, early_exit_enabled=early_exit_enabled, roi_meta=roi_meta
-            )
-        elif engine_type == EngineType.TESSERACT:
-            return engine_instance.recognise_text(
-                image, whitelist, blacklist, early_exit_enabled=early_exit_enabled, roi_meta=roi_meta
-            )
-        else:
-            # Default to PaddleOCR
-            return self.paddle_engine.recognise_text(image, whitelist, blacklist)
+        # Thread-safe OCR engine calls
+        with self._ocr_lock:
+            if engine_type == EngineType.PADDLE_GPU:
+                return engine_instance.recognise_text(
+                    image,
+                    whitelist,
+                    blacklist,
+                    prefer_gpu=True,
+                    early_exit_enabled=early_exit_enabled,
+                    roi_meta=roi_meta,
+                )
+            elif engine_type == EngineType.PADDLE_CPU:
+                return engine_instance.recognise_text(
+                    image,
+                    whitelist,
+                    blacklist,
+                    prefer_gpu=False,
+                    early_exit_enabled=early_exit_enabled,
+                    roi_meta=roi_meta,
+                )
+            elif engine_type == EngineType.TESSERACT:
+                return engine_instance.recognise_text(
+                    image, whitelist, blacklist, early_exit_enabled=early_exit_enabled, roi_meta=roi_meta
+                )
+            else:
+                # Default to PaddleOCR
+                return self.paddle_engine.recognise_text(image, whitelist, blacklist)
 
     def _process_candidate_with_engine(
         self,
@@ -248,9 +262,10 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
             if not self.tesseract_engine.available:
                 return "Tesseract (unavailable)", "", 0.0, 1.0
 
-            text, confidence, scale_used = self.tesseract_engine.recognise_text(
-                processed_img, whitelist, blacklist, early_exit_enabled=early_exit_enabled, roi_meta=roi_meta
-            )
+            with self._ocr_lock:
+                text, confidence, scale_used = self.tesseract_engine.recognise_text(
+                    processed_img, whitelist, blacklist, early_exit_enabled=early_exit_enabled, roi_meta=roi_meta
+                )
             return "Tesseract", text, confidence, scale_used
 
         elif engine_preference.lower() in ["paddle", "paddleocr", "auto"]:
@@ -261,14 +276,15 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
             prefer_gpu = self.paddle_engine.gpu_available
             engine_name = "PaddleOCR (GPU)" if prefer_gpu else "PaddleOCR (CPU)"
 
-            text, confidence, scale_used = self.paddle_engine.recognise_text(
-                processed_img,
-                whitelist,
-                blacklist,
-                prefer_gpu=prefer_gpu,
-                early_exit_enabled=early_exit_enabled,
-                roi_meta=roi_meta,
-            )
+            with self._ocr_lock:
+                text, confidence, scale_used = self.paddle_engine.recognise_text(
+                    processed_img,
+                    whitelist,
+                    blacklist,
+                    prefer_gpu=prefer_gpu,
+                    early_exit_enabled=early_exit_enabled,
+                    roi_meta=roi_meta,
+                )
             return engine_name, text, confidence, scale_used
 
         else:
@@ -276,9 +292,10 @@ class OCRProcessor:  # Coordinates image preprocessing and OCR recognition with 
             if self.paddle_engine.available:
                 prefer_gpu = self.paddle_engine.gpu_available
                 engine_name = f"PaddleOCR (GPU fallback)" if prefer_gpu else "PaddleOCR (CPU fallback)"
-                text, confidence, scale_used = self.paddle_engine.recognise_text(
-                    processed_img, whitelist, blacklist, prefer_gpu=prefer_gpu
-                )
+                with self._ocr_lock:
+                    text, confidence, scale_used = self.paddle_engine.recognise_text(
+                        processed_img, whitelist, blacklist, prefer_gpu=prefer_gpu
+                    )
                 return engine_name, text, confidence, scale_used
 
             return f"Unknown engine ({engine_preference})", "", 0.0, 1.0

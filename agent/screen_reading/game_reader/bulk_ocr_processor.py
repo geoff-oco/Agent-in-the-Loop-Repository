@@ -13,6 +13,42 @@ class BulkOCRProcessor:
         self.completed_tasks = 0  # Track completed tasks across all processing
         self.total_tasks = 0  # Will be set when processing starts
 
+    def _select_best_with_confidence_weighting(self, results_with_confidence: list) -> str:
+        # Select best OCR result using confidence-weighted voting
+        # Input: [(value, confidence), ...] from multiple frames
+        # Returns: The value with highest total confidence across all frames
+        if not results_with_confidence:
+            return "0"
+
+        # Group results by value and collect confidences
+        value_scores = {}
+        for value, confidence in results_with_confidence:
+            if value not in value_scores:
+                value_scores[value] = []
+            value_scores[value].append(confidence)
+
+        # Calculate total confidence for each unique value
+        weighted_scores = {value: sum(confidences) for value, confidences in value_scores.items()}
+
+        # Safety check: if no valid scores, return default
+        if not weighted_scores:
+            logging.warning("[BulkOCR] No valid confidence scores for Red2 final selection")
+            return "0"
+
+        # Select value with highest total confidence
+        best_value = max(weighted_scores, key=weighted_scores.get)
+
+        # Log the selection process
+        print(f"  Confidence weighting breakdown:")
+        for value, confidences in sorted(value_scores.items()):
+            total_conf = sum(confidences)
+            count = len(confidences)
+            avg_conf = total_conf / count if count > 0 else 0
+            print(f"    Value {value}: appears {count}x, total confidence={total_conf:.1f}, avg={avg_conf:.1f}%")
+        print(f"  > Selected: {best_value} (highest total confidence)")
+
+        return str(best_value)
+
     def process_bulk_captures(
         self,
         captured_screenshots: Dict[int, Image.Image],
@@ -107,9 +143,9 @@ class BulkOCRProcessor:
         return results
 
     def process_red2_final_screenshots(self, screenshots: list, red2_final_roi) -> Optional[str]:
-        # Process 5 screenshots for red2 final count with animation averaging
+        # Process 5 screenshots for red2 final count with confidence-weighted selection
         # Red2 final is SINGLE NUMBER (total unit count), not L/H/R breakdown
-        # Return: Averaged OCR text result as string (e.g. "15") or None
+        # Return: Confidence-weighted OCR text result as string (e.g. "15") or None
 
         if not screenshots or len(screenshots) == 0:
             logging.warning("[BulkOCR] No Red2 final screenshots to process")
@@ -121,8 +157,8 @@ class BulkOCRProcessor:
 
         print(f"\n=== Processing Red2 Final Count ({len(screenshots)} frames) ===")
 
-        # Process each screenshot's red2 ROI and collect valid results
-        ocr_results = []
+        # Process each screenshot's red2 ROI and collect valid results WITH confidence
+        results_with_confidence = []
 
         for i, screenshot in enumerate(screenshots):
             try:
@@ -145,13 +181,14 @@ class BulkOCRProcessor:
                 )
 
                 if results:
-                    # Get best result
+                    # Get best result (highest confidence from this frame)
                     method_name, _, text, confidence, rule_passed, rule_message = results[0]
 
                     # Only use valid digit results
                     if text.strip() and text.strip().isdigit():
                         value = int(text.strip())
-                        ocr_results.append(value)
+                        # Store both value AND confidence for weighted selection
+                        results_with_confidence.append((value, confidence))
                         print(f"  Frame {i+1}: '{text}' ({confidence:.1f}%, {method_name})")
                     else:
                         print(f"  Frame {i+1}: Invalid text '{text}'")
@@ -170,11 +207,10 @@ class BulkOCRProcessor:
             except Exception as e:
                 logging.error(f"[BulkOCR] Red2 final frame {i+1} OCR failed: {e}")
 
-        # Calculate average
-        if ocr_results:
-            average = sum(ocr_results) / len(ocr_results)
-            result_str = str(int(average))
-            print(f"Red2 Final Average: {ocr_results} -> {result_str}")
+        # Select best result using confidence-weighted voting
+        if results_with_confidence:
+            result_str = self._select_best_with_confidence_weighting(results_with_confidence)
+            print(f"Red2 Final Result: {result_str}")
             return result_str
         else:
             logging.warning("[BulkOCR] No valid Red2 final OCR results")
