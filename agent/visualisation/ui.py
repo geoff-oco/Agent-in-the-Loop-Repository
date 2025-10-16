@@ -395,6 +395,10 @@ def _generation_callback(sender, app_data, user_data):
 
     print("Generate Strategy button pressed")
 
+    # Clear chatbox and stats panel for fresh run
+    dpg.set_value("chatLog", "")
+    _clear_stats_panel()
+
     # Set UI to running state
     running = True
     _change_ui_state(True)
@@ -1119,6 +1123,58 @@ def _safe_dpg_call(func, *args, **kwargs):
     except Exception as e:
         print(f"Error in thread-safe DPG call: {e}")
         return None
+
+
+# Clear stats panel values for new strategy generation
+def _clear_stats_panel():
+    # Clear summary stats
+    dpg.set_value("Total_phases", "Total Phases: ")
+    dpg.set_value("Total_actions", "Total Actions: ")
+
+    # Clear Phase 1 stats
+    for tag in [
+        "P1_Blue_units",
+        "P1_Red_units",
+        "P1_Diff_units",
+        "P1_Blue_lost",
+        "P1_Red_lost",
+        "P1_Diff_lost",
+        "P1_Blue_actions",
+        "P1_Blue_bases",
+        "P1_Red_bases",
+        "P1_Diff_bases",
+    ]:
+        dpg.set_value(tag, "")
+
+    # Clear Phase 2 stats
+    for tag in [
+        "P2_Blue_units",
+        "P2_Red_units",
+        "P2_Diff_units",
+        "P2_Blue_lost",
+        "P2_Red_lost",
+        "P2_Diff_lost",
+        "P2_Blue_actions",
+        "P2_Blue_bases",
+        "P2_Red_bases",
+        "P2_Diff_bases",
+    ]:
+        dpg.set_value(tag, "")
+
+    # Clear Phase 3 stats
+    for tag in [
+        "P3_Blue_units",
+        "P3_Red_units",
+        "P3_Diff_units",
+        "P3_Blue_lost",
+        "P3_Red_lost",
+        "P3_Diff_lost",
+        "P3_Blue_actions",
+        "P3_Blue_bases",
+        "P3_Red_bases",
+        "P3_Diff_bases",
+    ]:
+        dpg.set_value(tag, "")
 
 
 def _change_ui_state(running):
