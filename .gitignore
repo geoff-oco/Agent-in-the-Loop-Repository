@@ -46,6 +46,8 @@ Thumbs.db
 *.tmp
 *.temp
 .env
+.nul
+nul
 
 # Screen reading output (session captures, OCR results)
 agent/screen_reading/output/

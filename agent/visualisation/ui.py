@@ -9,6 +9,7 @@ import win32process
 import sys
 import os
 import json
+import shutil
 import stats
 from typing import Optional
 from win_termination import (
@@ -17,6 +18,77 @@ from win_termination import (
     nuclear_shutdown_delayed,
 )
 from agent_bridge import AgentBridge
+
+
+# Clean up temporary files from previous sessions on startup
+def _cleanup_temp_files():
+    from pathlib import Path
+
+    print("Cleaning up temporary files from previous sessions...")
+    cleanup_count = 0
+
+    try:
+        # Get project root (2 levels up from this file: agent/visualisation/ui.py)
+        project_root = Path(__file__).parent.parent.parent
+
+        # Clean agent reply files (both game_state.txt and simple_game_state.txt)
+        agent_replies_dir = project_root / "agent" / "decision_logic" / "run_agent" / "agent_replies"
+        if agent_replies_dir.exists():
+            for reply_file in agent_replies_dir.glob("*.txt"):
+                try:
+                    reply_file.unlink()
+                    print(f"  Removed: {reply_file.name}")
+                    cleanup_count += 1
+                except Exception as e:
+                    print(f"  Warning: Could not remove {reply_file.name}: {e}")
+
+        # Clean game state files in agent directory (game_state.json, simple_game_state.json)
+        game_state_dir = project_root / "agent" / "decision_logic" / "run_agent" / "game_state"
+        if game_state_dir.exists():
+            for state_file in game_state_dir.glob("*.json"):
+                try:
+                    state_file.unlink()
+                    print(f"  Removed: {state_file.name}")
+                    cleanup_count += 1
+                except Exception as e:
+                    print(f"  Warning: Could not remove {state_file.name}: {e}")
+
+        # Clean finalOutput.txt (in visualisation directory)
+        final_output = Path(__file__).parent / "finalOutput.txt"
+        if final_output.exists():
+            try:
+                final_output.unlink()
+                print(f"  Removed: finalOutput.txt")
+                cleanup_count += 1
+            except Exception as e:
+                print(f"  Warning: Could not remove finalOutput.txt: {e}")
+
+        # Limit output sessions to 10 most recent (delete oldest by timestamp)
+        output_dir = project_root / "agent" / "screen_reading" / "output"
+        if output_dir.exists():
+            # Get all game_session_* directories
+            session_dirs = [d for d in output_dir.iterdir() if d.is_dir() and d.name.startswith("game_session_")]
+
+            # Sort by directory name (timestamp in name: game_session_YYYYMMDD_HHMMSS)
+            # Newest first (reverse=True)
+            session_dirs.sort(key=lambda x: x.name, reverse=True)
+
+            # Keep only the 10 most recent, delete the rest
+            if len(session_dirs) > 10:
+                sessions_to_delete = session_dirs[10:]  # Everything after index 10
+                for session_dir in sessions_to_delete:
+                    try:
+                        shutil.rmtree(session_dir)
+                        print(f"  Removed old session: {session_dir.name}")
+                        cleanup_count += 1
+                    except Exception as e:
+                        print(f"  Warning: Could not remove {session_dir.name}: {e}")
+
+        print(f"Cleanup complete: {cleanup_count} file(s) removed")
+
+    except Exception as e:
+        print(f"Error during cleanup: {e}")
+        print("Continuing with startup...")
 
 
 running = False  # Only global state flag we need - controls all operations
@@ -33,6 +105,9 @@ global_theme_ref = None
 
 
 def ui(tar_hwnd=None, overlay=None):
+    # Clean up temporary files from previous sessions
+    _cleanup_temp_files()
+
     # Store overlay reference for callbacks
     global overlay_instance, font_arial_global, font_arialBold_global, global_theme_ref
     overlay_instance = overlay
