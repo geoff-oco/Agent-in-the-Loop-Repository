@@ -194,7 +194,7 @@ def ui(tar_hwnd=None, overlay=None):
         logo_image = Image.open(battle_logo_path)
 
         # Resize to fit stats panel width
-        target_width = int((window_width / 7) * 0.22) 
+        target_width = int((window_width / 7) * 0.22)
         aspect_ratio = logo_image.height / logo_image.width
         target_height = int(target_width * aspect_ratio)
 
@@ -231,7 +231,7 @@ def ui(tar_hwnd=None, overlay=None):
         # Load image with PIL
         agent_image = Image.open(agent_logo_path)
 
-        # Resize to fit System Controls width 
+        # Resize to fit System Controls width
         target_width = int((window_width * 0.15) * 0.25)
         aspect_ratio = agent_image.height / agent_image.width
         target_height = int(target_width * aspect_ratio)
@@ -266,8 +266,8 @@ def ui(tar_hwnd=None, overlay=None):
         no_move=False,
         no_resize=False,
         no_title_bar=True,
-        width=int(window_width * 0.15), 
-        height=int(window_height * 0.26),
+        width=int(window_width * 0.15),
+        height=int(window_height * 0.32),
         pos=(40, (window_height / 3)),
     ):
 
@@ -300,7 +300,7 @@ def ui(tar_hwnd=None, overlay=None):
         dpg.add_spacer(height=5)
         if agent_logo_texture:
             # Calculate dimensions
-            spacing_between = 8 
+            spacing_between = 8
             loading_size = 40  # Fixed size for loading indicator
             total_group_width = agent_logo_width + spacing_between + loading_size
 
@@ -339,7 +339,7 @@ def ui(tar_hwnd=None, overlay=None):
         no_resize=False,
         no_title_bar=True,
         width=int(window_width * 0.21),
-        height=int(window_height * 0.65) - 20, 
+        height=int(window_height * 0.65) - 20,
         pos=((window_width / 4), (window_height - 20 - int(window_height * 0.65))),
     ):
 
@@ -354,12 +354,12 @@ def ui(tar_hwnd=None, overlay=None):
         if font_is_loaded and font_segoeuiBold_medium_global:
             dpg.bind_item_font(dpg.last_item(), font_segoeuiBold_medium_global)
 
-        # Calculate initial child window sizes (50/50 split) 
+        # Calculate initial child window sizes (50/50 split)
         parent_initial_height = int(window_height * 0.65) - 20
-        available_initial_height = parent_initial_height - int(window_height * 0.14) 
+        available_initial_height = parent_initial_height - int(window_height * 0.14)
         output_initial_height = int(available_initial_height * 0.50)
         chat_initial_height = int(available_initial_height * 0.50)
-        initial_wrap_width = int(window_width * 0.18) 
+        initial_wrap_width = int(window_width * 0.18)
 
         # Strategy output section
         with dpg.child_window(tag="outputWindow", width=-1, height=output_initial_height, border=True):
@@ -385,8 +385,8 @@ def ui(tar_hwnd=None, overlay=None):
         with dpg.group(horizontal=True):
             dpg.add_input_text(
                 tag="chatInput", width=int(window_width * 0.14), hint="Type here to discuss strategy with agent..."
-            )  
-            dpg.add_button(label="Send", width=int(window_width * 0.056), callback=_send_message) 
+            )
+            dpg.add_button(label="Send", width=int(window_width * 0.056), callback=_send_message)
 
     with dpg.theme() as global_theme:
         with dpg.theme_component(dpg.mvAll):
@@ -408,25 +408,25 @@ def ui(tar_hwnd=None, overlay=None):
     dpg.bind_item_theme("buttons_container", global_theme)
     dpg.bind_item_theme("chat_win", global_theme)
 
-    # Stats window 
-    stats_window_height = int(window_height * 0.60) 
-    stats_y_pos = int(window_height * 0.25) 
+    # Stats window
+    stats_window_height = int(window_height * 0.74)
+    stats_y_pos = int(window_height * 0.17)
     with dpg.window(
         tag="stats_window",
         no_background=False,
         no_move=False,
         no_resize=False,
         no_title_bar=True,
-        width=int(window_width / 7),  
+        width=int(window_width / 6),
         height=stats_window_height,
-        pos=((window_width * 2 / 3), stats_y_pos),
+        pos=((window_width * 0.64), stats_y_pos),
     ):
         if font_is_loaded:
             dpg.bind_item_font(dpg.last_item(), font_segoeuiBold)
 
         # Stats title - centered, larger, and bold
-        stats_title_width = int(window_width / 7)
-        estimated_text_width = 60  
+        stats_title_width = int(window_width / 6)
+        estimated_text_width = 60
         title_indent = max(0, (stats_title_width - estimated_text_width) // 2)
         dpg.add_text("Stats", color=(64, 224, 208), indent=title_indent)
         if font_is_loaded and font_segoeuiBold_large_global:
@@ -434,36 +434,36 @@ def ui(tar_hwnd=None, overlay=None):
         dpg.add_separator()
 
         # Total Phases - centered and bold
-        estimated_phases_width = 85  
+        estimated_phases_width = 85
         phases_indent = max(0, (stats_title_width - estimated_phases_width) // 2)
         dpg.add_text("Total Phases: ", indent=phases_indent, tag="Total_phases")
         if font_is_loaded:
-            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold)  
+            dpg.bind_item_font(dpg.last_item(), font_segoeuiBold)
         dpg.bind_item_theme(dpg.last_item(), mini_theme)
 
         # Total Actions - centered and bold
-        estimated_actions_width = 95  
+        estimated_actions_width = 95
         actions_indent = max(0, (stats_title_width - estimated_actions_width) // 2)
         dpg.add_text("Total Actions: ", indent=actions_indent, tag="Total_actions")
         if font_is_loaded:
             dpg.bind_item_font(dpg.last_item(), font_segoeuiBold)  # Bold instead of regular
         dpg.bind_item_theme(dpg.last_item(), mini_theme)
-        dpg.add_separator()  
+        dpg.add_separator()
 
         # Phase 1 title - centered and bold
-        estimated_phase_width = 65  
+        estimated_phase_width = 65
         phase_indent = max(0, (stats_title_width - estimated_phase_width) // 2)
         dpg.add_text("Phase 1", color=(64, 224, 208), indent=phase_indent)
         if font_is_loaded and font_segoeuiBold_medium_global:
             dpg.bind_item_font(dpg.last_item(), font_segoeuiBold_medium_global)
-        with dpg.child_window(height=int(window_height * 0.12)): 
+        with dpg.child_window(height=int(window_height * 0.15)):
             if font_is_loaded:
                 dpg.bind_item_font(dpg.last_item(), font_segoeui)
             with dpg.table(header_row=False, row_background=True, borders_innerV=True):
-                dpg.add_table_column(width_fixed=True, width=100)
-                dpg.add_table_column()
-                dpg.add_table_column()
-                dpg.add_table_column()
+                dpg.add_table_column(width_fixed=True, width=125)
+                dpg.add_table_column(init_width_or_weight=0.25)
+                dpg.add_table_column(init_width_or_weight=0.25)
+                dpg.add_table_column(init_width_or_weight=0.50)
 
                 # Custom colored header row
                 with dpg.table_row():
@@ -500,14 +500,14 @@ def ui(tar_hwnd=None, overlay=None):
         dpg.add_text("Phase 2", color=(64, 224, 208), indent=phase_indent)
         if font_is_loaded and font_segoeuiBold_medium_global:
             dpg.bind_item_font(dpg.last_item(), font_segoeuiBold_medium_global)
-        with dpg.child_window(height=int(window_height * 0.12)): 
+        with dpg.child_window(height=int(window_height * 0.15)):
             if font_is_loaded:
                 dpg.bind_item_font(dpg.last_item(), font_segoeui)
             with dpg.table(header_row=False, row_background=True, borders_innerV=True):
-                dpg.add_table_column(width_fixed=True, width=100)
-                dpg.add_table_column()
-                dpg.add_table_column()
-                dpg.add_table_column()
+                dpg.add_table_column(width_fixed=True, width=125)
+                dpg.add_table_column(init_width_or_weight=0.25)
+                dpg.add_table_column(init_width_or_weight=0.25)
+                dpg.add_table_column(init_width_or_weight=0.50)
 
                 # Custom colored header row
                 with dpg.table_row():
@@ -544,14 +544,14 @@ def ui(tar_hwnd=None, overlay=None):
         dpg.add_text("Phase 3", color=(64, 224, 208), indent=phase_indent)
         if font_is_loaded and font_segoeuiBold_medium_global:
             dpg.bind_item_font(dpg.last_item(), font_segoeuiBold_medium_global)
-        with dpg.child_window(height=int(window_height * 0.12)):  
+        with dpg.child_window(height=int(window_height * 0.15)):
             if font_is_loaded:
                 dpg.bind_item_font(dpg.last_item(), font_segoeui)
             with dpg.table(header_row=False, row_background=True, borders_innerV=True):
-                dpg.add_table_column(width_fixed=True, width=100)
-                dpg.add_table_column()
-                dpg.add_table_column()
-                dpg.add_table_column()
+                dpg.add_table_column(width_fixed=True, width=125)
+                dpg.add_table_column(init_width_or_weight=0.25)
+                dpg.add_table_column(init_width_or_weight=0.25)
+                dpg.add_table_column(init_width_or_weight=0.50)
 
                 # Custom colored header row
                 with dpg.table_row():
@@ -720,7 +720,7 @@ def _launch_roi_studio_callback(sender, app_data, user_data):
         current_roi_studio_subprocess = subprocess.Popen([sys.executable, roi_studio_path], cwd=project_root)
         print(f"ROI Studio launched from: {roi_studio_path} (PID: {current_roi_studio_subprocess.pid})")
 
-        # Disable the button while ROI Studio is running 
+        # Disable the button while ROI Studio is running
         dpg.disable_item("roi_studio_button")
 
         # Start monitoring thread to re-enable button when process exits
@@ -938,9 +938,9 @@ def _update_chat_window_sizes():
             if wrap_width < 200:
                 wrap_width = 200
 
-            # Calculate input width 
+            # Calculate input width
             send_button_width = int(window_width * 0.056) if window_width else 80
-            input_width = int(parent_width - send_button_width - 50)  
+            input_width = int(parent_width - send_button_width - 50)
             if input_width < 200:
                 input_width = 200
 
