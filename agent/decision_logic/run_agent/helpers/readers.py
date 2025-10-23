@@ -3,9 +3,10 @@ from pathlib import Path
 from typing import Any, Dict, Union, Optional, List
 from graph.state import ChatState
 
-# all of our reading/parsing logic in one place
+
+# All of our reading/parsing logic in one place
 class Readers:
-    #json file reader
+    # JSON file reader
     @staticmethod
     def read_json(path: Union[str, Path]) -> Dict[str, Any]:
         try:
@@ -14,9 +15,9 @@ class Readers:
         except Exception:
             return {}
 
-    # specifically built to read our prompts from markdown, with or without .md
+    # Specifically built to read our prompts from markdown, with or without .md
     @staticmethod
-    def read_prompt(prompts_dir: Union[str, Path], name: str) -> str: #Union allows str or Path
+    def read_prompt(prompts_dir: Union[str, Path], name: str) -> str: # Union allows str or Path
         p = Path(prompts_dir) / name
         if not p.exists():
             p = Path(prompts_dir) / (name if name.endswith(".md") else f"{name}.md")
@@ -25,8 +26,8 @@ class Readers:
                 return f.read()
         except Exception:
             return ""
-    
-    # generic text file reader
+
+    # Generic text file reader
     @staticmethod
     def read_text(path: Union[str, Path]) -> str:
         try:
@@ -34,8 +35,8 @@ class Readers:
                 return f.read()
         except Exception:
             return ""
-    
-    # only used here, this flattens any object to a string
+
+    # Internal: this flattens any object to a string
     @staticmethod
     def _flatten(obj: Any) -> str:
         if obj is None:
@@ -50,7 +51,7 @@ class Readers:
             return "\n".join([Readers._flatten(x) for x in obj])
         return str(obj)
 
-    # only used here, this finds JSON candidates in a string
+    # Internal: this finds JSON candidates in a string
     @staticmethod
     def _find_json_candidates(s: str) -> List[str]:
         out = []
@@ -58,39 +59,41 @@ class Readers:
         n = len(s)
         while i < n:
             try:
-                start = s.index("{", i) #we are checking for {
+                start = s.index("{", i)  # Check for {
             except ValueError:
                 break
-            depth = 0 # we use depth to track nested {}
-            buf = [] #we use a buffer to build our JSON candidate
+            depth = 0  # Use depth to track nested {}
+            buf = []  # Use a buffer to build our JSON candidate
             j = start
-            while j < n: #track positions until the end }
-                ch = s[j] #current character
-                if ch == "{": 
-                    depth += 1 #increase depth for nested {
+            while j < n:  # Track positions until the end }
+                ch = s[j]  # Current character
+                if ch == "{":
+                    depth += 1  # Increase depth for nested {
                 if depth > 0:
-                    buf.append(ch) #add character to buffer if inside JSON object
+                    buf.append(ch)  # Add character to buffer if inside JSON object
                 if ch == "}":
-                    depth -= 1 #decrease depth for nested }
+                    depth -= 1  # Decrease depth for nested }
                     if depth == 0:
-                        out.append("".join(buf)) #complete JSON candidate
+                        out.append("".join(buf))  # Complete JSON candidate
                         i = j + 1
                         break
                 j += 1
             else:
                 break
-            #We return all candidates found
+
+            # Return all candidates found
         return out
 
-    #The big method: extract a JSON object from arbitrary text
+    # Extract a JSON object from arbitrary text
     @staticmethod
     def extract_json(text: Any) -> Optional[Dict[str, Any]]:
+
         # Flatten input to string if string
         s = Readers._flatten(text)
         if not s:
             return None
 
-        #if it's already JSON, return it
+        # If it's already JSON, return it
         try:
             obj = json.loads(s)
             if isinstance(obj, dict):
@@ -98,25 +101,25 @@ class Readers:
         except Exception:
             pass
 
-        # find our JSON candidates
+        # Find our JSON candidates
         candidates = Readers._find_json_candidates(s)
         if not candidates:
             return None
 
-        #declare parsed for valid JSON objects
+        # Declare parsed for valid JSON objects
         parsed = []
         for c in candidates:
             try:
-                obj = json.loads(c) #try to parse
+                obj = json.loads(c)  # Try to parse
                 if isinstance(obj, dict):
-                    parsed.append(obj) #only append if dict
+                    parsed.append(obj)  # Only append if dict
             except Exception:
                 continue
 
         if not parsed:
             return None
 
-        # We prefer for this to be a decisions object if we can find one
+        # Prefer for this to be a decisions object if we can find one
         for obj in parsed:
             if "decisions" in obj:
                 return obj
@@ -128,10 +131,10 @@ class Readers:
     @staticmethod
     def build_selection_context(state: ChatState) -> Dict[str, Any]:
 
-        # check for raw game state
+        # Check for raw game state
         game_raw = getattr(state, "game_state_raw", None)
 
-        #otherwise try to read from file
+        # Otherwise, try to read from file
         if game_raw is None:
             base_dir = getattr(state, "game_state_dir", "game_state_experiment")
             filename = getattr(state, "game_state_filename", "final_game_state.json")
@@ -151,12 +154,12 @@ class Readers:
         selection_context = {
             "meta": {
                 "map": meta.get("map"),
-                "ler": meta.get("ler"),          # tie-break/side favour etc.
+                "ler": meta.get("ler"),
                 "notes": meta.get("notes"),
             },
             "phase_1": {
-                "start": p1.get("start"),        # who holds what / unit counts
-                "orig_actions": p1.get("orig_actions"),  # planned transfers
-            }
+                "start": p1.get("start"),
+                "orig_actions": p1.get("orig_actions"),
+            },
         }
         return selection_context

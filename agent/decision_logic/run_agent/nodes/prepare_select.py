@@ -8,31 +8,32 @@ from helpers.readers import Readers
 from langchain_core.messages import SystemMessage, HumanMessage
 from nodes.tools import load_markdowns
 
-#Set for this node only, will grab a snippet of startegies
+# Set for this node only, will grab a snippet of strategies
 PREVIEW_CHARS = 600
 
-#Our node for strategy selection and pathd determination
+
+# Our node for strategy selection and path determination
 def node(state: ChatState) -> ChatState:
 
-    #Grab all markdown titles
+    # Grab all markdown titles
     Helpers.list_markdowns(state.strategies_dir)
-    #list these in a ready package for tool calls
+    # List these in a ready package for tool calls
     names = Helpers.get_allowed_names()
 
     if not names:
         return state
 
-    #define model
+    # Define model
     llm = Helpers.get_langchain_llm(state.model, temperature=0.0, max_tokens=400)
 
-    #Bind our tool
+    # Bind our tool
     llm = llm.bind_tools([load_markdowns], tool_choice="load_markdowns", strict=True)
 
-    # grab our prompts for tool call
+    # Grab our prompts for tool call
     sys_txt = Readers.read_prompt(state.prompts_dir, "system.md") or ""
     sel_txt = Readers.read_prompt(state.prompts_dir, "select_markdowns.md") or ""
 
-    # Gives the LLM a snippet from each startegy
+    # Gives the LLM a snippet from each strategy so it knows what it is choosing
     previews: Dict[str, str] = {}
     for n in names:
         p = Path(state.strategies_dir) / n
@@ -52,8 +53,8 @@ def node(state: ChatState) -> ChatState:
             "Return STRICT JSON ONLY matching the output_schema."
         ),
         "filenames": names,
-        "previews": previews,          
-        "game_state": selection_context,      
+        "previews": previews,
+        "game_state": selection_context,
         "output_schema": {"selected": "string  # must equal one of 'filenames'"},
     }
 
@@ -65,49 +66,56 @@ def node(state: ChatState) -> ChatState:
     print("Requesting strategy selection...")
     ai = llm.invoke(msgs)
 
-    #Grab the raw text from AI and parse it, expecting JSON
+    # Grab the raw text from AI and parse it, expecting JSON
     tool_calls = getattr(ai, "tool_calls", None) or []
-    # we want a tool call, if none we fallback to first strategy
+
+    # We want a tool call, if none we fallback to first strategy
     if not tool_calls:
         if names:
             pick = names[0]
-            out_json = load_markdowns.invoke({"filename": pick}) #invoke our tool manually, sans LLM
+            out_json = load_markdowns.invoke({"filename": pick})  # Invoke our tool manually, sans LLM
             loaded = json.loads(out_json)
         else:
             loaded = {"selected_names": [], "selected_texts": {}}
     else:
         loaded = None
-        #Check the tool calls for our load_markdowns call
+
+        # Check the tool calls for our load_markdowns call
         for tc in tool_calls:
-            #Ensure it's the right tool
+
+            # Ensure it's the right tool
             if (tc.get("name") or "").lower() == "load_markdowns":
                 args = tc.get("args") or {}
-                filename = args.get("filename") #grab the filename
-                #default to first if missing or empty
+                filename = args.get("filename")  # Grab the filename
+
+                # Default to first if missing or empty
                 if not filename:
                     print("WARNING: Tool args missing; falling back to first strategy.")
                     filename = names[0] if names else None
                 if filename:
+
                     # Tool will give us the json we need
                     out_json = load_markdowns.invoke({"filename": filename})
+
                     # Parse the JSON response
                     loaded = json.loads(out_json)
                 break
 
         if not loaded:
-            # Something went wrong, fallback to first strategy
+
+            # Something went really wrong, fallback to first strategy
             print("WARNING: No valid tool call found; falling back to first strategy.")
             if names:
-                out_json = load_markdowns.invoke({"filename": names[0]}) #invoke our tool manually, sans LLM
-                loaded = json.loads(out_json) #parse the result
+                out_json = load_markdowns.invoke({"filename": names[0]})  # Invoke our tool manually, sans LLM
+                loaded = json.loads(out_json)  # Parse the result
             else:
                 loaded = {"selected_names": [], "selected_texts": {}}
-    
-    #Load our states from the tool call
+
+    # Load our states from the tool call
     state.selected_names = loaded.get("selected_names", [])
     state.selected_texts = loaded.get("selected_texts", {})
 
-    #Finally we determine the path from simple or detailed
+    # Finally we determine the path from simple or detailed
     try:
         mode = Helpers.get_mode_from_gamepath(state.game_state_path)
     except Exception:
