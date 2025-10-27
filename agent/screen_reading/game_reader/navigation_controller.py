@@ -212,18 +212,12 @@ class NavigationController:  # Handles game navigation and special capture seque
 
                 if results:
                     # Get the best result from this capture
-                    method_name, _, text, confidence, rule_passed, rule_message = (
-                        results[0]
-                    )
+                    method_name, _, text, confidence, rule_passed, rule_message = results[0]
 
                     # Only consider valid digit results
                     if text.strip() and text.strip().isdigit():
-                        ocr_results.append(
-                            (capture_num, text.strip(), confidence, method_name)
-                        )
-                        print(
-                            f"    Capture {capture_num}: '{text}' ({confidence:.1f}%, {method_name})"
-                        )
+                        ocr_results.append((capture_num, text.strip(), confidence, method_name))
+                        print(f"    Capture {capture_num}: '{text}' ({confidence:.1f}%, {method_name})")
                     else:
                         print(f"    Capture {capture_num}: Invalid text '{text}'")
                 else:
@@ -239,14 +233,10 @@ class NavigationController:  # Handles game navigation and special capture seque
             return None
 
         # Find the best result (highest confidence)
-        best_result = max(
-            ocr_results, key=lambda x: x[2]
-        )  # Sort by confidence (index 2)
+        best_result = max(ocr_results, key=lambda x: x[2])  # Sort by confidence (index 2)
         capture_num, text, confidence, method_name = best_result
 
-        print(
-            f"Best result: Capture {capture_num} - '{text}' ({confidence:.1f}%, {method_name})"
-        )
+        print(f"Best result: Capture {capture_num} - '{text}' ({confidence:.1f}%, {method_name})")
 
         # Click reset view button to return to normal view
         self._click_reset_view_button(dry_run)

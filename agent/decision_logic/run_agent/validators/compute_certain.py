@@ -88,7 +88,7 @@ def compute_certain(
         addv = PhaseMath.vec()
         subv = PhaseMath.vec()
 
-        # The logic here is that if the base was not touched by original effective moves, 
+        # The logic here is that if the base was not touched by original effective moves,
         # All inbound are leave/lock and none are delete then we can be certain of its numbers
         # We then take the original start for phase 1 and adjust it by inserts only
         if (not touched_by_orig) and all_inbound_ll and (not any_inbound_del):

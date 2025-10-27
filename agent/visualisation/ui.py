@@ -30,7 +30,7 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 console_handler = logging.StreamHandler(sys.stdout)
 console_handler.setLevel(logging.INFO)
-formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
@@ -168,6 +168,7 @@ def update_subprocess_state(process_type, process_obj):
         elif process_type == "roi_studio":
             current_roi_studio_subprocess = process_obj
 
+
 # Font and theme references for popup windows
 font_segoeui_global = None
 font_segoeuiBold_global = None
@@ -178,6 +179,16 @@ global_theme_ref = None
 # Window dimensions for relative sizing (set in ui() function)
 window_width = None
 window_height = None
+
+# UI layout constants
+UI_RESERVE_HEIGHT_RATIO = 0.14  # Fraction of window height reserved for controls
+UI_WINDOW_SPLIT_RATIO = 0.50  # 50/50 split between output and chat windows
+UI_WRAP_PADDING = 40  # Padding to account for scrollbar/borders
+UI_MIN_WRAP_WIDTH = 200  # Minimum text wrap width
+UI_MIN_HEIGHT = 150  # Minimum window height
+UI_BUTTON_WIDTH_RATIO = 0.056  # Send button width as fraction of window
+UI_INPUT_PADDING = 50  # Padding around input box
+UI_POLL_INTERVAL = 0.1  # Background thread poll interval (seconds)
 
 # Battle logo texture
 battle_logo_texture = None
@@ -430,11 +441,11 @@ def ui(tar_hwnd=None, overlay=None):
         if font_is_loaded and font_segoeuiBold_medium_global:
             dpg.bind_item_font(dpg.last_item(), font_segoeuiBold_medium_global)
 
-        # Calculate initial child window sizes (50/50 split)
+        # Calculate initial child window sizes
         parent_initial_height = int(window_height * 0.65) - 20
-        available_initial_height = parent_initial_height - int(window_height * 0.14)
-        output_initial_height = int(available_initial_height * 0.50)
-        chat_initial_height = int(available_initial_height * 0.50)
+        available_initial_height = parent_initial_height - int(window_height * UI_RESERVE_HEIGHT_RATIO)
+        output_initial_height = int(available_initial_height * UI_WINDOW_SPLIT_RATIO)
+        chat_initial_height = int(available_initial_height * UI_WINDOW_SPLIT_RATIO)
         initial_wrap_width = int(window_width * 0.18)
 
         # Strategy output section
@@ -673,7 +684,8 @@ def ui(tar_hwnd=None, overlay=None):
     resize_thread = threading.Thread(target=_update_chat_window_sizes, daemon=True)
     resize_thread.start()
 
-    # Style editor for real-time experimentation (positioned top-right) - COMMENTED OUT
+    # Style editor disabled - was used during UI development for theme experimentation
+    # Uncomment to enable DPG style/metrics tools for UI customisation
     # with dpg.window(tag="style_editor_win", no_background=False, no_move=False, no_resize=False, no_title_bar=True,
     #                 width=300, height=200,
     #                 pos=(window_width - 320, 20),
@@ -683,7 +695,7 @@ def ui(tar_hwnd=None, overlay=None):
     #     dpg.add_button(label="Show Metrics", callback=lambda: dpg.show_tool(dpg.mvTool_Metrics))
     #     dpg.add_button(label="Toggle This Panel", callback=lambda: dpg.configure_item("style_editor_win", show=not dpg.is_item_shown("style_editor_win")))
 
-    # Toggle button for style editor (top-right corner) - COMMENTED OUT
+    # Toggle button for style editor
     # with dpg.window(tag="style_toggle_win", no_background=False, no_move=False, no_resize=True, no_title_bar=True,
     #                 width=80, height=30,
     #                 pos=(window_width - 90, 10)):
@@ -1015,25 +1027,25 @@ def _update_chat_window_sizes():
             parent_height = dpg.get_item_height("chat_win")
 
             # Reserve space for UI elements
-            reserve_height = int(window_height * 0.14) if window_height else 150
+            reserve_height = int(window_height * UI_RESERVE_HEIGHT_RATIO) if window_height else UI_MIN_HEIGHT
             available_height = parent_height - reserve_height
-            if available_height < 150:
-                available_height = 150
+            if available_height < UI_MIN_HEIGHT:
+                available_height = UI_MIN_HEIGHT
 
-            # Split 50/50 for equal sizing
-            output_height = int(available_height * 0.50)
-            chat_height = int(available_height * 0.50)
+            # Split windows equally
+            output_height = int(available_height * UI_WINDOW_SPLIT_RATIO)
+            chat_height = int(available_height * UI_WINDOW_SPLIT_RATIO)
 
-            # Calculate wrap width (parent - scrollbar/padding)
-            wrap_width = int(parent_width - 40)
-            if wrap_width < 200:
-                wrap_width = 200
+            # Calculate wrap width
+            wrap_width = int(parent_width - UI_WRAP_PADDING)
+            if wrap_width < UI_MIN_WRAP_WIDTH:
+                wrap_width = UI_MIN_WRAP_WIDTH
 
             # Calculate input width
-            send_button_width = int(window_width * 0.056) if window_width else 80
-            input_width = int(parent_width - send_button_width - 50)
-            if input_width < 200:
-                input_width = 200
+            send_button_width = int(window_width * UI_BUTTON_WIDTH_RATIO) if window_width else 80
+            input_width = int(parent_width - send_button_width - UI_INPUT_PADDING)
+            if input_width < UI_MIN_WRAP_WIDTH:
+                input_width = UI_MIN_WRAP_WIDTH
 
             dpg.configure_item("outputWindow", height=output_height)
             dpg.configure_item("chatWindow", height=chat_height)
@@ -1044,7 +1056,7 @@ def _update_chat_window_sizes():
         except Exception:
             pass  # Items may not exist during initialisation
 
-        time.sleep(0.1)  # Poll every 100ms
+        time.sleep(UI_POLL_INTERVAL)
 
 
 def _start_save_state_check():

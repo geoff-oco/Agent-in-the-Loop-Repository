@@ -4,6 +4,7 @@ from ui import ui
 # Global reference for overlay cleanup
 overlay_instance = None
 
+
 def main():
     global overlay_instance
 
@@ -12,6 +13,7 @@ def main():
 
     overlay_instance = ExternalOverlay("RTSViewer", ui_with_overlay_ref)
     overlay_instance.start()
+
 
 if __name__ == "__main__":
     main()

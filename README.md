@@ -381,9 +381,9 @@ Agent-in-the-Loop-Repository/
 
 **Code Standards**:
 - **Python 3.9+** compatibility
-- **Type hints** for improved readability
 - **Modular architecture** with clear component separation
 - **Error handling** for robust computer vision processing
+- **Logging infrastructure** for debugging and monitoring
 
 **Performance Considerations**:
 - **GPU acceleration** available for PaddleOCR

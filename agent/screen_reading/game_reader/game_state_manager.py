@@ -99,11 +99,7 @@ class GameStateManager:  # Manages game state transitions and calculations
             if base_name and faction and unit_type:
                 try:
                     value = int(text) if text and text != "(empty)" else 0
-                    units = (
-                        state[base_name].blue
-                        if faction == "blue"
-                        else state[base_name].red
-                    )
+                    units = state[base_name].blue if faction == "blue" else state[base_name].red
                     setattr(units, unit_type, value)
                 except ValueError:
                     pass  # Keep default 0
@@ -215,9 +211,7 @@ class GameStateManager:  # Manages game state transitions and calculations
 
         return after_state
 
-    def calculate_phase_data(
-        self, phase_num: int, ocr_results: Dict[str, str], mode: str = "full"
-    ) -> PhaseData:
+    def calculate_phase_data(self, phase_num: int, ocr_results: Dict[str, str], mode: str = "full") -> PhaseData:
         # Calculate before/after states for a phase
         # mode: "full" = before + after states, "before_only" = before state only (after = None)
         # ocr_results: flat dict {roi_name: text_value} (same format as old code)
@@ -274,9 +268,7 @@ class GameStateManager:  # Manages game state transitions and calculations
                     ler_data["favour"] = "Red"
                     logging.info(f"LER favour detected: Red")
                 else:
-                    logging.warning(
-                        f"LER contains 'favour/favor of' but no team name found in: '{ler_text}'"
-                    )
+                    logging.warning(f"LER contains 'favour/favor of' but no team name found in: '{ler_text}'")
 
         except Exception as e:
             logging.error(f"Error parsing LER: {e}")
@@ -284,9 +276,7 @@ class GameStateManager:  # Manages game state transitions and calculations
         logging.info(f"Parsed LER: {ler_data}")
         return ler_data
 
-    def get_final_state(
-        self, phases: List[PhaseData], red2_final_count: Optional[str] = None
-    ) -> Dict[str, BaseUnits]:
+    def get_final_state(self, phases: List[PhaseData], red2_final_count: Optional[str] = None) -> Dict[str, BaseUnits]:
         # Calculate final state after all phases
         if not phases:
             return {}
@@ -295,9 +285,7 @@ class GameStateManager:  # Manages game state transitions and calculations
         last_phase = phases[-1]
 
         # Use after state if available, otherwise use before state
-        source_state = (
-            last_phase.after if last_phase.after is not None else last_phase.before
-        )
+        source_state = last_phase.after if last_phase.after is not None else last_phase.before
 
         # Apply final battle logic if needed
         final = {}
@@ -319,9 +307,7 @@ class GameStateManager:  # Manages game state transitions and calculations
                     final[base_name].red.H = final_count
                     print(f"Updated Red2 final red heavy units to: {final_count}")
                 except ValueError:
-                    print(
-                        f"Warning: Could not parse Red2 final count '{red2_final_count}', using calculated value"
-                    )
+                    print(f"Warning: Could not parse Red2 final count '{red2_final_count}', using calculated value")
 
         # Apply zeroing logic to final state (if red units present, zero blue units)
         final = self.apply_zeroing(final)
@@ -377,14 +363,10 @@ class GameStateManager:  # Manages game state transitions and calculations
 
             # Save LER capture to setup folder
             if self.output_manager:
-                self.output_manager.save_capture(
-                    roi_image, phase_num="setup", roi_name="LER_Panel"
-                )
+                self.output_manager.save_capture(roi_image, phase_num="setup", roi_name="LER_Panel")
 
             # Process OCR using multi-engine method (tries multiple engines for better accuracy)
-            accepted_chars = (
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-:. "
-            )
+            accepted_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-:. "
             results = self.ocr_processor.process_multi_engine(
                 roi_image,
                 self.ler_roi,
@@ -396,17 +378,13 @@ class GameStateManager:  # Manages game state transitions and calculations
             if results:
                 best_result = results[0]  # Results are sorted by score
                 _, _, text, confidence, rule_passed, _ = best_result
-                ocr_result = type(
-                    "OCRResult", (), {"text": text, "confidence": confidence}
-                )()
+                ocr_result = type("OCRResult", (), {"text": text, "confidence": confidence})()
             else:
                 ocr_result = type("OCRResult", (), {"text": "", "confidence": 0})()
 
             if ocr_result.text and ocr_result.confidence > 60:
                 self.initial_ler = ocr_result.text.strip()
-                print(
-                    f"Initial LER: '{self.initial_ler}' (confidence: {ocr_result.confidence:.1f}%)"
-                )
+                print(f"Initial LER: '{self.initial_ler}' (confidence: {ocr_result.confidence:.1f}%)")
                 return self.initial_ler
 
             print(f"Low confidence LER reading: {ocr_result.confidence:.1f}%")
@@ -431,14 +409,10 @@ class GameStateManager:  # Manages game state transitions and calculations
 
             # Save phase header capture to setup folder
             if self.output_manager:
-                self.output_manager.save_capture(
-                    roi_image, phase_num="setup", roi_name="Phase_Header"
-                )
+                self.output_manager.save_capture(roi_image, phase_num="setup", roi_name="Phase_Header")
 
             # Process OCR using single-engine method (PaddleOCR GPU for speed)
-            accepted_chars = (
-                "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-:. "
-            )
+            accepted_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-:. "
             results = self.ocr_processor.process_single_engine(
                 roi_image,
                 self.phase_roi,
@@ -451,16 +425,12 @@ class GameStateManager:  # Manages game state transitions and calculations
             if results:
                 best_result = results[0]  # Results are sorted by score
                 _, _, text, confidence, rule_passed, _ = best_result
-                ocr_result = type(
-                    "OCRResult", (), {"text": text, "confidence": confidence}
-                )()
+                ocr_result = type("OCRResult", (), {"text": text, "confidence": confidence})()
             else:
                 ocr_result = type("OCRResult", (), {"text": "", "confidence": 0})()
 
             if ocr_result.text:
-                print(
-                    f"Phase header: '{ocr_result.text}' (confidence: {ocr_result.confidence:.1f}%)"
-                )
+                print(f"Phase header: '{ocr_result.text}' (confidence: {ocr_result.confidence:.1f}%)")
                 return ocr_result.text
 
             return None

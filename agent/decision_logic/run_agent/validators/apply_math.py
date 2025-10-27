@@ -66,7 +66,7 @@ def apply_math(
             flags.append(f"nullified:action:{aid}")
             continue
 
-        # Adjust our budgets accordingly, we reduce original budget by what we take. 
+        # Adjust our budgets accordingly, we reduce original budget by what we take.
         # Insert budget is also reduced as original moves reduce what can be inserted.
         orig_budget[f] = PhaseMath.sub(bud, take)
         insert_budget[f] = PhaseMath.sub(insert_budget.get(f, PhaseMath.vec()), take)

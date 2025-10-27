@@ -17,7 +17,7 @@ class Readers:
 
     # Specifically built to read our prompts from markdown, with or without .md
     @staticmethod
-    def read_prompt(prompts_dir: Union[str, Path], name: str) -> str: # Union allows str or Path
+    def read_prompt(prompts_dir: Union[str, Path], name: str) -> str:  # Union allows str or Path
         p = Path(prompts_dir) / name
         if not p.exists():
             p = Path(prompts_dir) / (name if name.endswith(".md") else f"{name}.md")

@@ -36,7 +36,7 @@ class Helpers:
     @staticmethod
     def get_langchain_llm(
         model: str,
-        temperature: float = 0.0, # Toggled higher for prose or lower for JSON
+        temperature: float = 0.0,  # Toggled higher for prose or lower for JSON
         max_tokens: int = 800,
     ):
         # Force JSON-only output so the model cannot echo the input or add prose

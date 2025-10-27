@@ -79,8 +79,8 @@ def node(state: ChatState) -> ChatState:
     # Validate phase will run the response through validation and do various fixes and conversions
     decs, inserts, vflags = validate_phase_slice(pdata, got or {})
 
-    # end_snapshot shows the end state of the phase after applying the decisions and inserts, 
-    # eff shows the effective transfers, 
+    # end_snapshot shows the end state of the phase after applying the decisions and inserts,
+    # eff shows the effective transfers,
     # mflags shows any flags raised during math application
     # Apply math is then used to apply our effective decisions all to get that end snapshot
     eff, end_snapshot, mflags = apply_math(pdata, decs, inserts, meta=(state.runtime.get("meta") or {}))
@@ -94,7 +94,7 @@ def node(state: ChatState) -> ChatState:
 
     # We open up the next phase in the raw data and rewrite its start with our own end
     # certain is what we know for sure, possible is what could be true,
-    # audit is a full breakdown of how we got there, 
+    # audit is a full breakdown of how we got there,
     # This will ensure valid moves from phase to phase are not overwritten
     if (p + 1) in state.runtime["phases"]:
         certain, possible, audit = compute_certain(

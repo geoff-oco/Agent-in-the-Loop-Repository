@@ -12,8 +12,10 @@ from ctypes import c_int
 dwm = ctypes.windll.dwmapi
 user32 = ctypes.windll.user32
 
+
 class MARGINS(ctypes.Structure):
     _fields_ = [("cxLeftWidth", c_int), ("cxRightWidth", c_int), ("cyTopHeight", c_int), ("cyBottomHeight", c_int)]
+
 
 class ExternalOverlay:
     def __init__(self, target_window: str, ui_to_run: Callable, overlay_name: str = "Overlay"):
@@ -23,12 +25,12 @@ class ExternalOverlay:
         self.target_hwnd = None
         self.overlay_hwnd = None
         self.shutdown_flag = False
-    
+
     def start(self, overlay_delay: float = 0.005):
         ui_thread = threading.Thread(target=self._init_ui)
         ui_thread.start()
         time.sleep(0.5)
-        if(self.target_hwnd == None or self.overlay_hwnd == None):
+        if self.target_hwnd == None or self.overlay_hwnd == None:
             raise Exception("Creating handles failed.")
         hook_thread = threading.Thread(target=self._hook_to_target, args=(overlay_delay,))
         hook_thread.start()
@@ -43,12 +45,17 @@ class ExternalOverlay:
 
     def _set_dpg_win_transparent(self):
         # DPG does not support transparent window/viewport, so it has to be done manually
-        margins = MARGINS(-1, -1,-1, -1)
-        dwm.DwmExtendFrameIntoClientArea(self.overlay_hwnd, margins) 
+        margins = MARGINS(-1, -1, -1, -1)
+        dwm.DwmExtendFrameIntoClientArea(self.overlay_hwnd, margins)
         # Making the overlay click-through
-        win32gui.SetWindowLong(self.overlay_hwnd, win32con.GWL_EXSTYLE, 
-                               win32gui.GetWindowLong(self.overlay_hwnd, win32con.GWL_EXSTYLE) | win32con.WS_EX_LAYERED) # | win32con.WS_EX_TRANSPARENT 
-        win32gui.SetLayeredWindowAttributes(hwnd=self.overlay_hwnd,Key=win32api.RGB(0,0,0),Alpha=0, Flags=win32con.LWA_COLORKEY)
+        win32gui.SetWindowLong(
+            self.overlay_hwnd,
+            win32con.GWL_EXSTYLE,
+            win32gui.GetWindowLong(self.overlay_hwnd, win32con.GWL_EXSTYLE) | win32con.WS_EX_LAYERED,
+        )  # | win32con.WS_EX_TRANSPARENT
+        win32gui.SetLayeredWindowAttributes(
+            hwnd=self.overlay_hwnd, Key=win32api.RGB(0, 0, 0), Alpha=0, Flags=win32con.LWA_COLORKEY
+        )
 
     def _hook_to_target(self, overlay_delay: float):
         while not self.shutdown_flag:
@@ -58,7 +65,15 @@ class ExternalOverlay:
                     break
 
                 tar_rect = win32gui.GetWindowRect(self.target_hwnd)
-                win32gui.SetWindowPos(self.overlay_hwnd, win32con.HWND_TOPMOST, tar_rect[0], tar_rect[1], tar_rect[2]-tar_rect[0], tar_rect[3]-tar_rect[1], win32con.SWP_NOZORDER)
+                win32gui.SetWindowPos(
+                    self.overlay_hwnd,
+                    win32con.HWND_TOPMOST,
+                    tar_rect[0],
+                    tar_rect[1],
+                    tar_rect[2] - tar_rect[0],
+                    tar_rect[3] - tar_rect[1],
+                    win32con.SWP_NOZORDER,
+                )
             except Exception:
                 # Window handles are invalid, stop the thread
                 break
@@ -67,7 +82,7 @@ class ExternalOverlay:
     def stop(self):
         """Signal the overlay to stop and clean up threads"""
         self.shutdown_flag = True
-        
+
     def _init_ui(self):
         dpg.create_context()
 
@@ -80,13 +95,19 @@ class ExternalOverlay:
         else:
             viewport_width, viewport_height = 1920, 1080  # Fallback to common resolution
 
-        dpg.create_viewport(title=self.overlay_name, width=viewport_width, height=viewport_height,
-                           decorated=False, always_on_top=True, clear_color=[0.0,0.0,0.0,0.0]),
+        dpg.create_viewport(
+            title=self.overlay_name,
+            width=viewport_width,
+            height=viewport_height,
+            decorated=False,
+            always_on_top=True,
+            clear_color=[0.0, 0.0, 0.0, 0.0],
+        ),
         dpg.setup_dearpygui()
         dpg.show_viewport()
         self._set_handles()
         self._set_dpg_win_transparent()
-        #dpg.show_style_editor() # for show of Style
+        # dpg.show_style_editor() # for show of Style
         self.ui_to_run(self.target_hwnd)
         dpg.start_dearpygui()
         dpg.destroy_context()

@@ -18,4 +18,6 @@ class ChatState(BaseModel):
     current_phase: int = 1  # Phase counter for detailed mode
     last_structured: Dict[str, Any] = Field(default_factory=dict)  # Last structured response from LLM
     last_reply: Optional[str] = None  # Last raw reply from LLM
-    runtime: Dict[str, Any] = Field(default_factory=dict)  # Stores our runtime for detail mode, used in operations and output
+    runtime: Dict[str, Any] = Field(
+        default_factory=dict
+    )  # Stores our runtime for detail mode, used in operations and output
