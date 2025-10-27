@@ -50,6 +50,7 @@ This project implements a complete Agent-in-the-Loop system that captures, analy
 **Workflow Phases**:
 1. **Prepare & Select**: Load game state and select analysis mode
 2. **Summary**: Generate game situation overview
+2b. **Simple Advice**: Single-call strategic evaluation
 3. **Phase Analysis**: Multi-step strategic evaluation
 4. **Rationale**: Decision reasoning and logic
 5. **Finalize**: Output generation and formatting
@@ -204,6 +205,8 @@ python main.py
   - **Cancel**: Stops current operations immediately
   - **Launch ROI Studio**: Opens calibration tool
   - **Exit System**: Graceful shutdown of all components
+- If Generate Strategy is run with a save_state from the game the detailed pathway is run
+- If Generate Strategy is run without a save_state the simple pathway is activated
 - Progress tracking shows real-time status during processing
 - View strategic recommendations in chatbox overlay
 - Processing time: ~2-2.5 minutes (optimized from 5 minutes)
@@ -256,6 +259,23 @@ When calibrating ROIs for your display:
 5. Use the auto-scaling feature if text appears too small or large
 6. Save templates with descriptive names for easy identification
 
+### Cross-Game Use
+
+**Setting Up the Agentic Framework for Other RTS Games**
+
+The agent's simple pathway is designed to be game-agnostic - you can adapt it to analyse and advise for any RTS title by editing the three prompt files in /prompts.
+
+- Simple_Reading.md
+  Adjust the expected JSON structure here to match your chosen game’s regions of interest (ROIs) and OCR calibration. Each “base” or “zone” should correspond to a measurable area in your                     new game’s UI.
+
+- Simple_Advice.md
+  Redefine what lock, insert, and delete mean within the context of your game. For example, lock could mean “continue this tactic,” delete could mean “avoid this move,” and insert could  mean “add or consider this action.” The JSON output schema must remain unchanged to preserve compatibility.
+
+- Simple_System.md
+  Use this file to describe the core rules of your game - unit types, movement logic, and win conditions. This gives the agent grounding for interpreting the data and generating meaningful advice.
+
+Keep edits minimal and structured. As long as the JSON format and file roles are preserved, the agent will automatically adapt to new RTS environments. When ready use simple pathway to test results.
+
 ## Component Dependencies
 
 ### Screen Reading
@@ -297,7 +317,7 @@ Agent-in-the-Loop-Repository/
 │   │       ├── nodes/           # Analysis pipeline nodes
 │   │       ├── helpers/         # Utility functions
 │   │       ├── validators/      # Data validation logic
-│   │       └── requirements.txt
+│   │       └── prompts/	 # Calibrated prompts for agent
 │   └── visualisation/           # GUI overlay system
 │       ├── main.py              # Application entry point
 │       ├── ui.py                # Interface components
@@ -356,6 +376,6 @@ This project demonstrates practical applications of:
 - **Human-AI interaction** through overlay interfaces
 - **Multi-component system integration** with clear data pipelines
 
-**Author**: Agnet in the Loop - Group 2 
+**Author**: Agent in the Loop - Group 2 
 **Institution**: Edith Cowan University - Computer Science
 **Project Type**: Agent-in-the-Loop Implementation for final Applied Project

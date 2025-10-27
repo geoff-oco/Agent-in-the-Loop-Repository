@@ -6,13 +6,15 @@ from helpers.helpers import Helpers
 from helpers.readers import Readers
 from graph.state import ChatState
 
+
 def node(state: ChatState) -> ChatState:
-    #Grab our LLM and prompts
+
+    # Grab our LLM and prompts
     llm = Helpers.get_langchain_llm(state.model, temperature=0.2, max_tokens=400)
     sys_txt = Readers.read_prompt(state.prompts_dir, "system.md") or ""
     summary_text = (state.runtime or {}).get("summary", "") or ""
 
-    # abridged will be a simplified version of decisions we got from model and how it changed our gamestate
+    # Abridged will be a simplified version of decisions we got from model and how it changed our gamestate
     abridged = {}
     if state.runtime and isinstance(state.runtime.get("phases"), dict):
         try:
@@ -24,44 +26,46 @@ def node(state: ChatState) -> ChatState:
                     }
         except Exception:
             abridged = {}
-    
-    #For the rationale we will package our info into a greater prompt
+
+    # For the rationale we will package our info into a more specified prompt
     content = (
         "Write 3 to 6 concise sentences explaining WHY the chosen plan across the three phases strengthens Blue's position."
         f"We built our startegy off of this original plan:\n\n{state.selected_texts}\n\n"
-        f"Use the summary we built with that strategy guide your rationale:\n\"\"\"\n{summary_text}\n\"\"\"\n"
+        f'Use the summary we built with that strategy guide your rationale:\n"""\n{summary_text}\n"""\n'
         " Mention key tradeoffs or risks briefly.\n"
-        "Return STRICT JSON only:\n{\n  \"rationale\": \"sentence 1 ...\"\n}\n\n"
+        'Return STRICT JSON only:\n{\n  "rationale": "sentence 1 ..."\n}\n\n'
         f"Artifacts (abridged):\n{json.dumps(abridged, ensure_ascii=False)}"
     )
 
-    #Compose everything for the LLM
+    # Compose everything for the LLM
     msgs: List[Any] = [
         SystemMessage(content=sys_txt),
         SystemMessage(content="You MUST answer in strict JSON. No extra keys or markdown."),
         HumanMessage(content=content),
     ]
 
-    #Annnd send it!
+    # Send it
     print("Requesting Rationale...")
     ai: AIMessage = llm.invoke(msgs)
-    #Grab the reply
+
+    # Grab the reply
     raw = getattr(ai, "output_text", None) or getattr(ai, "content", None) or ""
 
-    #Parse the json
+    # Parse the json
     try:
-        data: Dict[str, Any] = Readers.extract_json(raw)  # type: ignore[attr-defined]
+        data: Dict[str, Any] = Readers.extract_json(raw)
         print("Rationale completed!")
     except Exception:
         try:
             data = json.loads(raw or "{}")
         except Exception:
             data = {}
-    #Extract the rationale portion and clean
+
+    # Extract the rationale portion and clean
     rationale = str((data or {}).get("rationale", "")).strip() or raw.strip()
 
     if state.runtime is None:
         state.runtime = {}
-    #Finally append the rationale to our state
+    # Finally append the rationale to our state
     state.runtime["rationale"] = rationale
     return state

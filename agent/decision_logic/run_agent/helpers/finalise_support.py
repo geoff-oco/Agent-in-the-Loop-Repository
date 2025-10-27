@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 
 # Class to help with finalising our output
 class FinaliseSupport:
+
     # Toggle the visibility of some of our validator info
     SHOW_PHASE_STATE_BLOCKS = False
 
@@ -23,7 +24,7 @@ class FinaliseSupport:
     @staticmethod
     def _fmt_transfer(t: Dict[str, Any]) -> str:
 
-        # check we have a transfer and get the verb
+        # Check we have a transfer and get the verb
         verb = "lock" if t.get("locked") else t.get("kind", "")
         return f'{verb} {t.get("from")}->{t.get("to")} ' f'{t.get("L",0)}/{t.get("H",0)}/{t.get("R",0)}'
 
@@ -38,6 +39,7 @@ class FinaliseSupport:
     # This method extracts deleted action IDs from flags
     @staticmethod
     def _deleted_ids_from_flags(flags: List[Any]) -> List[int]:
+
         # Extract deleted action IDs from flags
         out: List[int] = []
         for f in flags or []:
@@ -83,7 +85,7 @@ class FinaliseSupport:
             ph = phases[p]
             lines.append(f"Phase {p}")
 
-            # CERTAIN start from validation hidden with earlier flag, certain start represents the state at the start of the phase unmutated
+            # CERTAIN start from validation hidden with earlier flag, certain start represents the state at the start of the phase
             st = ph.get("start", {})
             if FinaliseSupport.SHOW_PHASE_STATE_BLOCKS:
                 lines.append("Start (CERTAIN)")
@@ -151,7 +153,7 @@ class FinaliseSupport:
             lines.append(rationale.strip())
             lines.append("")
 
-            # Clean it all up and join it allll together
+            # Clean it all up and join it all together
         return "\n".join(lines).strip()
 
     # ---------- simple finalise support ----------
@@ -159,9 +161,11 @@ class FinaliseSupport:
     # Simpler formatting for a single LLM return
     @staticmethod
     def format_simple(simple: Dict[str, Any]) -> str:
+
         # check it is our simple return and give our title
         if not isinstance(simple, dict):
             return "Simple Advice\n\n(no data)"
+
         # Begin lines
         lines: List[str] = ["Simple Advice", ""]
 
@@ -204,7 +208,7 @@ class FinaliseSupport:
         if rat:
             lines += ["Rationale", rat, ""]
 
-        # Sometimes gives optional notes?? I've written this to grab those.
+        # Sometimes gives optional notes? I've written this to grab those.
         if simple.get("notes"):
             lines += ["Notes", str(simple.get("notes")), ""]
 
