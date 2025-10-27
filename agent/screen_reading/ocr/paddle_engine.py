@@ -10,7 +10,10 @@ import time
 
 # Basic environment variables for PaddleOCR
 os.environ["FLAGS_eager_delete_tensor_gb"] = "0.0"
-os.environ["FLAGS_fraction_of_gpu_memory_to_use"] = "0.8"
+# GPU memory allocation: Default 50% (safer for lower-end GPUs), configurable via env var
+# Set PADDLE_GPU_MEMORY_FRACTION=0.8 for high-end systems, or 0.3 for <2GB VRAM GPUs
+default_gpu_memory_fraction = os.getenv("PADDLE_GPU_MEMORY_FRACTION", "0.5")
+os.environ["FLAGS_fraction_of_gpu_memory_to_use"] = default_gpu_memory_fraction
 
 # Import PaddleOCR with fallback handling
 try:
@@ -249,6 +252,7 @@ class PaddleEngine:  # Wrapper for PaddleOCR with lazy initialisation and GPU su
 
     def _generate_optimal_scales(self, image: Image.Image) -> List[float]:
         # Generate test scales targeting 32-48px height range for PaddleOCR
+        # Configurable via OCR_MAX_SCALES env var (default: 5 for accuracy, 3 for speed)
         current_height = image.height
         if current_height == 0:
             return [1.0]
@@ -267,6 +271,12 @@ class PaddleEngine:  # Wrapper for PaddleOCR with lazy initialisation and GPU su
 
         # Sort scales to test most likely optimal first
         scales.sort(key=lambda s: abs(s * current_height - 40))
+
+        # Limit scales if configured (for performance on lower-end systems)
+        max_scales = int(os.getenv("OCR_MAX_SCALES", "5"))
+        if len(scales) > max_scales:
+            scales = scales[:max_scales]
+
         return scales
 
     def _extract_paddle_results(self, results, whitelist: Optional[str], blacklist: Optional[str]) -> Tuple[str, float]:

@@ -26,7 +26,12 @@ import logging
 # Set environment variables to suppress PaddleOCR initialisation output
 os.environ["GLOG_minloglevel"] = "2"  # Suppress INFO and WARNING logs
 os.environ["FLAGS_eager_delete_tensor_gb"] = "0.0"
-os.environ["FLAGS_fraction_of_gpu_memory_to_use"] = "0.8"
+# GPU memory: Use environment variable if set, otherwise defaults to 50% (set in paddle_engine.py)
+# This allows centralized configuration via PADDLE_GPU_MEMORY_FRACTION environment variable
+if "PADDLE_GPU_MEMORY_FRACTION" in os.environ:
+    os.environ["FLAGS_fraction_of_gpu_memory_to_use"] = os.environ["PADDLE_GPU_MEMORY_FRACTION"]
+else:
+    os.environ["FLAGS_fraction_of_gpu_memory_to_use"] = "0.5"
 
 # Configure logging to suppress warnings
 logging.getLogger("paddleocr").setLevel(logging.ERROR)

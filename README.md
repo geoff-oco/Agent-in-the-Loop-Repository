@@ -72,18 +72,63 @@ This project implements a complete Agent-in-the-Loop system that captures, analy
 - `ui.py` - Interface layout and functionality
 - `external_overlay/` - Window management and game integration
 
+## System Requirements
+
+### Minimum (CPU-only)
+- Dual-core CPU (2+ GHz)
+- 4GB RAM
+- Windows 10/11 (64-bit)
+- 1920×1080 or 2560×1440 display
+- Python 3.9+
+
+### Recommended (GPU-accelerated)
+- Quad-core CPU (3+ GHz)
+- 8GB RAM
+- NVIDIA GPU with 2GB+ VRAM (CUDA 11.8)
+- Windows 10/11 (64-bit)
+- Python 3.11
+
+### Performance Tuning
+
+**GPU Memory** (for GPUs with <2GB VRAM):
+```bash
+# PowerShell
+$env:PADDLE_GPU_MEMORY_FRACTION="0.3"
+
+# Command Prompt
+set PADDLE_GPU_MEMORY_FRACTION=0.3
+```
+Default: 50%. Low-end GPUs: 30%. High-end GPUs: 80%.
+
+**OCR Speed** (for older CPUs):
+```bash
+# PowerShell
+$env:OCR_MAX_SCALES="3"
+
+# Command Prompt
+set OCR_MAX_SCALES=3
+```
+Default: 5 scales (accurate). Low-end: 3 scales (40% faster).
+
+Set environment variables before running Python scripts.
+
+### Resource Usage
+- **Memory**: 68-118 MB image processing + 500 MB PaddleOCR models
+- **CPU/GPU**: 4 parallel workers, 50-100% utilization during OCR
+- **Disk**: 50-100 MB per session (auto-cleanup keeps 10 most recent)
+
 ## Quick Start
 
 ### Prerequisites
 
 - **Python 3.9+** (developed with Python 3.11)
 - **RTSViewer game** (included in `system_files/`)
-- **2GB+ RAM** (for PaddleOCR models)
+- **4GB+ RAM**
 - **Windows OS** (for PyWin32 overlay functionality)
 
-**Optional Enhancements**:
-- **NVIDIA GPU** with CUDA for accelerated OCR processing
-- **Tesseract OCR** for additional text recognition engine (see Tesseract installation guide below)
+**Optional**:
+- **NVIDIA GPU** with CUDA 11.8 for faster OCR (2GB+ VRAM recommended)
+- **Tesseract OCR** for backup text recognition (see installation guide below)
 
 ### Installation
 

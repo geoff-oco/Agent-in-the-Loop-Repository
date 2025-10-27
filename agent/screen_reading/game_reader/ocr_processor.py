@@ -1,5 +1,6 @@
 # OCR processing and colour detection for live game reading
 import logging
+import os
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List, Optional, Tuple
@@ -16,8 +17,8 @@ class GameOCRProcessor:  # Handles OCR processing and colour detection for game 
         self.ocr_processor = ocr_processor
         self.screen_capture = screen_capture
         self.output_manager = output_manager
-        # Thread pool for parallel OCR processing
-        self.max_workers = 8  # Configurable number of parallel workers
+        # Thread pool for parallel OCR processing (auto-configured: default 4, min 2)
+        self.max_workers = min(4, max(2, os.cpu_count() or 2))
 
     def _process_single_roi(
         self, roi_name: str, roi: ROIMeta, frame: Image.Image, phase_num: int, is_adjustment: bool = False

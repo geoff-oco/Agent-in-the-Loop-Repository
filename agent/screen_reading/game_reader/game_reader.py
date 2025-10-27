@@ -375,7 +375,7 @@ class LiveGameReader:  # Main game reader orchestrator
             ocr_processor = BulkOCRProcessor(
                 self.game_ocr_processor,  # Pass GameOCRProcessor for full OCR logic
                 self.progress_reporter,
-                max_workers=8,
+                # max_workers auto-configured in BulkOCRProcessor (default: 4, min: 2)
             )
 
             # Process phase screenshots with total task count for accurate progress

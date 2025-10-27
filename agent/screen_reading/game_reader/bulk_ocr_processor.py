@@ -1,12 +1,16 @@
 # Bulk OCR processor for efficient batch processing with mode support
 import logging
+import os
 from typing import Dict, Optional
 from PIL import Image
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 
 class BulkOCRProcessor:
-    def __init__(self, game_ocr_processor, progress_reporter=None, max_workers=8):
+    def __init__(self, game_ocr_processor, progress_reporter=None, max_workers=None):
+        # Auto-configure workers if not specified: default 4, scaled by CPU count with min 2
+        if max_workers is None:
+            max_workers = min(4, max(2, os.cpu_count() or 2))
         self.game_ocr = game_ocr_processor  # Reuse existing GameOCRProcessor with all its logic
         self.progress_reporter = progress_reporter
         self.max_workers = max_workers

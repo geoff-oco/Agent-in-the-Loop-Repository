@@ -4,6 +4,7 @@ from PIL import Image, ImageEnhance, ImageOps, ImageFilter
 import pytesseract
 import re
 import time
+import os
 
 
 class TesseractEngine:
@@ -129,6 +130,7 @@ class TesseractEngine:
 
     def _generate_optimal_scales(self, image: Image.Image, is_single_char: bool) -> List[float]:
         # Generate test scales optimised for Tesseract (1x-3x range)
+        # Configurable via OCR_MAX_SCALES env var (default: 5 for accuracy, 3 for speed)
         if is_single_char:
             # Single characters need more aggressive scaling (2x-3x range)
             scales = [3.0, 2.5, 2.0, 1.5, 1.0]
@@ -144,6 +146,11 @@ class TesseractEngine:
             # Avoid extremely large images that would be slow
             if scaled_width <= 1000 and scaled_height <= 1000:
                 filtered_scales.append(scale)
+
+        # Limit scales if configured (for performance on lower-end systems)
+        max_scales = int(os.getenv("OCR_MAX_SCALES", "5"))
+        if len(filtered_scales) > max_scales:
+            filtered_scales = filtered_scales[:max_scales]
 
         return filtered_scales if filtered_scales else [1.0]
 
