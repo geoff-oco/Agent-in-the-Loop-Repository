@@ -13,6 +13,8 @@ import shutil
 import numpy as np
 from PIL import Image
 import stats
+import platform
+from pathlib import Path
 from typing import Optional
 from win_termination import (
     terminate_process_tree_aggressive,
@@ -93,6 +95,20 @@ def _cleanup_temp_files():
         print("Continuing with startup...")
 
 
+def _get_system_font():
+    # Get system font path for cross-platform support
+    # Returns None if fonts not found (DPG will use built-in defaults)
+    if platform.system() == "Windows":
+        font_regular = Path("C:/Windows/Fonts/segoeui.ttf")
+        font_bold = Path("C:/Windows/Fonts/segoeuib.ttf")
+
+        if font_regular.exists() and font_bold.exists():
+            return str(font_regular), str(font_bold)
+
+    # Fall back to DPG default fonts for non-Windows or missing fonts
+    return None, None
+
+
 running = False  # Only global state flag we need - controls all operations
 hidden = False
 overlay_instance = None
@@ -145,35 +161,44 @@ def ui(tar_hwnd=None, overlay=None):
     font_is_loaded = True
     with dpg.font_registry():
         try:
-            # Load Segoe UI fonts with extended glyph ranges for Unicode support
+            # Load system fonts with extended glyph ranges for Unicode support
             # This fixes '?' characters from LLM output (smart quotes, em dashes, etc.)
+            font_regular_path, font_bold_path = _get_system_font()
 
-            # Regular font for body text (System Output, Chatbox)
-            font_segoeui = dpg.add_font("C:/Windows/Fonts/segoeui.ttf", 7 * FONT_SCALE)
-            # Add default ASCII range (0x0020-0x00FF)
-            dpg.add_font_range_hint(dpg.mvFontRangeHint_Default, parent=font_segoeui)
-            # Add General Punctuation block (U+2000-U+206F) for smart quotes, dashes
-            dpg.add_font_range(0x2000, 0x206F, parent=font_segoeui)
-            # Add Latin Extended-A (U+0100-U+017F) for accented characters
-            dpg.add_font_range(0x0100, 0x017F, parent=font_segoeui)
+            if font_regular_path and font_bold_path:
+                # Regular font for body text (System Output, Chatbox)
+                font_segoeui = dpg.add_font(font_regular_path, 7 * FONT_SCALE)
+                # Add default ASCII range (0x0020-0x00FF)
+                dpg.add_font_range_hint(dpg.mvFontRangeHint_Default, parent=font_segoeui)
+                # Add General Punctuation block (U+2000-U+206F) for smart quotes, dashes
+                dpg.add_font_range(0x2000, 0x206F, parent=font_segoeui)
+                # Add Latin Extended-A (U+0100-U+017F) for accented characters
+                dpg.add_font_range(0x0100, 0x017F, parent=font_segoeui)
 
-            # Bold font for headers and emphasis
-            font_segoeuiBold = dpg.add_font("C:/Windows/Fonts/segoeuib.ttf", 7 * FONT_SCALE)
-            dpg.add_font_range_hint(dpg.mvFontRangeHint_Default, parent=font_segoeuiBold)
-            dpg.add_font_range(0x2000, 0x206F, parent=font_segoeuiBold)
-            dpg.add_font_range(0x0100, 0x017F, parent=font_segoeuiBold)
+                # Bold font for headers and emphasis
+                font_segoeuiBold = dpg.add_font(font_bold_path, 7 * FONT_SCALE)
+                dpg.add_font_range_hint(dpg.mvFontRangeHint_Default, parent=font_segoeuiBold)
+                dpg.add_font_range(0x2000, 0x206F, parent=font_segoeuiBold)
+                dpg.add_font_range(0x0100, 0x017F, parent=font_segoeuiBold)
 
-            # Medium bold font for section titles
-            font_segoeuiBold_medium = dpg.add_font("C:/Windows/Fonts/segoeuib.ttf", 9 * FONT_SCALE)
-            dpg.add_font_range_hint(dpg.mvFontRangeHint_Default, parent=font_segoeuiBold_medium)
-            dpg.add_font_range(0x2000, 0x206F, parent=font_segoeuiBold_medium)
-            dpg.add_font_range(0x0100, 0x017F, parent=font_segoeuiBold_medium)
+                # Medium bold font for section titles
+                font_segoeuiBold_medium = dpg.add_font(font_bold_path, 9 * FONT_SCALE)
+                dpg.add_font_range_hint(dpg.mvFontRangeHint_Default, parent=font_segoeuiBold_medium)
+                dpg.add_font_range(0x2000, 0x206F, parent=font_segoeuiBold_medium)
+                dpg.add_font_range(0x0100, 0x017F, parent=font_segoeuiBold_medium)
 
-            # Large bold font for Stats title
-            font_segoeuiBold_large = dpg.add_font("C:/Windows/Fonts/segoeuib.ttf", 10 * FONT_SCALE)
-            dpg.add_font_range_hint(dpg.mvFontRangeHint_Default, parent=font_segoeuiBold_large)
-            dpg.add_font_range(0x2000, 0x206F, parent=font_segoeuiBold_large)
-            dpg.add_font_range(0x0100, 0x017F, parent=font_segoeuiBold_large)
+                # Large bold font for Stats title
+                font_segoeuiBold_large = dpg.add_font(font_bold_path, 10 * FONT_SCALE)
+                dpg.add_font_range_hint(dpg.mvFontRangeHint_Default, parent=font_segoeuiBold_large)
+                dpg.add_font_range(0x2000, 0x206F, parent=font_segoeuiBold_large)
+                dpg.add_font_range(0x0100, 0x017F, parent=font_segoeuiBold_large)
+            else:
+                # Use DPG default fonts (no custom fonts loaded)
+                print("Using DPG default fonts (system fonts not found)")
+                font_segoeui = None
+                font_segoeuiBold = None
+                font_segoeuiBold_medium = None
+                font_segoeuiBold_large = None
 
             # Store fonts globally for popup access
             font_segoeui_global = font_segoeui
@@ -789,8 +814,8 @@ def _exit_callback(sender, app_data, user_data):
 
     try:
         dpg.set_value("outputText", "EXITING: Shutting down...")
-    except:
-        pass
+    except Exception as e:
+        print(f"Failed to update UI during shutdown: {e}")
 
     # Terminate any running subprocesses
     if current_subprocess:
@@ -798,54 +823,58 @@ def _exit_callback(sender, app_data, user_data):
             if current_subprocess.poll() is None:
                 print(f"Terminating subprocess PID: {current_subprocess.pid}")
                 terminate_process_tree_aggressive(current_subprocess.pid)
-        except:
-            pass
+        except Exception as e:
+            print(f"Failed to terminate subprocess: {e}")
 
     if current_agent_subprocess:
         try:
             if current_agent_subprocess.poll() is None:
                 print(f"Terminating agent subprocess PID: {current_agent_subprocess.pid}")
                 terminate_process_tree_aggressive(current_agent_subprocess.pid)
-        except:
-            pass
+        except Exception as e:
+            print(f"Failed to terminate agent subprocess: {e}")
 
     if current_roi_studio_subprocess:
         try:
             if current_roi_studio_subprocess.poll() is None:
                 print(f"Terminating ROI Studio subprocess PID: {current_roi_studio_subprocess.pid}")
                 terminate_process_tree_aggressive(current_roi_studio_subprocess.pid)
-        except:
-            pass
+        except Exception as e:
+            print(f"Failed to terminate ROI Studio subprocess: {e}")
 
     # Kill any remaining LIVE_GAME_READER processes
     try:
         selective_shutdown()
         print("Selective shutdown completed")
-    except:
-        pass
+    except Exception as e:
+        print(f"Selective shutdown failed: {e}")
 
     # Start delayed nuclear cleanup in background
     try:
         nuclear_shutdown_delayed()
-    except:
-        pass
+    except Exception as e:
+        print(f"Nuclear shutdown failed: {e}")
 
     # Stop overlay
     try:
         if overlay_instance:
             overlay_instance.stop()
-    except:
-        pass
+    except Exception as e:
+        print(f"Overlay stop failed: {e}")
 
     # Stop DearPyGUI
     try:
         dpg.stop_dearpygui()
-    except:
-        pass
+    except Exception as e:
+        print(f"DPG stop failed: {e}")
 
-    # Force exit
+    # Clean shutdown - destroy DPG context and exit properly
     print("Exiting...")
-    os._exit(0)
+    try:
+        dpg.destroy_context()
+    except Exception as e:
+        print(f"Failed to destroy DPG context: {e}")
+    sys.exit(0)
 
 
 # MARK: Chat Callbacks

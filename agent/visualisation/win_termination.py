@@ -45,8 +45,8 @@ def terminate_process_tree_aggressive(pid):
                     kernel32.TerminateProcess(handle, 1)
                     kernel32.CloseHandle(handle)
                     print(f"Force terminated PID {proc.pid}")
-            except:
-                pass
+            except Exception as e:
+                print(f"Failed to terminate process {proc.pid}: {e}")
         return True
     except Exception as e:
         print(f"WinAPI termination failed: {e}")
