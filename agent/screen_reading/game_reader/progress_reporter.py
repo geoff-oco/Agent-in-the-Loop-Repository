@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import logging
 import os
 from datetime import datetime
 from pathlib import Path
@@ -36,8 +37,8 @@ class ProgressReporter:
         try:
             with open(self.progress_file, "w") as f:
                 json.dump(progress_data, f, indent=2)
-        except Exception:
-            pass  # Silently fail - don't break the main process
+        except Exception as e:
+            logging.error(f"Failed to update progress: {e}")
 
     def complete(self, status: str = "Screen reading complete!"):
         progress_data = {
@@ -51,8 +52,9 @@ class ProgressReporter:
         try:
             with open(self.progress_file, "w") as f:
                 json.dump(progress_data, f, indent=2)
-        except Exception:
-            pass
+            logging.info("Progress complete")
+        except Exception as e:
+            logging.error(f"Failed to mark progress complete: {e}")
 
     def error(self, error_message: str):
         progress_data = {
@@ -67,12 +69,13 @@ class ProgressReporter:
         try:
             with open(self.progress_file, "w") as f:
                 json.dump(progress_data, f, indent=2)
-        except Exception:
-            pass
+            logging.error(f"Progress error: {error_message}")
+        except Exception as e:
+            logging.error(f"Failed to report progress error: {e}")
 
     def clear(self):
         if self.progress_file.exists():
             try:
                 self.progress_file.unlink()
-            except Exception:
-                pass
+            except Exception as e:
+                logging.error(f"Failed to clear progress file: {e}")

@@ -288,6 +288,7 @@ class LiveGameReader:  # Main game reader orchestrator
                 # Parse actions and generate capture plan from save_state
                 self.actions_by_phase = SmartCapturePlanner.parse_actions_from_save_state(save_state_data)
                 capture_plan = SmartCapturePlanner.calculate_capture_plan_from_save_state(self.actions_by_phase)
+                logging.info("Save state detected - using enriched capture plan")
                 print(f"Save state detected - Capture plan generated from save_state.json")
                 print(f"  Phases to capture: {capture_plan['phases_to_capture']}")
                 print(f"  Phase modes: {capture_plan['phase_modes']}")
@@ -295,6 +296,7 @@ class LiveGameReader:  # Main game reader orchestrator
 
             elif phase_selection is not None:
                 # User provided phase selection via UI popup
+                logging.info(f"Using user phase selection: phase {phase_selection} has no actions")
                 print(f"Using user-provided phase selection: phase {phase_selection} has no actions")
                 capture_plan = SmartCapturePlanner.calculate_capture_plan_from_user_selection(phase_selection)
                 print(f"  Phases to capture: {capture_plan['phases_to_capture']}")
@@ -303,6 +305,7 @@ class LiveGameReader:  # Main game reader orchestrator
 
             else:
                 # No save_state and no user selection - default to full 3-phase capture
+                logging.info("No save_state - defaulting to simple 3-phase capture")
                 print("No save_state.json found and no user selection - defaulting to full 3-phase capture")
                 capture_plan = {
                     "phases_to_capture": [1, 2, 3],

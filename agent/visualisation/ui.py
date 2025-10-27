@@ -14,6 +14,7 @@ import numpy as np
 from PIL import Image
 import stats
 import platform
+import logging
 from pathlib import Path
 from typing import Optional
 from win_termination import (
@@ -22,6 +23,39 @@ from win_termination import (
     nuclear_shutdown_delayed,
 )
 from agent_bridge import AgentBridge
+
+
+# Logging configuration
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setLevel(logging.INFO)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+
+
+# Error message mapping for user-facing output
+ERROR_MESSAGES = {
+    FileNotFoundError: "Required file not found. Check that RTSViewer is in system_files/ directory.",
+    TimeoutError: "Operation timed out. The process took too long. Please try again.",
+    ConnectionError: "Cannot connect to OpenAI API. Check your internet and API key in .env file.",
+    PermissionError: "Permission denied. Try running as administrator.",
+    ValueError: "Invalid data received. Check that game state is correct.",
+}
+
+
+def get_user_friendly_error(exception):
+    error_type = type(exception)
+    error_str = str(exception)
+
+    # If exception already has a user-friendly message, use it directly
+    if error_str and len(error_str) < 200:
+        return error_str
+
+    # Otherwise use generic mapping
+    base_msg = ERROR_MESSAGES.get(error_type, "An unexpected error occurred")
+    return f"{base_msg}: {error_str}"
 
 
 # Clean up temporary files from previous sessions on startup
@@ -109,6 +143,10 @@ def _get_system_font():
     return None, None
 
 
+# Thread synchronization for shared state
+# Prevents race conditions when multiple threads access global variables
+state_lock = threading.Lock()
+
 running = False  # Only global state flag we need - controls all operations
 hidden = False
 overlay_instance = None
@@ -116,6 +154,19 @@ current_process = None
 current_subprocess = None
 current_agent_subprocess = None
 current_roi_studio_subprocess = None
+
+
+def update_subprocess_state(process_type, process_obj):
+    # Thread-safe update of subprocess global variables
+    # Used by worker threads to safely update subprocess references
+    global current_subprocess, current_agent_subprocess, current_roi_studio_subprocess
+    with state_lock:
+        if process_type == "screen_reading":
+            current_subprocess = process_obj
+        elif process_type == "agent":
+            current_agent_subprocess = process_obj
+        elif process_type == "roi_studio":
+            current_roi_studio_subprocess = process_obj
 
 # Font and theme references for popup windows
 font_segoeui_global = None
@@ -650,6 +701,7 @@ def _generation_callback(sender, app_data, user_data):
     Called on button press"""
     global running
 
+    logging.info("Generate Strategy button clicked")
     print("Generate Strategy button pressed")
 
     # Clear chatbox and stats panel for fresh run
@@ -668,6 +720,7 @@ def _stopButton_callback(sender, app_data, user_data):
     """Cancel button - stops current operation"""
     global running, current_subprocess, current_agent_subprocess
 
+    logging.info("Cancel button clicked - stopping all operations")
     print("CANCEL BUTTON PRESSED")
     running = False  # Stop all loops
 
@@ -691,7 +744,7 @@ def _stopButton_callback(sender, app_data, user_data):
                 terminate_process_tree_aggressive(current_subprocess.pid)
         except Exception as e:
             print(f"Error terminating screen reading subprocess: {e}")
-        current_subprocess = None
+        update_subprocess_state("screen_reading", None)
 
     # 2. Agent strategy generation subprocess
     if current_agent_subprocess:
@@ -701,7 +754,7 @@ def _stopButton_callback(sender, app_data, user_data):
                 terminate_process_tree_aggressive(current_agent_subprocess.pid)
         except Exception as e:
             print(f"Error terminating agent subprocess: {e}")
-        current_agent_subprocess = None
+        update_subprocess_state("agent", None)
 
     # Clean up progress file
     try:
@@ -733,17 +786,20 @@ def _launch_roi_studio_callback(sender, app_data, user_data):
             return
         else:
             # Process finished - clean up reference
-            current_roi_studio_subprocess = None
+            update_subprocess_state("roi_studio", None)
 
     try:
+        logging.info("Launching ROI Studio")
         print("Launching ROI Studio...")
         # Get the project root directory
         project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         roi_studio_path = os.path.join(project_root, "screen_reading", "LIVE_ROI_STUDIO.py")
 
         # Launch ROI Studio as a separate process
-        current_roi_studio_subprocess = subprocess.Popen([sys.executable, roi_studio_path], cwd=project_root)
-        print(f"ROI Studio launched from: {roi_studio_path} (PID: {current_roi_studio_subprocess.pid})")
+        roi_process = subprocess.Popen([sys.executable, roi_studio_path], cwd=project_root)
+        update_subprocess_state("roi_studio", roi_process)
+        logging.info(f"ROI Studio launched with PID: {roi_process.pid}")
+        print(f"ROI Studio launched from: {roi_studio_path} (PID: {roi_process.pid})")
 
         # Disable the button while ROI Studio is running
         dpg.disable_item("roi_studio_button")
@@ -752,8 +808,9 @@ def _launch_roi_studio_callback(sender, app_data, user_data):
         threading.Thread(target=_monitor_roi_studio, daemon=True).start()
 
     except Exception as e:
+        logging.error(f"Failed to launch ROI Studio: {e}")
         print(f"Failed to launch ROI Studio: {e}")
-        current_roi_studio_subprocess = None
+        update_subprocess_state("roi_studio", None)
 
 
 def _monitor_roi_studio():
@@ -773,7 +830,7 @@ def _monitor_roi_studio():
         print(f"Error monitoring ROI Studio: {e}")
     finally:
         # Process finished - re-enable button
-        current_roi_studio_subprocess = None
+        update_subprocess_state("roi_studio", None)
 
         # Thread-safe UI update
         try:
@@ -802,6 +859,7 @@ def _hide_callback(sender, app_data, user_data):
 def _exit_callback(sender, app_data, user_data):
     """Exit System button - shuts down everything and exits"""
     global overlay_instance, running, current_subprocess, current_agent_subprocess, current_roi_studio_subprocess
+    logging.info("Exit System button clicked - shutting down")
     print("EXIT SYSTEM BUTTON PRESSED")
 
     running = False  # Stop all loops
@@ -898,6 +956,7 @@ def _process_chat_message(user_question):
     try:
         from pathlib import Path
 
+        logging.info("Processing chat message")
         project_root = Path(__file__).parent.parent.parent
         agent_dir = project_root / "agent" / "decision_logic" / "run_agent"
         game_state_dir = agent_dir / "game_state"
@@ -927,13 +986,16 @@ def _process_chat_message(user_question):
         if not answer:
             raise Exception("No response from chat system")
 
+        logging.info("Chat response received")
         current_log = dpg.get_value("chatLog")
         updated = current_log.replace("Agent: Thinking...", f"Agent: {answer}")
         _safe_dpg_call(dpg.set_value, "chatLog", updated)
 
     except Exception as e:
+        logging.error(f"Chat message failed: {e}")
+        user_msg = get_user_friendly_error(e)
         current_log = dpg.get_value("chatLog")
-        updated = current_log.replace("Agent: Thinking...", f"Agent: Error - {str(e)}")
+        updated = current_log.replace("Agent: Thinking...", f"Agent: {user_msg}")
         _safe_dpg_call(dpg.set_value, "chatLog", updated)
 
 
@@ -1167,7 +1229,7 @@ def _launch_subprocess_with_phase_selection(phase_selection: Optional[int]):
     global current_subprocess, current_process, running
 
     current_process = None
-    current_subprocess = None
+    update_subprocess_state("screen_reading", None)
 
     # Now display warning message
     warning_msg = "=== IMPORTANT: DO NOT MOVE MOUSE ===\n"
@@ -1304,6 +1366,7 @@ def _run_agent_strategy():
 
     # Generate strategy using the agent bridge
     try:
+        logging.info("Starting AI strategy generation")
         _safe_dpg_call(dpg.set_value, "outputText", "STRATEGY GENERATION: Initialising agent...")
 
         # Create agent bridge
@@ -1321,7 +1384,7 @@ def _run_agent_strategy():
 
         # Store subprocess in global for cancel button access
         if process_holder[0] is not None:
-            current_agent_subprocess = process_holder[0]
+            update_subprocess_state("agent", process_holder[0])
 
         # Check if operation was cancelled during execution
         if not running:
@@ -1332,6 +1395,7 @@ def _run_agent_strategy():
         if success:
             # Strategy generated successfully - display it only if still running
             if running:
+                logging.info("AI strategy generation completed successfully")
                 _safe_dpg_call(dpg.set_value, "outputText", f"STRATEGY GENERATED:\n\n{result}")
                 _safe_dpg_call(dpg.set_value, "chatLog", "Strategy ready! Ask questions about it.")
                 print("Strategy generation completed successfully")
@@ -1341,6 +1405,7 @@ def _run_agent_strategy():
         else:
             # Error occurred - display only if still running
             if running:
+                logging.error(f"AI strategy generation failed: {result}")
                 _safe_dpg_call(
                     dpg.set_value,
                     "outputText",
@@ -1349,14 +1414,15 @@ def _run_agent_strategy():
                 print(f"Strategy generation failed: {result}")
 
     except Exception as e:
-        error_msg = f"Error in strategy generation: {str(e)}"
+        logging.error(f"AI strategy generation error: {e}")
+        error_msg = get_user_friendly_error(e)
         if running:  # Only display error if not cancelled
             _safe_dpg_call(dpg.set_value, "outputText", f"STRATEGY GENERATION ERROR:\n\n{error_msg}")
         print(error_msg)
 
     # Reset UI state when done
     running = False
-    current_agent_subprocess = None
+    update_subprocess_state("agent", None)
     _change_ui_state(False)
 
 
@@ -1602,6 +1668,7 @@ def _run_agent(phase_selection: Optional[int] = None):
         screen_reading_dir = os.path.join(project_root, "agent", "screen_reading")
         game_reader_path = os.path.join(screen_reading_dir, "LIVE_GAME_READER.py")
 
+        logging.info(f"Starting screen reading: {game_reader_path}")
         print(f"Launching LIVE_GAME_READER from: {game_reader_path}")
         print(f"Working directory: {screen_reading_dir}")
 
@@ -1614,25 +1681,26 @@ def _run_agent(phase_selection: Optional[int] = None):
             print(f"Passing --phase-selection {phase_selection} to LIVE_GAME_READER")
 
         # Run LIVE_GAME_READER as subprocess with screen_reading as working directory
-        current_subprocess = subprocess.Popen(
+        screen_process = subprocess.Popen(
             cmd,
             cwd=screen_reading_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
         )
+        update_subprocess_state("screen_reading", screen_process)
 
         # Wait for completion while checking for cancellation
         stdout_data = ""
         stderr_data = ""
 
         try:
-            stdout_data, stderr_data = current_subprocess.communicate(timeout=300)  # 5 minute timeout
-            result_returncode = current_subprocess.returncode
+            stdout_data, stderr_data = screen_process.communicate(timeout=300)  # 5 minute timeout
+            result_returncode = screen_process.returncode
         except subprocess.TimeoutExpired:
             if running:  # Only kill if not already cancelled
-                current_subprocess.kill()
-                stdout_data, stderr_data = current_subprocess.communicate()
+                screen_process.kill()
+                stdout_data, stderr_data = screen_process.communicate()
             result_returncode = -1
 
         # Prepare output for display
@@ -1645,10 +1713,13 @@ def _run_agent(phase_selection: Optional[int] = None):
         output_text += f"Exit Code: {result_returncode}\n"
 
         if result_returncode == 0:
+            logging.info("Screen reading completed successfully")
             output_text += "SUCCESS: Game reading completed"
         elif result_returncode == -1:
+            logging.warning("Screen reading timed out")
             output_text += "TIMEOUT: Game reading timed out"
         else:
+            logging.error(f"Screen reading failed with exit code {result_returncode}")
             output_text += "FAILED: Game reading failed"
 
         # Write output to file for UI to read
@@ -1657,11 +1728,13 @@ def _run_agent(phase_selection: Optional[int] = None):
             f.write(output_text)
 
     except subprocess.TimeoutExpired:
+        logging.error("Screen reading timed out after 5 minutes")
         output_text = "ERROR: LIVE_GAME_READER timed out after 5 minutes"
         output_file = os.path.join(os.path.dirname(__file__), "finalOutput.txt")
         with open(output_file, "w", encoding="utf-8") as f:
             f.write(output_text)
     except Exception as e:
+        logging.error(f"Failed to launch screen reading: {e}")
         output_text = f"ERROR: Failed to launch LIVE_GAME_READER: {str(e)}"
         output_file = os.path.join(os.path.dirname(__file__), "finalOutput.txt")
         with open(output_file, "w", encoding="utf-8") as f:
