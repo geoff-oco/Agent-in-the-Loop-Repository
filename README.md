@@ -256,7 +256,7 @@ python main.py
 - If Generate Strategy is run without a save_state the simple pathway is activated
 - Progress tracking shows real-time status during processing
 - View strategic recommendations in chatbox overlay
-- Processing time: ~2-2.5 minutes (optimized from 5 minutes)
+- Processing time: ~2-2.5 minutes (optimised from 5 minutes)
 
 ## ROI Templates and Calibration
 
@@ -265,7 +265,7 @@ python main.py
 The system uses **Region of Interest (ROI) templates** to identify and extract text from specific areas of the game interface. These templates are stored in the `rois/main/` directory and contain:
 
 - **Coordinate positions** for each text region
-- **Preprocessing method** optimized for that specific region
+- **Preprocessing method** optimised for that specific region
 - **Text validation patterns** to ensure accurate recognition
 - **Auto-scaling settings** for optimal OCR performance
 
@@ -278,7 +278,7 @@ The `LIVE_GAME_READER.py` script:
 4. **Bulk capture phase (~15s)**: Captures all screenshots with mouse lock
 5. **Batch OCR phase (~2min)**: User freed, parallel processing of all captures
 6. Applies calibrated preprocessing and validates against patterns
-7. Generates game_state.json AND real-time stats.txt with simulation data
+7. Generates game_state.json AND real-time stats.json with simulation data
 
 ### Resolution and Multi-Monitor Support
 
@@ -293,18 +293,17 @@ The `LIVE_GAME_READER.py` script:
 - Navigation (button clicks) works correctly across all monitor setups
 
 **If auto-detection doesn't work for your setup**:
-- Run `python LIVE_ROI_STUDIO.py` to create custom templates for your resolution
+- Run `python LIVE_ROI_STUDIO.py` to create custom templates for your resolution or launch via main UI system.
 - Save templates with `_custom.json` suffix to be used as fallback
 
 ### Calibration Best Practices
 
 When calibrating ROIs for your display:
-1. Ensure RTSViewer is running at your native resolution
-2. Draw ROI boxes tightly around text regions to minimize noise
-3. Test multiple preprocessing methods to find the most accurate one
-4. Define validation patterns to catch OCR errors
-5. Use the auto-scaling feature if text appears too small or large
-6. Save templates with descriptive names for easy identification
+1. Ensure RTSViewer is running at your native resolution and is full-screen windowed for consistency.
+2. Draw ROI boxes tightly around text regions to minimize noise, preview image button to refine in real-time.
+3. Test multiple preprocessing methods to find the most accurate one or use auto for consistent results.
+4. Define validation patterns to catch OCR errors and refine expected output.
+5. Save templates with descriptive names for easy identification and appropriate mapping in processing code.
 
 ### Cross-Game Use
 
@@ -384,25 +383,22 @@ Agent-in-the-Loop-Repository/
 **Code Standards**:
 - **Python 3.9+** compatibility
 - **Modular architecture** with clear component separation
-- **Error handling** for robust computer vision processing
+- **Error handling** for robust processing and graceful fallbacks to improve adaptability to inconsistent results
 - **Logging infrastructure** for debugging and monitoring
 
 **Performance Considerations**:
-- **GPU acceleration** available for PaddleOCR
-- **Threaded execution** in GUI for responsiveness
-- **Efficient screen capture** with MSS library
-- **Pattern-based validation** prioritizes accuracy over speed
+- **GPU acceleration** available for PaddleOCR with Nvidia GPU's CUDA infrastructure, with configurable VRAM allocation
+- **Threaded execution** in GUI for responsiveness, with configurable thread allocation
+- **Efficient screen capture** with MSS library, all done in batch and stored in memory at the beginning of processing
+- **Pattern-based validation** assists ocr packages in narrowing expected values to recognise and prevents false early exiting with dynamic confidence adjustments with expected patterns
 
 ## Troubleshooting
 
 **Screen Reading Issues**:
 - Ensure RTSViewer is running before calibration
-- Try different OCR preprocessing methods for poor accuracy
-- Use auto-scaling feature for optimal text size
-- Run as administrator if screen capture fails
-- If processing is slow, verify GPU acceleration is enabled for PaddleOCR
-- Check that parallel processing shows "(Parallel)" in phase headers
-- For multi-monitor issues, ensure RTSViewer is visible on the detected monitor
+- Poor OCR confidence/results - test roi's with test all ROI's button, remove early exiting to determine any issues, refine region to reduce noise, reduce load on CPU/GPU while processing occurring.
+- If processing is slow, verify GPU acceleration is enabled for PaddleOCR if applicable, reduce any external load on system whilst processing occuring, ensure all regions have readable characters (blank captures confuse the algorithm and increase processing as all early-exits fail and entire processing loop is exhausted)
+- Ensure RTSViewer is visible on the detected monitor and all regions are visible during captures, review captures taken to confirm
 - If resolution detection fails, check that ROI files exist for your resolution or use _custom fallback
 
 **AI Analysis Issues**:
@@ -423,6 +419,6 @@ This project demonstrates practical applications of:
 - **Human-AI interaction** through overlay interfaces
 - **Multi-component system integration** with clear data pipelines
 
-**Author**: Agent in the Loop - Group 2 
+**Author/s**: Agent in the Loop - Group 2 (Brody Orchard, Geoffrey O'Connell, Scott Taylor, Alexia Aletia, Sam Scammel)
 **Institution**: Edith Cowan University - Computer Science
 **Project Type**: Agent-in-the-Loop Implementation for final Applied Project
