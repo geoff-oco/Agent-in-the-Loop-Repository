@@ -154,7 +154,7 @@ pip install --upgrade pip || python.exe -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-4. **Configure environment** (create `.env` file):
+4. **Configure environment** (create `.env` file in repository root):
 ```env
 OPENAI_API_KEY=your_openai_api_key_here
 MODEL_NAME=gpt-4o-mini
@@ -162,6 +162,12 @@ PROMPTS_DIR=./prompts
 STRATEGIES_DIR=./strategies
 GAME_STATE_PATH=./game_state
 ```
+
+**Note**: A template file `.env.example` is provided in the repository root. Copy it to `.env` and configure:
+- **OPENAI_API_KEY** (Required): Your OpenAI API key from https://platform.openai.com/api-keys
+- **MODEL_NAME** (Required): AI model to use (gpt-4o-mini recommended)
+- **PADDLE_GPU_MEMORY_FRACTION** (Optional): GPU memory allocation (default 0.5 = 50%)
+- **OCR_MAX_SCALES** (Optional): OCR scale testing iterations (default 5, use 3 for faster processing)
 
 5. **Install Tesseract OCR**:
 

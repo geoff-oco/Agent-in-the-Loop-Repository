@@ -51,3 +51,10 @@ nul
 
 # Screen reading output (session captures, OCR results)
 agent/screen_reading/output/
+
+# Agent decision logic runtime files
+agent/decision_logic/run_agent/agent_replies/*.txt
+agent/decision_logic/run_agent/game_state/*.json
+
+# Visualisation runtime output
+agent/visualisation/finalOutput.txt
