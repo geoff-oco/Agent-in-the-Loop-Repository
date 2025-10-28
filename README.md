@@ -193,6 +193,8 @@ If Tesseract is not found automatically, you may need to set the path in your Py
 
 ### Usage Workflow
 
+**Important**: Launch RTSViewer manually first, then run the system.
+
 #### Option 1: Integrated System Launch (Recommended)
 
 **One-click system startup**:
@@ -200,7 +202,7 @@ If Tesseract is not found automatically, you may need to set the path in your Py
 # From repository root
 start_system.bat
 ```
-This launches both RTSViewer and the integrated visualization overlay with all components ready.
+This launches the visualization overlay system. **Prerequisite**: RTSViewer must be running before executing this command.
 
 #### Option 2: Manual Component Launch
 
