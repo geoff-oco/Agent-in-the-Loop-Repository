@@ -349,39 +349,104 @@ Keep edits minimal and structured. As long as the JSON format and file roles are
 
 ## Project Structure
 
+### High-Level Overview
+
+```
+Agent-in-the-Loop-Repository/
+├── agent/                       # Core system components
+│   ├── screen_reading/          # Computer vision & OCR for game state extraction
+│   ├── decision_logic/          # AI strategic analysis using LangGraph & OpenAI
+│   └── visualisation/           # GUI overlay and user interaction system
+├── system_files/                # RTSViewer game executable and runtime files
+├── project_context/             # Project documentation, proposals, and references
+├── requirements.txt             # Python dependencies for entire system
+├── start_system.bat             # One-click launcher (activates venv, starts UI)
+├── .env.example                 # Environment configuration template
+└── README.md                    # System documentation
+```
+
+**Data Flow**: Screen Reading → JSON → Decision Logic → TXT → Visualisation → User
+
+### Detailed Structure
+
 ```
 Agent-in-the-Loop-Repository/
 ├── agent/
 │   ├── screen_reading/          # Computer vision & OCR system
-│   │   ├── LIVE_ROI_STUDIO.py   # Interactive calibration tool
-│   │   ├── LIVE_GAME_READER.py  # Automated reading system
-│   │   ├── roi_studio/          # GUI components for setup
-│   │   ├── game_reader/         # Automation engine
+│   │   ├── LIVE_ROI_STUDIO.py   # Interactive calibration tool for ROI setup
+│   │   ├── LIVE_GAME_READER.py  # Automated game state extraction
 │   │   ├── core/                # Data models and validation
+│   │   │   ├── models.py        # ROIMeta, OCRResult dataclasses
+│   │   │   ├── roi_manager.py   # ROI loading, saving, resolution detection
+│   │   │   └── validators.py    # Pattern-based text validation
 │   │   ├── ocr/                 # OCR processing pipeline
+│   │   │   ├── processor.py     # Main OCR interface and method selection
+│   │   │   ├── paddle_engine.py # PaddleOCR implementation (primary)
+│   │   │   ├── tesseract_engine.py  # Tesseract implementation (fallback)
+│   │   │   └── engine_selector.py   # Automatic OCR engine selection
 │   │   ├── imaging/             # Computer vision utilities
+│   │   │   ├── capture.py       # MSS screen capture functionality
+│   │   │   ├── preprocessor.py  # 5 preprocessing methods for OCR
+│   │   │   └── utils.py         # Image manipulation helpers
+│   │   ├── game_reader/         # Automation engine
+│   │   │   ├── game_reader.py   # Main orchestrator for 3-phase workflow
+│   │   │   ├── bulk_capture_manager.py    # Batch screenshot capture (~15s)
+│   │   │   ├── bulk_ocr_processor.py      # Parallel OCR processing (8 workers)
+│   │   │   ├── smart_capture_planner.py   # Phase skip logic via save_state
+│   │   │   ├── game_state_manager.py      # JSON game state construction
+│   │   │   ├── navigation_controller.py   # UI navigation and button clicks
+│   │   │   └── stats_reporter.py          # Statistics generation (units, actions)
+│   │   ├── roi_studio/          # GUI components for calibration
+│   │   │   ├── studio.py        # Main ROI Studio interface
+│   │   │   ├── ui_components.py # DearPyGUI UI layout and callbacks
+│   │   │   ├── template_manager.py    # ROI template saving and loading
+│   │   │   └── ocr_tester.py    # Real-time OCR testing interface
+│   │   ├── parsers/             # Data parsing utilities
+│   │   │   ├── save_state_parser.py   # Parses save_state.json from game
+│   │   │   └── game_state_merger.py   # Merges OCR + save_state data
 │   │   ├── rois/                # ROI templates and configurations
-│   │   └── requirements.txt
+│   │   │   ├── rois_main/       # Active ROI templates (2560x1440, 1920x1080, custom)
+│   │   │   ├── template_images/ # Template matching images for navigation
+│   │   │   └── template_rois/   # Template ROI definitions for matching
+│   │   ├── output/              # Session outputs (game_state JSON, stats, captures, logs)
+│   │   └── requirements.txt     # Screen reading dependencies
 │   ├── decision_logic/          # AI analysis system
 │   │   └── run_agent/
-│   │       ├── run_agent.py     # Main agent entry point
+│   │       ├── run_agent.py     # Main agent entry point (takes JSON filename)
+│   │       ├── chat_discuss.py  # Conversational follow-up Q&A
 │   │       ├── graph/           # LangGraph workflow definition
+│   │       │   ├── graph.py     # Workflow nodes and conditional routing
+│   │       │   └── state.py     # ChatState Pydantic model
 │   │       ├── nodes/           # Analysis pipeline nodes
+│   │       │   ├── prepare_select.py  # Loads game state, selects strategy
+│   │       │   ├── summary.py         # Generates situation overview
+│   │       │   ├── phase_step.py      # Analyses individual phase (loops 1-3)
+│   │       │   ├── rationale.py       # Decision reasoning synthesis
+│   │       │   ├── finalise.py        # Formats final output
+│   │       │   └── simple_advice.py   # Quick advice mode (bypasses phases)
 │   │       ├── helpers/         # Utility functions
+│   │       │   ├── helpers.py   # LLM initialisation and utilities
+│   │       │   ├── readers.py   # Prompt and JSON file reading
+│   │       │   └── phase_math.py # Phase calculations and unit math
 │   │       ├── validators/      # Data validation logic
-│   │       └── prompts/	 # Calibrated prompts for agent
+│   │       ├── prompts/         # AI prompts (system, advice, reading)
+│   │       ├── strategies/      # Strategic approach templates (6 strategies)
+│   │       ├── game_state/      # Working directory for JSON inputs
+│   │       ├── agent_replies/   # Working directory for TXT outputs
+│   │       └── requirements.txt # Decision logic dependencies
 │   └── visualisation/           # GUI overlay system
 │       ├── main.py              # Application entry point
-│       ├── ui.py                # Interface components
-│       ├── external_overlay/    # Window management
-│       ├── agent_bridge.py      # Integration between components
-│       ├── win_termination.py   # Process management utilities
-│       └── finalOutput.txt      # AI analysis results
-├── system_files/                # RTSViewer game files
-├── project_context/             # Documentation and references
-├── requirements.txt             # Combined dependencies
-├── start_system.bat             # One-click system launcher
-└── README.md                    # This file
+│       ├── ui.py                # Interface layout, callbacks, progress tracking
+│       ├── agent_bridge.py      # Bridges screen reading output to agent input
+│       ├── win_termination.py   # Process tree termination utilities
+│       └── external_overlay/    # Window management for RTSViewer hooking
+├── system_files/                # RTSViewer game executable and files
+├── project_context/             # Documentation and project references
+├── requirements.txt             # Combined dependencies for entire system
+├── start_system.bat             # One-click system launcher (venv + main.py)
+├── .env.example                 # Environment configuration template
+├── .gitignore                   # Git exclusions
+└── README.md                    # System readme
 ```
 
 ## Development Notes
