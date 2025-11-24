@@ -2,6 +2,14 @@
 
 *An intelligent real-time strategy game analysis system combining computer vision, AI decision-making, and interactive visualization.*
 
+## About this project
+
+This repository is a fork of Agent-in-the-Loop-Repository(https://github.com/B0rc/Agent-in-the-Loop-Repository), developed as part of my capstone research project at Edith Cowan University.
+
+**My role & contributions:**
+- Designed and implemented the Langgraph Agent for LLM assisted analysis of RTS style strategic simulations.
+- Wrote all modules and prompt logic contained within decision_logic/run_agent.
+
 ## System Overview
 
 This project implements a complete Agent-in-the-Loop system that captures, analyzes, and provides strategic advice for real-time strategy games. The system consists of three integrated components working together to create an intelligent game analysis pipeline.
